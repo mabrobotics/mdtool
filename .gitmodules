@@ -1,0 +1,3 @@
+[submodule "md80_usbcan"]
+	path = md80_usbcan
+	url = git@gitlab.com:MAB_Robotics/md80_usbcan.git

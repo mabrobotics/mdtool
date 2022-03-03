@@ -1,0 +1,3 @@
+build/*
+.vscode/*
+package/md_tools

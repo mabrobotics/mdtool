@@ -1,0 +1,5 @@
+Package: md_tools
+Version: 0.1
+Maintainer: Jakub Matyszczak
+Architecture: x86_64
+Description: Tools for configuring md80 motor drives.
