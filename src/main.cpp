@@ -8,7 +8,10 @@ int main(int argc, char**argv)
         args.emplace_back(argv[i]);
         
     if(args.size() < 2)
+    {
         ui::printTooFewArgs();
+        return 2;
+    }
     
     MainWorker program(args);
     
