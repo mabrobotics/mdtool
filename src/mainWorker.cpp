@@ -14,16 +14,22 @@ enum class toolsOptions_E
     NONE,
     CURRENT,
     CAN,
-    SAVE
+    SAVE,
+    ZERO,
+    CALIBRATION
 };
 toolsOptions_E str2option(std::string&opt)
 {
-    if(opt == "ping")
+    if(opt == "current")
         return toolsOptions_E::CURRENT;
     if(opt == "can")
         return toolsOptions_E::CAN;
+    if(opt == "zero")
+        return toolsOptions_E::ZERO;
     if(opt == "save")
         return toolsOptions_E::SAVE;
+    if(opt == "calibration")
+        return toolsOptions_E::CALIBRATION;
     return toolsOptions_E::NONE;
 }
 toolsCmd_E str2cmd(std::string&cmd)
@@ -76,10 +82,16 @@ MainWorker::MainWorker(std::vector<std::string>&args)
         toolsOptions_E option = str2option(args[2]);
         if (option == toolsOptions_E::CAN)
             configCan(args);
+        if (option == toolsOptions_E::SAVE)
+            configSave(args);
+        if (option == toolsOptions_E::ZERO)
+            configZero(args);
+        if (option == toolsOptions_E::CURRENT)
+            configCurrent(args);
         break;
     }
     case toolsCmd_E::SETUP:
-        break;
+        setupCalibration(args);
     default:
         return;
     }
@@ -102,7 +114,36 @@ void MainWorker::configCan(std::vector<std::string>&args)
     candle->configMd80Can(id, new_id, baud, timeout);
     candle->setVebose(printVerbose);
 }
-void MainWorker::setup()
+void MainWorker::configSave(std::vector<std::string>&args)
 {
+    candle->setVebose(true);
 
+    int id = atoi(args[3].c_str());
+    candle->configMd80Save(id);
+
+    candle->setVebose(printVerbose);
+}
+void MainWorker::configZero(std::vector<std::string>&args)
+{
+    candle->setVebose(true);
+    int id = atoi(args[3].c_str());
+    candle->controlMd80SetEncoderZero(id);
+    candle->setVebose(printVerbose);
+}
+void MainWorker::configCurrent(std::vector<std::string>&args)
+{
+    candle->setVebose(true);
+    int id = atoi(args[3].c_str());
+    float currentLimit = atof(args[4].c_str());
+    candle->configMd80SetCurrentLimit(id, currentLimit);
+    candle->setVebose(printVerbose);
+}
+void MainWorker::setupCalibration(std::vector<std::string>&args)
+{
+    candle->setVebose(true);
+    if (!ui::getCalibrationConfirmation())
+        return;
+    int id = atoi(args[3].c_str());
+    candle->setupMd80Calibration(id);
+    candle->setVebose(printVerbose);
 }

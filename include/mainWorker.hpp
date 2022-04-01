@@ -14,5 +14,8 @@ private:
 
     void ping();
     void configCan(std::vector<std::string>&args);
-    void setup();
+    void configSave(std::vector<std::string>&args);
+    void configZero(std::vector<std::string>&args);
+    void configCurrent(std::vector<std::string>&args);
+    void setupCalibration(std::vector<std::string>&args);
 };

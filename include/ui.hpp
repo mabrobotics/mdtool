@@ -10,4 +10,6 @@ namespace ui
     void printHelp();
     void printHelpConfig();
     void printHelpSetup();
+
+    bool getCalibrationConfirmation();
 }
