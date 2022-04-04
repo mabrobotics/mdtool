@@ -34,6 +34,7 @@ void printHelp()
     vout << "\t config [options] [arguments] \t sets configuration options. use `md_tools config` for more info." << std::endl;
     vout << "\t setup [options] \t\t launches a setup procedues. Use `md_tools setup` for more info." << std::endl;
     vout << "\t test [id] [position] \t\t simple test movement from current location to [position]. [position] should be <-10, 10> rad" << std::endl;
+    vout << "\t blink [id] \t\t\t blink LEDs on driver board." << std::endl;
     vout << std::endl;
     vout << "Add '-sv' after arguments to suppress outout" << std::endl;
 }

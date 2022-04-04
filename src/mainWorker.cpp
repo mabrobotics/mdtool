@@ -10,7 +10,8 @@ enum class toolsCmd_E
     PING,
     CONFIG,
     SETUP,
-    TEST
+    TEST,
+    BLINK
 };
 enum class toolsOptions_E
 {
@@ -48,6 +49,8 @@ toolsCmd_E str2cmd(std::string&cmd)
         return toolsCmd_E::SETUP;
     if(cmd == "test")
         return toolsCmd_E::TEST;
+    if(cmd == "blink")
+        return toolsCmd_E::BLINK;
     return toolsCmd_E::NONE;
 }
 
@@ -120,6 +123,11 @@ MainWorker::MainWorker(std::vector<std::string>&args)
     case toolsCmd_E::TEST:
     {
         testMove(args);
+        break;
+    }
+    case toolsCmd_E::BLINK:
+    {
+        blink(args);
         break;
     }
     default:
@@ -201,4 +209,9 @@ void MainWorker::testMove(std::vector<std::string>&args)
 
     candle->end();
     candle->controlMd80Enable(id, false);
+}
+void MainWorker::blink(std::vector<std::string>&args)
+{
+    int id = atoi(args[2].c_str());
+    candle->configMd80Blink(id);
 }

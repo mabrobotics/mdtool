@@ -21,4 +21,5 @@ private:
     void setupDiagnostic(std::vector<std::string>&args);
 
     void testMove(std::vector<std::string>&args);
+    void blink(std::vector<std::string>&args);
 };
