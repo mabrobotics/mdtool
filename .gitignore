@@ -1,4 +1,4 @@
 build/*
 .vscode/*
-package/*/usr/local/bin/mdtool
+package/*/usr/local/bin/
 package/*.deb
