@@ -64,9 +64,11 @@ void printHelpSetup()
     vout << std::endl;
     vout << "Example: " << std::endl;
     vout << "\tmd_tools setup calibration 74" << std::endl;
+    vout << "\tmd_tools setup diagnostic 211" << std::endl;
     vout << std::endl;
     vout << "Supported options: " << std::endl;
     vout << "\t calibration [id] \t\t\t\t Starts motor calibration procedure." << std::endl;
+    vout << "\t diagnostic  [id] \t\t\t\t Prints diagnostic information." << std::endl;
 }
 bool getCalibrationConfirmation()
 {

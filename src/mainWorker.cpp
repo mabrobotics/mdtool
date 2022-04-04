@@ -19,7 +19,8 @@ enum class toolsOptions_E
     CAN,
     SAVE,
     ZERO,
-    CALIBRATION
+    CALIBRATION,
+    DIAGNOSTIC
 };
 toolsOptions_E str2option(std::string&opt)
 {
@@ -33,6 +34,8 @@ toolsOptions_E str2option(std::string&opt)
         return toolsOptions_E::SAVE;
     if(opt == "calibration")
         return toolsOptions_E::CALIBRATION;
+    if(opt == "diagnostic")
+        return toolsOptions_E::DIAGNOSTIC;
     return toolsOptions_E::NONE;
 }
 toolsCmd_E str2cmd(std::string&cmd)
@@ -110,6 +113,8 @@ MainWorker::MainWorker(std::vector<std::string>&args)
             ui::printHelpSetup();
         if (option == toolsOptions_E::CALIBRATION)
             setupCalibration(args);
+        if (option == toolsOptions_E::DIAGNOSTIC)
+            setupDiagnostic(args);
         break;
     }
     case toolsCmd_E::TEST:
@@ -161,6 +166,12 @@ void MainWorker::setupCalibration(std::vector<std::string>&args)
     int id = atoi(args[3].c_str());
     candle->setupMd80Calibration(id);
 }
+void MainWorker::setupDiagnostic(std::vector<std::string>&args)
+{
+    int id = atoi(args[3].c_str());
+    candle->setupMd80Diagnostic(id);
+}
+
 void MainWorker::testMove(std::vector<std::string>&args)
 {
     int id = atoi(args[2].c_str());

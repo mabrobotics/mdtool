@@ -18,6 +18,7 @@ private:
     void configZero(std::vector<std::string>&args);
     void configCurrent(std::vector<std::string>&args);
     void setupCalibration(std::vector<std::string>&args);
+    void setupDiagnostic(std::vector<std::string>&args);
 
     void testMove(std::vector<std::string>&args);
 };
