@@ -27,7 +27,7 @@ void printHelp()
 {
     vout << std::endl;
     vout << "Usage: " << std::endl;
-    vout << "\tmd_tools <command> [arguments | options]" << std::endl;
+    vout << "\tmdtool <command> [arguments | options]" << std::endl;
     vout << std::endl;
     vout << "Supported commands: " << std::endl;
     vout << "\t ping \t\t\t\t discovers all drives available on FDCAN bus." << std::endl;
@@ -42,13 +42,13 @@ void printHelpConfig()
 {
     vout << std::endl;
     vout << "Usage: " << std::endl;
-    vout << "\tmd_tools config [options] [arguments]" << std::endl;
+    vout << "\tmdtool config [options] [arguments]" << std::endl;
     vout << std::endl;
     vout << "Example: " << std::endl;
-    vout << "\tmd_tools config zero 14" << std::endl;
-    vout << "\tmd_tools config can 100 105 8M 100" << std::endl;
-    vout << "\tmd_tools config save 105" << std::endl;
-    vout << "\tmd_tools config current 105 12.5" << std::endl;
+    vout << "\tmdtool config zero 14" << std::endl;
+    vout << "\tmdtool config can 100 105 8M 100" << std::endl;
+    vout << "\tmdtool config save 105" << std::endl;
+    vout << "\tmdtool config current 105 12.5" << std::endl;
     vout << std::endl;
     vout << "Supported options: " << std::endl;
     vout << "\t zero [id] \t\t\t\t sets current drive position as zero reference position." << std::endl;
@@ -61,11 +61,11 @@ void printHelpSetup()
 {
     vout << std::endl;
     vout << "Usage: " << std::endl;
-    vout << "\tmd_tools setup [options] [arguments]" << std::endl;
+    vout << "\tmdtool setup [options] [arguments]" << std::endl;
     vout << std::endl;
     vout << "Example: " << std::endl;
-    vout << "\tmd_tools setup calibration 74" << std::endl;
-    vout << "\tmd_tools setup diagnostic 211" << std::endl;
+    vout << "\tmdtool setup calibration 74" << std::endl;
+    vout << "\tmdtool setup diagnostic 211" << std::endl;
     vout << std::endl;
     vout << "Supported options: " << std::endl;
     vout << "\t calibration [id] \t\t\t\t Starts motor calibration procedure." << std::endl;

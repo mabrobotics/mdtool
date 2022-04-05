@@ -1,5 +1,6 @@
-Package: mdtools
-Version: 0.1
+Package: mdtool
+Version: 1.0
 Maintainer: MAB Robotics <contact@mabrobotics.pl>
 Architecture: amd64
 Description: Tools for configuring md80 motor drives.
+Depends: setserial

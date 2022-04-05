@@ -30,9 +30,9 @@ To build repo to package first build with `make install`. Then go to `package/` 
 ```
 This will create a .deb archive that can be installed with 
 ```
-sudo dpkg -i mdtools_ver-rev_arch.deb
+sudo apt install ./mdtool_xx-x_xx
 ```
 and later uninstalled with 
 ```
-sudo dpkg -r mdtools
+sudo apt remove mdtool
 ```
