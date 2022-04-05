@@ -10,4 +10,7 @@ namespace ui
     void printHelp();
     void printHelpConfig();
     void printHelpSetup();
+
+    bool getCalibrationConfirmation();
+    void printPosition(int id, float pos);
 }
