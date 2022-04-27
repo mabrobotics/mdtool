@@ -14,6 +14,7 @@ make install
 `make` alone is for development, when `make install` is for release - it copies the files to `package/` directory, for easy .deb package creation.
 
 ## Cross compilation
+The tool can be build using native compilers (as above) or using arm32/arm64 compilers ( for usage with embedded computers, mainly Raspbbery Pi).
 ### Dependencies
 for any cross-compilation
 ```
@@ -27,7 +28,25 @@ and for arm64 (aarm64)
 ```
 sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
 ```
-
+### Building
+To build for armhf (arm 32-bit) or aarm64 (arm 64*bit):
+Clean build directory
+```
+cd build
+rm -r *
+```
+Prepare Makefile with proper architecure
+```
+cmake .. -DARCH=armhf
+OR
+cmake .. -DARCH=aarm64
+```
+Build
+```
+make
+OR
+make install
+```
 # .deb package
 Based on :
 https://www.internalpointers.com/post/build-binary-deb-package-practical-guide
