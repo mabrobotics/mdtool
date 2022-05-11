@@ -64,7 +64,7 @@ To build repo to package first build with `make install`. Then go to `package/` 
 ```
 This will create a .deb archive that can be installed with 
 ```
-sudo apt install ./mdtool_xx-x_xx
+sudo apt install ./mdtool_xx-x_xx.deb
 ```
 and later uninstalled with 
 ```
