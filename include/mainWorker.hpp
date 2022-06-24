@@ -22,4 +22,5 @@ private:
 
     void testMove(std::vector<std::string>&args);
     void blink(std::vector<std::string>&args);
+    void encoder(std::vector<std::string>&args);
 };

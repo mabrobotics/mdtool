@@ -30,7 +30,7 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 file(GLOB SRC "src/*.cpp")
 
 set(CANDLE_OMIT_EXAMPLES ON)
-add_subdirectory(md80_usbcan/Candle)
+add_subdirectory(candle/Candle)
 
 add_executable(${PROJECT_NAME} ${SRC})
 target_link_libraries(${PROJECT_NAME} candle)

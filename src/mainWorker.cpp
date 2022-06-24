@@ -11,7 +11,8 @@ enum class toolsCmd_E
     CONFIG,
     SETUP,
     TEST,
-    BLINK
+    BLINK,
+    ENCODER
 };
 enum class toolsOptions_E
 {
@@ -51,6 +52,8 @@ toolsCmd_E str2cmd(std::string&cmd)
         return toolsCmd_E::TEST;
     if(cmd == "blink")
         return toolsCmd_E::BLINK;
+    if(cmd == "encoder")
+        return toolsCmd_E::ENCODER;
     return toolsCmd_E::NONE;
 }
 
@@ -130,6 +133,11 @@ MainWorker::MainWorker(std::vector<std::string>&args)
         blink(args);
         break;
     }
+    case toolsCmd_E::ENCODER:
+    {
+        encoder(args);
+        break;
+    }
     default:
         return;
     }
@@ -178,6 +186,8 @@ void MainWorker::setupDiagnostic(std::vector<std::string>&args)
 {
     int id = atoi(args[3].c_str());
     candle->setupMd80Diagnostic(id);
+    candle->addMd80(id);
+    ui::printDriveInfo(id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity(), candle->md80s[0].getTorque(), 24.0f , candle->md80s[0].getErrorVector());
 }
 
 void MainWorker::testMove(std::vector<std::string>&args)
@@ -214,4 +224,20 @@ void MainWorker::blink(std::vector<std::string>&args)
 {
     int id = atoi(args[2].c_str());
     candle->configMd80Blink(id);
+}
+void MainWorker::encoder(std::vector<std::string>&args)
+{
+    int id = atoi(args[2].c_str());
+    if (!candle->addMd80(id))
+        exit(-1);
+    candle->controlMd80Mode(id, mab::Md80Mode_E::IDLE);
+    candle->controlMd80Enable(id, true);
+    candle->begin();
+
+    while(1)
+    {
+        ui::printPositionAndVelocity(id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity());
+        usleep(100000);
+    }
+    candle->end();
 }

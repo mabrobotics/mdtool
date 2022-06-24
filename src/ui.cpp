@@ -3,9 +3,26 @@
 #include <streambuf>
 #include <iostream>
 
+#define ERROR_BRIDGE_OCP  		    0    // 1
+#define ERROR_BRIDGE_FAULT 		    1    // 2
+#define ERROR_OUT_ENCODER_E		    2    // 4
+#define ERROR_OUT_ENCODER_COM_E 	3    // 8
+#define ERROR_EMPTY3 			    4    // 16           //NOT USED YET
+#define ERROR_EMPTY4 			    5    // 32           //NOT USED YET
+#define ERROR_EMPTY5			    6    // 64           //NOT USED YET
+#define ERROR_EMPTY6			    7    // 128          //NOT USED YET
+
+#define ERROR_UNDERVOLTAGE 		    8 	 // 256
+#define ERROR_OVERVOLTAGE 		    9 	 // 512
+#define ERROR_TEMP_W 			    10	 // 1024         //NOT USED YET
+#define ERROR_TEMP_SD 			    11 	 // 2048
+#define ERROR_CALIBRATION 		    12	 // 4096         //NOT USED YET
+#define ERROR_OCD 				    13	 // 8092
+#define ERROR_CAN_WD 			    14	 // 16384
+#define ERROR_EMPTY7			    15   // 32768        //NOT USED YET
+
 namespace ui
 {
-
 class mystreambuf: public std::streambuf {    };
 mystreambuf nostreambuf;
 std::ostream nocout(&nostreambuf);
@@ -35,6 +52,7 @@ void printHelp()
     vout << "\t setup [options] \t\t launches a setup procedure. Use `mdtool setup` for more info." << std::endl;
     vout << "\t test [id] [position] \t\t simple test movement from current location to [position]. [position] should be <-10, 10> rad" << std::endl;
     vout << "\t blink [id] \t\t\t blink LEDs on driver board." << std::endl;
+    vout << "\t encoder [id] \t\t\t prints current position and velocity in a loop." << std::endl;
     vout << std::endl;
     vout << "Add '-sv' after arguments to suppress output" << std::endl;
 }
@@ -90,6 +108,42 @@ bool getCalibrationConfirmation()
 void printPosition(int id, float pos)
 {
     vout << "Drive " << id << " Position: " << pos << std::endl;
+}
+void printPositionAndVelocity(int id, float pos, float velocity)
+{
+    vout << "Drive " << id << " Position: " << pos << "\tVelocity: " << velocity <<std::endl;
+}
+void printDriveInfo(int id, float pos, float vel, float torque, float temperature, unsigned short error)
+{
+    vout << "Drive " << id << " Position: " << pos << "\tVelocity: " << vel << "\tTorque: " << torque <<std::endl;
+    vout << "Drive " << id << " Temp: " << temperature << "*C\tError: 0x" << std::hex <<(unsigned short)error << std::dec << std::endl;
+    if(error != 0)
+    {
+        vout << "Errors: ";
+        if (error & (1 << ERROR_BRIDGE_OCP))
+            vout << "ERROR_BRIDGE_OCP, ";
+        if (error & (1 << ERROR_BRIDGE_FAULT))
+            vout << "ERROR_BRIDGE_FAULT, ";
+        if (error & (1 << ERROR_OUT_ENCODER_E))
+            vout << "ERROR_OUT_ENCODER_E, ";
+        if (error & (1 << ERROR_OUT_ENCODER_COM_E))
+            vout << "ERROR_OUT_ENCODER_COM_E, ";
+        if (error & (1 << ERROR_UNDERVOLTAGE))
+            vout << "ERROR_UNDERVOLTAGE, ";
+        if (error & (1 << ERROR_OVERVOLTAGE))
+            vout << "ERROR_OVERVOLTAGE, ";
+        if (error & (1 << ERROR_TEMP_W))
+            vout << "ERROR_TEMP_W, ";
+        if (error & (1 << ERROR_TEMP_SD))
+            vout << "ERROR_TEMP_SD, ";
+        if (error & (1 << ERROR_CALIBRATION))
+            vout << "ERROR_CALIBRATION, ";
+        if (error & (1 << ERROR_OCD))
+            vout << "ERROR_OCD, ";
+        if (error & (1 << ERROR_CAN_WD))
+            vout << "ERROR_CAN_WD, ";
+        vout << std::endl;
+    }
 }
 
 }
