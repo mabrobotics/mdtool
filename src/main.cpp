@@ -1,7 +1,7 @@
 #include "mainWorker.hpp"
 #include "ui.hpp"
 
-const std::string version = "v1.0";
+const std::string version = "v1.1";
 
 int main(int argc, char**argv)
 {

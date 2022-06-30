@@ -167,6 +167,7 @@ void MainWorker::configSave(std::vector<std::string>&args)
 void MainWorker::configZero(std::vector<std::string>&args)
 {
     int id = atoi(args[3].c_str());
+    candle->addMd80(id);
     candle->controlMd80SetEncoderZero(id);
 }
 void MainWorker::configCurrent(std::vector<std::string>&args)
@@ -180,14 +181,18 @@ void MainWorker::setupCalibration(std::vector<std::string>&args)
     if (!ui::getCalibrationConfirmation())
         return;
     int id = atoi(args[3].c_str());
-    candle->setupMd80Calibration(id);
+    uint16_t BWHz = atoi(args[4].c_str());
+
+    if(BWHz < BANDWIDTH_MIN)BWHz = BANDWIDTH_MIN;
+    else if(BWHz > BANDWIDTH_MAX)BWHz = BANDWIDTH_MAX;
+    candle->setupMd80Calibration(id,BWHz);
 }
 void MainWorker::setupDiagnostic(std::vector<std::string>&args)
 {
     int id = atoi(args[3].c_str());
     candle->setupMd80Diagnostic(id);
     candle->addMd80(id);
-    ui::printDriveInfo(id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity(), candle->md80s[0].getTorque(), 24.0f , candle->md80s[0].getErrorVector());
+    ui::printDriveInfo(id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity(), candle->md80s[0].getTorque(), candle->md80s[0].getTemperature(), candle->md80s[0].getErrorVector());
 }
 
 void MainWorker::testMove(std::vector<std::string>&args)

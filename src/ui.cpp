@@ -7,7 +7,7 @@
 #define ERROR_BRIDGE_FAULT 		    1    // 2
 #define ERROR_OUT_ENCODER_E		    2    // 4
 #define ERROR_OUT_ENCODER_COM_E 	3    // 8
-#define ERROR_EMPTY3 			    4    // 16           //NOT USED YET
+#define ERROR_PARAM_IDENT 			4    // 16           
 #define ERROR_EMPTY4 			    5    // 32           //NOT USED YET
 #define ERROR_EMPTY5			    6    // 64           //NOT USED YET
 #define ERROR_EMPTY6			    7    // 128          //NOT USED YET
@@ -70,7 +70,7 @@ void printHelpConfig()
     vout << std::endl;
     vout << "Supported options: " << std::endl;
     vout << "\t zero [id] \t\t\t\t sets current drive position as zero reference position." << std::endl;
-    vout << "\t can [id] [new_id] [baudrate] [timeout]  \t changes FDCAN parameters of the drive. [id] - currend drive id, [new_id] - new id to be set " <<
+    vout << "\t can [id] [new_id] [baudrate] [timeout]  changes FDCAN parameters of the drive. [id] - currend drive id, [new_id] - new id to be set " <<
         "[baudrate] - can be either 1M, 2M, 5M or 8M, [timeout] - FDCAN communication watchdog timeout in ms." << std::endl;
     vout << "\t save [id] \t\t\t\t saves current, can(FDCAN) and calibration config to flash, if changed." << std::endl;
     vout << "\t current [id] [current] \t\t sets max phase current the drive will output. Check md80 docs for more info. [current] - current limit in Amps." << std::endl;
@@ -82,12 +82,12 @@ void printHelpSetup()
     vout << "\tmdtool setup [options] [arguments]" << std::endl;
     vout << std::endl;
     vout << "Example: " << std::endl;
-    vout << "\tmdtool setup calibration 74" << std::endl;
+    vout << "\tmdtool setup calibration 74 500" << std::endl;
     vout << "\tmdtool setup diagnostic 211" << std::endl;
     vout << std::endl;
     vout << "Supported options: " << std::endl;
-    vout << "\t calibration [id] \t\t\t\t Starts motor calibration procedure." << std::endl;
-    vout << "\t diagnostic  [id] \t\t\t\t Prints diagnostic information." << std::endl;
+    vout << "\t calibration [id] [torque bandwidth] \t Starts motor calibration procedure for a given torque bandwidth in Hz. For more information please refer to the manual." << std::endl;
+    vout << "\t diagnostic  [id] \t\t\t Prints diagnostic information." << std::endl;
 }
 bool getCalibrationConfirmation()
 {
@@ -128,6 +128,8 @@ void printDriveInfo(int id, float pos, float vel, float torque, float temperatur
             vout << "ERROR_OUT_ENCODER_E, ";
         if (error & (1 << ERROR_OUT_ENCODER_COM_E))
             vout << "ERROR_OUT_ENCODER_COM_E, ";
+        if (error & (1 << ERROR_PARAM_IDENT))
+            vout << "ERROR_PARAM_IDENT, ";
         if (error & (1 << ERROR_UNDERVOLTAGE))
             vout << "ERROR_UNDERVOLTAGE, ";
         if (error & (1 << ERROR_OVERVOLTAGE))

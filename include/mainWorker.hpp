@@ -2,6 +2,8 @@
 
 #include "candle.hpp"
 
+#define BANDWIDTH_MIN	(uint16_t)50
+#define BANDWIDTH_MAX 	(uint16_t)2500
 class MainWorker
 {
 public:
