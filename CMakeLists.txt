@@ -29,12 +29,13 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 
 file(GLOB SRC "src/*.cpp")
 
+set(CANDLE_BUILD_STATIC ON)
 set(CANDLE_OMIT_EXAMPLES ON)
 add_subdirectory(candle/Candle)
 
 add_executable(${PROJECT_NAME} ${SRC})
 target_link_libraries(${PROJECT_NAME} candle)
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/md80_usbcan/Candle/include)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/candle/Candle/include)
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "mdtool")
 
 install(TARGETS ${PROJECT_NAME} 
