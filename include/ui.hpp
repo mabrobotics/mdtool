@@ -5,6 +5,7 @@
 namespace ui
 {
     void printTooFewArgs();
+    void printTooFewArgsNoHelp();
     void printUnknownCmd(std::string arg);
 
     void printHelp();

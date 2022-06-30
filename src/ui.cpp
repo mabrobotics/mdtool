@@ -34,6 +34,11 @@ void printTooFewArgs()
     printHelp();
 }
 
+void printTooFewArgsNoHelp()
+{
+    vout << "Not enough arguments!" << std::endl;
+}
+
 void printUnknownCmd(std::string arg = "")
 {
     vout << "Command '" << arg << "' unknown!" << std::endl;

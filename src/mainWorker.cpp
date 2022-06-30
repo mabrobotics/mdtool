@@ -153,6 +153,12 @@ void MainWorker::ping()
 
 void MainWorker::configCan(std::vector<std::string>&args)
 {
+    if(args.size() != 7)
+    {
+        ui::printTooFewArgsNoHelp();
+        return;
+    }
+
     int id = atoi(args[3].c_str());
     int new_id = atoi(args[4].c_str());
     mab::CANdleBaudrate_E baud = str2baud(args[5]);
@@ -161,23 +167,44 @@ void MainWorker::configCan(std::vector<std::string>&args)
 }
 void MainWorker::configSave(std::vector<std::string>&args)
 {
+    if(args.size() != 4)
+    {
+        ui::printTooFewArgsNoHelp();
+        return;
+    }
     int id = atoi(args[3].c_str());
     candle->configMd80Save(id);
 }
 void MainWorker::configZero(std::vector<std::string>&args)
 {
+    if(args.size() != 4)
+    {
+        ui::printTooFewArgsNoHelp();
+        return;
+    }
     int id = atoi(args[3].c_str());
     candle->addMd80(id);
     candle->controlMd80SetEncoderZero(id);
 }
 void MainWorker::configCurrent(std::vector<std::string>&args)
 {
+    if(args.size() != 5)
+    {
+        ui::printTooFewArgsNoHelp();
+        return;
+    }
     int id = atoi(args[3].c_str());
     float currentLimit = atof(args[4].c_str());
     candle->configMd80SetCurrentLimit(id, currentLimit);
 }
 void MainWorker::setupCalibration(std::vector<std::string>&args)
 {
+    if(args.size() != 5)
+    {
+        ui::printTooFewArgsNoHelp();
+        return;
+    }
+
     if (!ui::getCalibrationConfirmation())
         return;
     int id = atoi(args[3].c_str());
@@ -189,6 +216,11 @@ void MainWorker::setupCalibration(std::vector<std::string>&args)
 }
 void MainWorker::setupDiagnostic(std::vector<std::string>&args)
 {
+    if(args.size() != 4)
+    {
+        ui::printTooFewArgsNoHelp();
+        return;
+    }
     int id = atoi(args[3].c_str());
     candle->setupMd80Diagnostic(id);
     candle->addMd80(id);
@@ -197,6 +229,12 @@ void MainWorker::setupDiagnostic(std::vector<std::string>&args)
 
 void MainWorker::testMove(std::vector<std::string>&args)
 {
+    if(args.size() != 4)
+    {
+        ui::printTooFewArgsNoHelp();
+        return;
+    }
+
     int id = atoi(args[2].c_str());
     float targetPos = atof(args[3].c_str());
     if(targetPos > 10.0f)
@@ -227,11 +265,23 @@ void MainWorker::testMove(std::vector<std::string>&args)
 }
 void MainWorker::blink(std::vector<std::string>&args)
 {
+    if(args.size() != 3)
+    {
+        ui::printTooFewArgsNoHelp();
+        return;
+    }
+
     int id = atoi(args[2].c_str());
     candle->configMd80Blink(id);
 }
 void MainWorker::encoder(std::vector<std::string>&args)
 {
+    if(args.size() != 3)
+    {
+        ui::printTooFewArgsNoHelp();
+        return;
+    }
+
     int id = atoi(args[2].c_str());
     if (!candle->addMd80(id))
         exit(-1);
