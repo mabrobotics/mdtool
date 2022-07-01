@@ -120,11 +120,16 @@ void printPositionAndVelocity(int id, float pos, float velocity)
 }
 void printDriveInfo(int id, float pos, float vel, float torque, float temperature, unsigned short error)
 {
-    vout << "Drive " << id << " Position: " << pos << "\tVelocity: " << vel << "\tTorque: " << torque <<std::endl;
-    vout << "Drive " << id << " Temp: " << temperature << "*C\tError: 0x" << std::hex <<(unsigned short)error << std::dec << std::endl;
+    vout << "Drive " << id << ":" << std::endl;
+    vout << "- position: " << pos << " rad" << std::endl;
+    vout << "- velocity: " << vel << " rad/s" <<  std::endl;
+    vout << "- torque: " << torque << " Nm" <<  std::endl;
+    vout << "- temperature: " << temperature << " *C" << std::endl;
+    vout << "- error: 0x" << std::hex <<(unsigned short)error << std::dec;
+
     if(error != 0)
     {
-        vout << "Errors: ";
+        vout << "  (";
         if (error & (1 << ERROR_BRIDGE_OCP))
             vout << "ERROR_BRIDGE_OCP, ";
         if (error & (1 << ERROR_BRIDGE_FAULT))
@@ -149,8 +154,9 @@ void printDriveInfo(int id, float pos, float vel, float torque, float temperatur
             vout << "ERROR_OCD, ";
         if (error & (1 << ERROR_CAN_WD))
             vout << "ERROR_CAN_WD, ";
-        vout << std::endl;
+        vout << ")";
     }
+    vout << std::endl;
 }
 
 }
