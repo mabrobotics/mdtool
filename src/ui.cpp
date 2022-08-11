@@ -39,6 +39,11 @@ void printTooFewArgsNoHelp()
     vout << "Not enough arguments!" << std::endl;
 }
 
+void printWrongArgumentsSpecified()
+{
+    vout << "Wrong arguments specified!" << std::endl;
+}
+
 void printUnknownCmd(std::string arg = "")
 {
     vout << "Command '" << arg << "' unknown!" << std::endl;
@@ -52,12 +57,13 @@ void printHelp()
     vout << "\tmdtool <command> [arguments | options]" << std::endl;
     vout << std::endl;
     vout << "Supported commands: " << std::endl;
-    vout << "\t ping \t\t\t\t discovers all drives available on FDCAN bus." << std::endl;
+    vout << "\t ping [can speed] discovers all drives available on FDCAN bus at [can speed] (1M/2M/5M/8M), use 'all' keyword for scanning all speeds at once." << std::endl;
     vout << "\t config [options] [arguments] \t sets configuration options. use `mdtool config` for more info." << std::endl;
     vout << "\t setup [options] \t\t launches a setup procedure. Use `mdtool setup` for more info." << std::endl;
     vout << "\t test [id] [position] \t\t simple test movement from current location to [position]. [position] should be <-10, 10> rad" << std::endl;
     vout << "\t blink [id] \t\t\t blink LEDs on driver board." << std::endl;
     vout << "\t encoder [id] \t\t\t prints current position and velocity in a loop." << std::endl;
+    vout << "\t bus [type] \t\t\t changes default CANdle CAN bus [type] (SPI/USB/UART)" << std::endl;
     vout << std::endl;
     vout << "Add '-sv' after arguments to suppress output" << std::endl;
 }
@@ -118,9 +124,10 @@ void printPositionAndVelocity(int id, float pos, float velocity)
 {
     vout << "Drive " << id << " Position: " << pos << "\tVelocity: " << velocity <<std::endl;
 }
-void printDriveInfo(int id, float pos, float vel, float torque, float temperature, unsigned short error)
+void printDriveInfo(int id, float pos, float vel, float torque, float temperature, unsigned short error, mab::CANdleBaudrate_E baud)
 {
     vout << "Drive " << id << ":" << std::endl;
+    vout << "- CAN speed: " << baud << "M" << std::endl;
     vout << "- position: " << pos << " rad" << std::endl;
     vout << "- velocity: " << vel << " rad/s" <<  std::endl;
     vout << "- torque: " << torque << " Nm" <<  std::endl;
@@ -157,6 +164,44 @@ void printDriveInfo(int id, float pos, float vel, float torque, float temperatur
         vout << ")";
     }
     vout << std::endl;
+}
+
+void printScanOutput(mab::Candle* candle)
+{
+    std::cout<<"[MDTOOL] Please be patient, this process can take up to 16 seconds"<<std::endl;
+    std::cout<<"[CANDLE] Pinging drives at 1M CAN speed..."<<std::endl;
+    ui::printFoundDrives(candle->ping(mab::CANdleBaudrate_E::CAN_BAUD_1M));
+    std::cout<<"[CANDLE] Pinging drives at 2M CAN speed..."<<std::endl;
+    ui::printFoundDrives(candle->ping(mab::CANdleBaudrate_E::CAN_BAUD_2M));
+    std::cout<<"[CANDLE] Pinging drives at 5M CAN speed..."<<std::endl;
+    ui::printFoundDrives(candle->ping(mab::CANdleBaudrate_E::CAN_BAUD_5M));
+    std::cout<<"[CANDLE] Pinging drives at 8M CAN speed..."<<std::endl;
+    ui::printFoundDrives(candle->ping(mab::CANdleBaudrate_E::CAN_BAUD_8M));
+}
+
+void printFoundDrives(std::vector<uint16_t> ids)
+{
+    if(ids.size() == 0)
+    {
+        vout << "No drives found." << std::endl;
+        return;
+    }
+    vout << "Found drives."  << std::endl;
+    for(size_t i = 0; i < ids.size(); i++)
+    {
+        if (ids[i] == 0)
+            break;  //No more ids in the message
+        
+        vout << std::to_string(i+1) <<": ID = " << ids[i]  << 
+            " (0x" << std::hex << ids[i] << std::dec << ")" << std::endl;
+        if(ids[i] > 2047)
+        {
+            vout << "Error! This ID is invalid! Probably two or more drives share same ID." <<
+                "Communication will most likely be broken until IDs are unique! [FAILED] "<< std::endl;
+            std::vector<uint16_t>empty;
+            return;
+        }
+    }
 }
 
 }

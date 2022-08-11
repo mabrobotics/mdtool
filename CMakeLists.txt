@@ -10,8 +10,8 @@ endif()
 
 if( "${ARCH}" STREQUAL "armhf")
     message("Compiling for armhf")
-    set(CMAKE_CXX_COMPILER arm-linux-gnueabi-g++)
-    set(CMAKE_C_COMPILER arm-linux-gnueabi-gcc)
+    set(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++)
+    set(CMAKE_C_COMPILER arm-linux-gnueabihf-gcc)
 elseif ( "${ARCH}" STREQUAL "aarm64")
     message("Compiling for aarm64")
     set(CMAKE_CXX_COMPILER aarch64-linux-gnu-g++)
@@ -31,11 +31,11 @@ file(GLOB SRC "src/*.cpp")
 
 set(CANDLE_BUILD_STATIC ON)
 set(CANDLE_OMIT_EXAMPLES ON)
-add_subdirectory(candle/Candle)
+add_subdirectory(candle_gitlab)
 
 add_executable(${PROJECT_NAME} ${SRC})
 target_link_libraries(${PROJECT_NAME} candle)
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/candle/Candle/include)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/candle_gitlab/Candle/include ${CMAKE_SOURCE_DIR}/3rd_party/mINI/src)
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "mdtool")
 
 install(TARGETS ${PROJECT_NAME} 

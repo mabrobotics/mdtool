@@ -1,3 +1,6 @@
 [submodule "candle"]
 	path = candle
 	url = https://github.com/mabrobotics/candle.git
+[submodule "candle_gitlab"]
+	path = candle_gitlab
+	url = https://gitlab.com/MAB_Robotics/md80_usbcan.git
