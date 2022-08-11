@@ -1,32 +1,34 @@
 #include "ui.hpp"
 
-#include <streambuf>
 #include <iostream>
+#include <streambuf>
 
-#define ERROR_BRIDGE_OCP  		    0    // 1
-#define ERROR_BRIDGE_FAULT 		    1    // 2
-#define ERROR_OUT_ENCODER_E		    2    // 4
-#define ERROR_OUT_ENCODER_COM_E 	3    // 8
-#define ERROR_PARAM_IDENT 			4    // 16           
-#define ERROR_EMPTY4 			    5    // 32           //NOT USED YET
-#define ERROR_EMPTY5			    6    // 64           //NOT USED YET
-#define ERROR_EMPTY6			    7    // 128          //NOT USED YET
+#define ERROR_BRIDGE_OCP        0  // 1
+#define ERROR_BRIDGE_FAULT      1  // 2
+#define ERROR_OUT_ENCODER_E     2  // 4
+#define ERROR_OUT_ENCODER_COM_E 3  // 8
+#define ERROR_PARAM_IDENT       4  // 16
+#define ERROR_EMPTY4            5  // 32           //NOT USED YET
+#define ERROR_EMPTY5            6  // 64           //NOT USED YET
+#define ERROR_EMPTY6            7  // 128          //NOT USED YET
 
-#define ERROR_UNDERVOLTAGE 		    8 	 // 256
-#define ERROR_OVERVOLTAGE 		    9 	 // 512
-#define ERROR_TEMP_W 			    10	 // 1024         //NOT USED YET
-#define ERROR_TEMP_SD 			    11 	 // 2048
-#define ERROR_CALIBRATION 		    12	 // 4096         //NOT USED YET
-#define ERROR_OCD 				    13	 // 8092
-#define ERROR_CAN_WD 			    14	 // 16384
-#define ERROR_EMPTY7			    15   // 32768        //NOT USED YET
+#define ERROR_UNDERVOLTAGE      8   // 256
+#define ERROR_OVERVOLTAGE       9   // 512
+#define ERROR_TEMP_W            10  // 1024         //NOT USED YET
+#define ERROR_TEMP_SD           11  // 2048
+#define ERROR_CALIBRATION       12  // 4096         //NOT USED YET
+#define ERROR_OCD               13  // 8092
+#define ERROR_CAN_WD            14  // 16384
+#define ERROR_EMPTY7            15  // 32768        //NOT USED YET
 
 namespace ui
 {
-class mystreambuf: public std::streambuf {    };
+class mystreambuf : public std::streambuf
+{
+};
 mystreambuf nostreambuf;
 std::ostream nocout(&nostreambuf);
-#define vout (std::cout)    //For easy customization later on
+#define vout (std::cout)  // For easy customization later on
 
 void printTooFewArgs()
 {
@@ -81,8 +83,8 @@ void printHelpConfig()
     vout << std::endl;
     vout << "Supported options: " << std::endl;
     vout << "\t zero [id] \t\t\t\t sets current drive position as zero reference position." << std::endl;
-    vout << "\t can [id] [new_id] [baudrate] [timeout]  changes FDCAN parameters of the drive. [id] - currend drive id, [new_id] - new id to be set " <<
-        "[baudrate] - can be either 1M, 2M, 5M or 8M, [timeout] - FDCAN communication watchdog timeout in ms." << std::endl;
+    vout << "\t can [id] [new_id] [baudrate] [timeout]  changes FDCAN parameters of the drive. [id] - currend drive id, [new_id] - new id to be set "
+         << "[baudrate] - can be either 1M, 2M, 5M or 8M, [timeout] - FDCAN communication watchdog timeout in ms." << std::endl;
     vout << "\t save [id] \t\t\t\t saves current, can(FDCAN) and calibration config to flash, if changed." << std::endl;
     vout << "\t current [id] [current] \t\t sets max phase current the drive will output. Check md80 docs for more info. [current] - current limit in Amps." << std::endl;
 }
@@ -109,7 +111,7 @@ bool getCalibrationConfirmation()
     vout << "Are you sure you want to start calibration? [Y/n]" << std::endl;
     char x;
     std::cin >> x;
-    if(x != 'Y')
+    if (x != 'Y')
     {
         vout << "Calibration abandoned." << std::endl;
         return false;
@@ -122,19 +124,19 @@ void printPosition(int id, float pos)
 }
 void printPositionAndVelocity(int id, float pos, float velocity)
 {
-    vout << "Drive " << id << " Position: " << pos << "\tVelocity: " << velocity <<std::endl;
+    vout << "Drive " << id << " Position: " << pos << "\tVelocity: " << velocity << std::endl;
 }
 void printDriveInfo(int id, float pos, float vel, float torque, float temperature, unsigned short error, mab::CANdleBaudrate_E baud)
 {
     vout << "Drive " << id << ":" << std::endl;
     vout << "- CAN speed: " << baud << "M" << std::endl;
     vout << "- position: " << pos << " rad" << std::endl;
-    vout << "- velocity: " << vel << " rad/s" <<  std::endl;
-    vout << "- torque: " << torque << " Nm" <<  std::endl;
+    vout << "- velocity: " << vel << " rad/s" << std::endl;
+    vout << "- torque: " << torque << " Nm" << std::endl;
     vout << "- temperature: " << temperature << " *C" << std::endl;
-    vout << "- error: 0x" << std::hex <<(unsigned short)error << std::dec;
+    vout << "- error: 0x" << std::hex << (unsigned short)error << std::dec;
 
-    if(error != 0)
+    if (error != 0)
     {
         vout << "  (";
         if (error & (1 << ERROR_BRIDGE_OCP))
@@ -168,40 +170,39 @@ void printDriveInfo(int id, float pos, float vel, float torque, float temperatur
 
 void printScanOutput(mab::Candle* candle)
 {
-    std::cout<<"[MDTOOL] Please be patient, this process can take up to 16 seconds"<<std::endl;
-    std::cout<<"[CANDLE] Pinging drives at 1M CAN speed..."<<std::endl;
+    std::cout << "[MDTOOL] Please be patient, this process can take up to 16 seconds" << std::endl;
+    std::cout << "[CANDLE] Pinging drives at 1M CAN speed..." << std::endl;
     ui::printFoundDrives(candle->ping(mab::CANdleBaudrate_E::CAN_BAUD_1M));
-    std::cout<<"[CANDLE] Pinging drives at 2M CAN speed..."<<std::endl;
+    std::cout << "[CANDLE] Pinging drives at 2M CAN speed..." << std::endl;
     ui::printFoundDrives(candle->ping(mab::CANdleBaudrate_E::CAN_BAUD_2M));
-    std::cout<<"[CANDLE] Pinging drives at 5M CAN speed..."<<std::endl;
+    std::cout << "[CANDLE] Pinging drives at 5M CAN speed..." << std::endl;
     ui::printFoundDrives(candle->ping(mab::CANdleBaudrate_E::CAN_BAUD_5M));
-    std::cout<<"[CANDLE] Pinging drives at 8M CAN speed..."<<std::endl;
+    std::cout << "[CANDLE] Pinging drives at 8M CAN speed..." << std::endl;
     ui::printFoundDrives(candle->ping(mab::CANdleBaudrate_E::CAN_BAUD_8M));
 }
 
 void printFoundDrives(std::vector<uint16_t> ids)
 {
-    if(ids.size() == 0)
+    if (ids.size() == 0)
     {
         vout << "No drives found." << std::endl;
         return;
     }
-    vout << "Found drives."  << std::endl;
-    for(size_t i = 0; i < ids.size(); i++)
+    vout << "Found drives." << std::endl;
+    for (size_t i = 0; i < ids.size(); i++)
     {
         if (ids[i] == 0)
-            break;  //No more ids in the message
-        
-        vout << std::to_string(i+1) <<": ID = " << ids[i]  << 
-            " (0x" << std::hex << ids[i] << std::dec << ")" << std::endl;
-        if(ids[i] > 2047)
+            break;  // No more ids in the message
+
+        vout << std::to_string(i + 1) << ": ID = " << ids[i] << " (0x" << std::hex << ids[i] << std::dec << ")" << std::endl;
+        if (ids[i] > 2047)
         {
-            vout << "Error! This ID is invalid! Probably two or more drives share same ID." <<
-                "Communication will most likely be broken until IDs are unique! [FAILED] "<< std::endl;
-            std::vector<uint16_t>empty;
+            vout << "Error! This ID is invalid! Probably two or more drives share same ID."
+                 << "Communication will most likely be broken until IDs are unique! [FAILED] " << std::endl;
+            std::vector<uint16_t> empty;
             return;
         }
     }
 }
 
-}
+}  // namespace ui
