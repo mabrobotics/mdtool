@@ -170,7 +170,6 @@ void printDriveInfo(int id, float pos, float vel, float torque, float temperatur
 
 void printScanOutput(mab::Candle* candle)
 {
-    std::cout << "[MDTOOL] Please be patient - this process can take up to 16 seconds" << std::endl;
     std::cout << "[CANDLE] Pinging drives at 1M CAN speed..." << std::endl;
     ui::printFoundDrives(candle->ping(mab::CANdleBaudrate_E::CAN_BAUD_1M));
     std::cout << "[CANDLE] Pinging drives at 2M CAN speed..." << std::endl;

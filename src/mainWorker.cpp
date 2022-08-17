@@ -237,7 +237,8 @@ void MainWorker::configZero(std::vector<std::string>& args)
     }
     int id = atoi(args[3].c_str());
     checkSpeedForId(id);
-    candle->addMd80(id);
+    if(!candle->addMd80(id))
+        return;
     candle->controlMd80SetEncoderZero(id);
 }
 void MainWorker::configCurrent(std::vector<std::string>& args)
@@ -282,7 +283,8 @@ void MainWorker::setupDiagnostic(std::vector<std::string>& args)
     int id = atoi(args[3].c_str());
     checkSpeedForId(id);
     candle->setupMd80Diagnostic(id);
-    candle->addMd80(id);
+    if(!candle->addMd80(id))
+        return;
     ui::printDriveInfo(id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity(), candle->md80s[0].getTorque(), candle->md80s[0].getTemperature(), candle->md80s[0].getErrorVector(), candle->getCurrentBaudrate());
 }
 
