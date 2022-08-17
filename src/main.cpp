@@ -5,7 +5,7 @@ const std::string version = "v1.1";
 
 int main(int argc, char** argv)
 {
-    std::cout << "[MDTOOL] Mdtool version: " << version << std::endl;
+    std::cout << "[MDTOOL] MDtool version: " << version << std::endl;
     std::vector<std::string> args;
     for (int i = 0; i < argc; i++)
         args.emplace_back(argv[i]);

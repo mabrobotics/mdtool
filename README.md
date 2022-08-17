@@ -14,7 +14,7 @@ make install
 `make` alone is for development, when `make install` is for release - it copies the files to `package/` directory, for easy .deb package creation.
 
 ## Cross compilation
-The tool can be build using native compilers (as above) or using arm32/arm64 compilers ( for usage with embedded computers, mainly Raspbbery Pi).
+The tool can be build using native compilers (as above) or using arm32/arm64 compilers (for usage with SBCs, mainly Raspbbery Pi).
 ### Dependencies
 for any cross-compilation
 ```
@@ -55,7 +55,7 @@ Naming conventions:
 `<name>_<version>-<revision>_<architecture>.deb`
 when changeding package name things that need to be done:
 - change package directory name
-- change packege version in DEBIAN/control
+- change package version in DEBIAN/control
 - change directory names in INSTALL section in the CMakeLists.txt
   
 To build repo to package first build with `make install`. Then go to `package/` directory and run
@@ -70,3 +70,4 @@ and later uninstalled with
 ```
 sudo apt remove mdtool
 ```
+Be sure to call ./mdtool bus <SPI/UART/USB> to configure mdtool for a desired communication bus.

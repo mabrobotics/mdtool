@@ -5,13 +5,15 @@
 
 #define BANDWIDTH_MIN (uint16_t)50
 #define BANDWIDTH_MAX (uint16_t)2500
+
 class MainWorker
 {
    public:
     MainWorker(std::vector<std::string>& args);
 
    private:
-    const std::string path = "mdtool.ini";
+    const std::string path = "/.config/MDtool.ini";
+    std::string pathFull = "";
 
     mab::Candle* candle;
 

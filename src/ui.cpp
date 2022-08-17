@@ -59,13 +59,13 @@ void printHelp()
     vout << "\tmdtool <command> [arguments | options]" << std::endl;
     vout << std::endl;
     vout << "Supported commands: " << std::endl;
-    vout << "\t ping [can speed] discovers all drives available on FDCAN bus at [can speed] (1M/2M/5M/8M), use 'all' keyword for scanning all speeds at once." << std::endl;
+    vout << "\t ping [can speed] \t\t discovers all drives available on FDCAN bus at [can speed] (1M/2M/5M/8M), use 'all' keyword for scanning all speeds at once." << std::endl;
     vout << "\t config [options] [arguments] \t sets configuration options. use `mdtool config` for more info." << std::endl;
     vout << "\t setup [options] \t\t launches a setup procedure. Use `mdtool setup` for more info." << std::endl;
-    vout << "\t test [id] [position] \t\t simple test movement from current location to [position]. [position] should be <-10, 10> rad" << std::endl;
+    vout << "\t test [id] [position] \t\t simple test movement from current location to [position]. [position] should be <-10, 10> rad." << std::endl;
     vout << "\t blink [id] \t\t\t blink LEDs on driver board." << std::endl;
     vout << "\t encoder [id] \t\t\t prints current position and velocity in a loop." << std::endl;
-    vout << "\t bus [type] \t\t\t changes default CANdle CAN bus [type] (SPI/USB/UART)" << std::endl;
+    vout << "\t bus [type] \t\t\t changes default CANdle CAN bus [type] (SPI/USB/UART)." << std::endl;
     vout << std::endl;
     vout << "Add '-sv' after arguments to suppress output" << std::endl;
 }
@@ -83,7 +83,7 @@ void printHelpConfig()
     vout << std::endl;
     vout << "Supported options: " << std::endl;
     vout << "\t zero [id] \t\t\t\t sets current drive position as zero reference position." << std::endl;
-    vout << "\t can [id] [new_id] [baudrate] [timeout]  changes FDCAN parameters of the drive. [id] - currend drive id, [new_id] - new id to be set "
+    vout << "\t can [id] [new_id] [baudrate] [timeout]  changes FDCAN parameters of the drive. [id] - currend drive id, [new_id] - new id to be set."
          << "[baudrate] - can be either 1M, 2M, 5M or 8M, [timeout] - FDCAN communication watchdog timeout in ms." << std::endl;
     vout << "\t save [id] \t\t\t\t saves current, can(FDCAN) and calibration config to flash, if changed." << std::endl;
     vout << "\t current [id] [current] \t\t sets max phase current the drive will output. Check md80 docs for more info. [current] - current limit in Amps." << std::endl;
@@ -170,7 +170,7 @@ void printDriveInfo(int id, float pos, float vel, float torque, float temperatur
 
 void printScanOutput(mab::Candle* candle)
 {
-    std::cout << "[MDTOOL] Please be patient, this process can take up to 16 seconds" << std::endl;
+    std::cout << "[MDTOOL] Please be patient - this process can take up to 16 seconds" << std::endl;
     std::cout << "[CANDLE] Pinging drives at 1M CAN speed..." << std::endl;
     ui::printFoundDrives(candle->ping(mab::CANdleBaudrate_E::CAN_BAUD_1M));
     std::cout << "[CANDLE] Pinging drives at 2M CAN speed..." << std::endl;

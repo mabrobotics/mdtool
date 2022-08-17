@@ -81,6 +81,9 @@ MainWorker::MainWorker(std::vector<std::string>& args)
     mab::BusType_E busType = mab::BusType_E::USB;
     mab::CANdleBaudrate_E baud = mab::CANdleBaudrate_E::CAN_BAUD_1M;
 
+    /* get user home directory */
+    pathFull = (std::string(getenv("HOME")) + path);
+
     if (args.size() > 1)
         cmd = str2cmd(args[1]);
     if (cmd == toolsCmd_E::NONE)
@@ -99,9 +102,10 @@ MainWorker::MainWorker(std::vector<std::string>& args)
             printVerbose = false;
     }
 
-    mINI::INIFile file(path);
+    mINI::INIFile file(pathFull);
     mINI::INIStructure ini;
     file.read(ini);
+
     std::string& busString = ini["communication"]["bus"];
 
     if (busString == "SPI")
@@ -377,7 +381,7 @@ void MainWorker::bus(std::vector<std::string>& args)
 
 void MainWorker::changeDefaultConfig(std::string bus)
 {
-    mINI::INIFile file(path);
+    mINI::INIFile file(pathFull);
     mINI::INIStructure ini;
     file.read(ini);
     if (!bus.empty()) ini["communication"]["bus"] = bus;
