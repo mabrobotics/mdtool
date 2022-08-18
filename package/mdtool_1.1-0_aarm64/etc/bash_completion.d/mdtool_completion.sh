@@ -14,6 +14,12 @@ _mdtool_complete()
 		COMPREPLY=( $(compgen -W "bus ping config setup test blink encoder" -- $cur) )
 	elif [ $COMP_CWORD -eq 2 ]; then
 		case "$prev" in
+			"bus")
+			COMPREPLY=( $(compgen -W "USB SPI UART" -- $cur) )
+			;;
+			"ping")
+			COMPREPLY=( $(compgen -W "all" -- $cur) )
+			;;
 			"config")
 			COMPREPLY=( $(compgen -W "zero can save current" -- $cur) )
 			;; 
