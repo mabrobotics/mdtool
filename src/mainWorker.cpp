@@ -226,6 +226,8 @@ void MainWorker::configSave(std::vector<std::string>& args)
 	}
 	int id = atoi(args[3].c_str());
 	checkSpeedForId(id);
+	if (!candle->addMd80(id))
+		return;
 	candle->configMd80Save(id);
 }
 void MainWorker::configZero(std::vector<std::string>& args)
@@ -250,6 +252,8 @@ void MainWorker::configCurrent(std::vector<std::string>& args)
 	}
 	int id = atoi(args[3].c_str());
 	checkSpeedForId(id);
+	if (!candle->addMd80(id))
+		return;
 	candle->configMd80SetCurrentLimit(id, atof(args[4].c_str()));
 }
 void MainWorker::setupCalibration(std::vector<std::string>& args)
@@ -264,6 +268,8 @@ void MainWorker::setupCalibration(std::vector<std::string>& args)
 		return;
 	int id = atoi(args[3].c_str());
 	checkSpeedForId(id);
+	if (!candle->addMd80(id))
+		return;
 	candle->setupMd80Calibration(id, (uint16_t)atoi(args[4].c_str()));
 }
 void MainWorker::setupDiagnostic(std::vector<std::string>& args)
@@ -275,9 +281,9 @@ void MainWorker::setupDiagnostic(std::vector<std::string>& args)
 	}
 	int id = atoi(args[3].c_str());
 	checkSpeedForId(id);
-	candle->setupMd80Diagnostic(id);
 	if (!candle->addMd80(id))
 		return;
+	candle->setupMd80Diagnostic(id);
 	ui::printDriveInfo(id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity(), candle->md80s[0].getTorque(), candle->md80s[0].getTemperature(), candle->md80s[0].getErrorVector(), candle->getCurrentBaudrate());
 }
 
@@ -328,7 +334,8 @@ void MainWorker::blink(std::vector<std::string>& args)
 
 	int id = atoi(args[2].c_str());
 	checkSpeedForId(id);
-
+	if (!candle->addMd80(id))
+		return;
 	candle->configMd80Blink(id);
 }
 void MainWorker::encoder(std::vector<std::string>& args)
