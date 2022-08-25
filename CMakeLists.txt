@@ -29,6 +29,7 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 
 file(GLOB SRC "src/*.cpp")
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CANDLE_BUILD_STATIC ON)
 set(CANDLE_OMIT_EXAMPLES ON)
 add_subdirectory(candle_gitlab)
