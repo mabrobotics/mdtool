@@ -36,7 +36,7 @@ add_subdirectory(candle)
 
 add_executable(${PROJECT_NAME} ${SRC})
 target_link_libraries(${PROJECT_NAME} candle)
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/candle/Candle/include ${CMAKE_SOURCE_DIR}/3rd_party/mINI/src)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/candle/include ${CMAKE_SOURCE_DIR}/3rd_party/mINI/src)
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "mdtool")
 
 install(TARGETS ${PROJECT_NAME} 
