@@ -86,7 +86,7 @@ void printHelpConfig()
     vout << "\t can [id] [new_id] [baudrate] [timeout]  changes FDCAN parameters of the drive. [id] - currend drive id, [new_id] - new id to be set."
          << "[baudrate] - can be either 1M, 2M, 5M or 8M, [timeout] - FDCAN communication watchdog timeout in ms." << std::endl;
     vout << "\t save [id] \t\t\t\t saves current, can(FDCAN) and calibration config to flash, if changed." << std::endl;
-    vout << "\t current [id] [current] \t\t sets max phase current the drive will output. Check md80 docs for more info. [current] - current limit in Amps." << std::endl;
+    vout << "\t current [id] [current] \t\t sets max phase current the drive will output. Check MD80 docs for more info. [current] - current limit in Amps." << std::endl;
 }
 void printHelpSetup()
 {
@@ -104,7 +104,7 @@ void printHelpSetup()
 }
 bool getCalibrationConfirmation()
 {
-    vout << "This step will start drive calibration. If calibration is done incorrectly or fails, it will result in undefined behaviour of the drive." << std::endl;
+    vout << "This step will start drive calibration. If calibration is done incorrectly or fails the drive will not move. In such case please rerun the calibration and if the problem persists contact MABRobotics." << std::endl;
     vout << "The process takes around 40-50 seconds, and should not be cancelled or stopped." << std::endl;
     vout << "Ensure that the power supply's voltage is stable @24V and it is able to deliver >1A." << std::endl;
     vout << "For proper calibration, there mustn't be any load at the drives output shaft (rotor), ideally there shouldn't be anything attached to the output shaft." << std::endl;
