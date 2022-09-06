@@ -24,7 +24,8 @@ enum class toolsOptions_E
 	SAVE,
 	ZERO,
 	CALIBRATION,
-	DIAGNOSTIC
+	DIAGNOSTIC,
+	MOTOR
 };
 toolsOptions_E str2option(std::string& opt)
 {
@@ -40,6 +41,8 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::CALIBRATION;
 	if (opt == "diagnostic")
 		return toolsOptions_E::DIAGNOSTIC;
+	if (opt == "motor")
+		return toolsOptions_E::MOTOR;
 	return toolsOptions_E::NONE;
 }
 toolsCmd_E str2cmd(std::string& cmd)
@@ -82,7 +85,7 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 	mab::CANdleBaudrate_E baud = mab::CANdleBaudrate_E::CAN_BAUD_1M;
 
 	/* get user home directory */
-	pathFull = (std::string(getenv("HOME")) + path);
+	pathFull = (std::string(getenv("HOME")) + mdtoolConfigPath);
 
 	if (args.size() > 1)
 		cmd = str2cmd(args[1]);
@@ -147,6 +150,8 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 				setupCalibration(args);
 			if (option == toolsOptions_E::DIAGNOSTIC)
 				setupDiagnostic(args);
+			if (option == toolsOptions_E::MOTOR)
+				setupMotor(args);
 			break;
 		}
 		case toolsCmd_E::TEST:
@@ -285,6 +290,78 @@ void MainWorker::setupDiagnostic(std::vector<std::string>& args)
 		return;
 	candle->setupMd80Diagnostic(id);
 	ui::printDriveInfo(id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity(), candle->md80s[0].getTorque(), candle->md80s[0].getTemperature(), candle->md80s[0].getErrorVector(), candle->getCurrentBaudrate());
+}
+
+void MainWorker::setupMotor(std::vector<std::string>& args)
+{
+	int id = atoi(args[3].c_str());
+	checkSpeedForId(id);
+	if (!candle->addMd80(id))
+		return;
+
+	std::string path = (std::string(getenv("HOME")) + motorConfigPath + args[4].c_str());
+
+	mINI::INIFile motorCfg(path);
+	mINI::INIStructure cfg;
+	motorCfg.read(cfg);
+
+	motorConfig_ut motorConfig;
+	memset(motorConfig.bytes,0,sizeof(motorConfig));
+
+	memcpy(motorConfig.s.motorName,cfg["motor"]["name"].c_str(),sizeof(motorConfig.s.motorName));
+	motorConfig.s.polePairs = atoi(cfg["motor"]["pole pairs"].c_str());
+	motorConfig.s.motorKt = atof(cfg["motor"]["torque constant"].c_str());
+	motorConfig.s.gearRatio = atof(cfg["motor"]["gear ratio"].c_str());
+	motorConfig.s.iMax = atoi(cfg["motor"]["max current"].c_str());
+	motorConfig.s.motorKt_a = atof(cfg["motor"]["torque constant a"].c_str());
+	motorConfig.s.motorKt_b = atof(cfg["motor"]["torque constant b"].c_str());
+	motorConfig.s.motorKt_c = atof(cfg["motor"]["torque constant c"].c_str());
+	motorConfig.s.torqueBandwidth = atoi(cfg["motor"]["torque bandwidth"].c_str());
+
+	motorConfig.s.outputEncoder = atoi(cfg["output encoder"]["output encoder"].c_str());
+	motorConfig.s.outputEncoderDir = atoi(cfg["output encoder"]["output encoder dir"].c_str());
+
+	motorConfig.s.canId = atoi(cfg["can default"]["id"].c_str());
+	motorConfig.s.canBaudrate = atoi(cfg["can default"]["baudrate"].c_str());
+	motorConfig.s.canBaudrate = atoi(cfg["can default"]["can watchdog"].c_str());
+
+	char txBuffer[64] = {0};
+	char rxBuffer[64] = {0};
+
+	static_assert(sizeof(motorConfig.bytes) <= 63);
+
+	txBuffer[0] = 0x71;
+	memcpy(&txBuffer[1], motorConfig.bytes,sizeof(motorConfig.bytes));
+
+	if(!candle->sengGenericFDCanFrame(id, 64, txBuffer, rxBuffer, 100))
+		return;
+
+	motorMotionConfig_ut motorMotionConfig;
+	memset(motorMotionConfig.bytes,0,sizeof(motorMotionConfig));
+
+	motorMotionConfig.s.impedancePdGains.kp = atof(cfg["impedance PD"]["kp"].c_str());
+	motorMotionConfig.s.impedancePdGains.kd = atof(cfg["impedance PD"]["kd"].c_str());
+	motorMotionConfig.s.impedancePdGains.max_out = atof(cfg["impedance PD"]["max out"].c_str());
+
+	motorMotionConfig.s.positionPidGains.kp = atof(cfg["position PID"]["kp"].c_str());
+	motorMotionConfig.s.positionPidGains.kd = atof(cfg["position PID"]["kd"].c_str());
+	motorMotionConfig.s.positionPidGains.max_out = atof(cfg["position PID"]["max out"].c_str());
+	motorMotionConfig.s.positionPidGains.i_windup = atof(cfg["position PID"]["windup"].c_str());
+	
+	motorMotionConfig.s.velocityPidGains.kp = atof(cfg["velocity PID"]["kp"].c_str());
+	motorMotionConfig.s.velocityPidGains.kd = atof(cfg["velocity PID"]["kd"].c_str());
+	motorMotionConfig.s.velocityPidGains.max_out = atof(cfg["velocity PID"]["max out"].c_str());
+	motorMotionConfig.s.velocityPidGains.i_windup = atof(cfg["velocity PID"]["windup"].c_str());
+
+	static_assert(sizeof(motorMotionConfig.bytes) <= 63);
+
+	txBuffer[0] = 0x72;
+	memcpy(&txBuffer[1], motorMotionConfig.bytes,sizeof(motorMotionConfig.bytes));
+
+	if(!candle->sengGenericFDCanFrame(id, 64, txBuffer, rxBuffer, 100))
+		return;
+
+	candle->configMd80Save(id);
 }
 
 void MainWorker::testMove(std::vector<std::string>& args)
