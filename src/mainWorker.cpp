@@ -2,6 +2,8 @@
 
 #include <unistd.h>
 
+#include <filesystem>
+
 #include "mini/ini.h"
 #include "ui.hpp"
 
@@ -23,9 +25,11 @@ enum class toolsOptions_E
 	CAN,
 	SAVE,
 	ZERO,
+	BANDWIDTH,
 	CALIBRATION,
 	DIAGNOSTIC,
-	MOTOR
+	MOTOR,
+	DIAGNOSTIC_EX,
 };
 toolsOptions_E str2option(std::string& opt)
 {
@@ -37,12 +41,16 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::ZERO;
 	if (opt == "save")
 		return toolsOptions_E::SAVE;
+	if (opt == "bandwidth")
+		return toolsOptions_E::BANDWIDTH;
 	if (opt == "calibration")
 		return toolsOptions_E::CALIBRATION;
 	if (opt == "diagnostic")
 		return toolsOptions_E::DIAGNOSTIC;
 	if (opt == "motor")
 		return toolsOptions_E::MOTOR;
+	if (opt == "diagnostic_ex")
+		return toolsOptions_E::DIAGNOSTIC_EX;
 	return toolsOptions_E::NONE;
 }
 toolsCmd_E str2cmd(std::string& cmd)
@@ -87,6 +95,9 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 	/* get user home directory */
 	pathFull = (std::string(getenv("HOME")) + mdtoolConfigPath);
 
+	/* create .config directory if doesnt exist already */
+	std::filesystem::create_directory(std::string(getenv("HOME")) + mdtoolConfigPath);
+
 	if (args.size() > 1)
 		cmd = str2cmd(args[1]);
 	if (cmd == toolsCmd_E::NONE)
@@ -105,7 +116,7 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 			printVerbose = false;
 	}
 
-	mINI::INIFile file(pathFull);
+	mINI::INIFile file(pathFull + mdtoolConfigFileName);
 	mINI::INIStructure ini;
 	file.read(ini);
 
@@ -138,6 +149,8 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 				configZero(args);
 			if (option == toolsOptions_E::CURRENT)
 				configCurrent(args);
+			if (option == toolsOptions_E::BANDWIDTH)
+				configBandwidth(args);
 			if (option == toolsOptions_E::NONE)
 				ui::printHelpConfig();
 			break;
@@ -152,6 +165,8 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 				setupDiagnostic(args);
 			if (option == toolsOptions_E::MOTOR)
 				setupMotor(args);
+			if (option == toolsOptions_E::DIAGNOSTIC_EX)
+				setupDiagnosticExtended(args);
 			break;
 		}
 		case toolsCmd_E::TEST:
@@ -261,6 +276,22 @@ void MainWorker::configCurrent(std::vector<std::string>& args)
 		return;
 	candle->configMd80SetCurrentLimit(id, atof(args[4].c_str()));
 }
+
+void MainWorker::configBandwidth(std::vector<std::string>& args)
+{
+	if (args.size() != 5)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+	int id = atoi(args[3].c_str());
+	checkSpeedForId(id);
+	if (!candle->addMd80(id))
+		return;
+
+	candle->configMd80TorqueBandwidth(id, atof(args[4].c_str()));
+}
+
 void MainWorker::setupCalibration(std::vector<std::string>& args)
 {
 	if (args.size() != 5)
@@ -301,14 +332,22 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 
 	std::string path = (std::string(getenv("HOME")) + motorConfigPath + args[4].c_str());
 
+	/* create motor configs directory if it doesnt exist already */
+	std::filesystem::create_directory(std::string(getenv("HOME")) + motorConfigPath);
+
 	mINI::INIFile motorCfg(path);
 	mINI::INIStructure cfg;
-	motorCfg.read(cfg);
+
+	if (!motorCfg.read(cfg))
+	{
+		ui::printUnableToFindCfgFile(path);
+		return;
+	}
 
 	motorConfig_ut motorConfig;
-	memset(motorConfig.bytes,0,sizeof(motorConfig));
+	memset(motorConfig.bytes, 0, sizeof(motorConfig));
 
-	memcpy(motorConfig.s.motorName,cfg["motor"]["name"].c_str(),sizeof(motorConfig.s.motorName));
+	memcpy(motorConfig.s.motorName, (cfg["motor"]["name"]).c_str(), sizeof(motorConfig.s.motorName));
 	motorConfig.s.polePairs = atoi(cfg["motor"]["pole pairs"].c_str());
 	motorConfig.s.motorKt = atof(cfg["motor"]["torque constant"].c_str());
 	motorConfig.s.gearRatio = atof(cfg["motor"]["gear ratio"].c_str());
@@ -321,47 +360,68 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	motorConfig.s.outputEncoder = atoi(cfg["output encoder"]["output encoder"].c_str());
 	motorConfig.s.outputEncoderDir = atoi(cfg["output encoder"]["output encoder dir"].c_str());
 
-	motorConfig.s.canId = atoi(cfg["can default"]["id"].c_str());
-	motorConfig.s.canBaudrate = atoi(cfg["can default"]["baudrate"].c_str());
-	motorConfig.s.canBaudrate = atoi(cfg["can default"]["can watchdog"].c_str());
-
 	char txBuffer[64] = {0};
 	char rxBuffer[64] = {0};
 
 	static_assert(sizeof(motorConfig.bytes) <= 63);
 
-	txBuffer[0] = 0x71;
-	memcpy(&txBuffer[1], motorConfig.bytes,sizeof(motorConfig.bytes));
+	txBuffer[0] = mab::FRAME_MOTOR_CONFIG;
+	memcpy(&txBuffer[1], motorConfig.bytes, sizeof(motorConfig.bytes));
 
-	if(!candle->sengGenericFDCanFrame(id, 64, txBuffer, rxBuffer, 100))
-		return;
+	if (!candle->sengGenericFDCanFrame(id, 64, txBuffer, rxBuffer, 100))
+	{
+		std::cout << "FAILED to setup motor" << std::endl;
+	}
 
 	motorMotionConfig_ut motorMotionConfig;
-	memset(motorMotionConfig.bytes,0,sizeof(motorMotionConfig));
+	memset(motorMotionConfig.bytes, 0, sizeof(motorMotionConfig));
 
 	motorMotionConfig.s.impedancePdGains.kp = atof(cfg["impedance PD"]["kp"].c_str());
 	motorMotionConfig.s.impedancePdGains.kd = atof(cfg["impedance PD"]["kd"].c_str());
-	motorMotionConfig.s.impedancePdGains.max_out = atof(cfg["impedance PD"]["max out"].c_str());
+	motorMotionConfig.s.impedancePdGains.outMax = atof(cfg["impedance PD"]["max out"].c_str());
 
 	motorMotionConfig.s.positionPidGains.kp = atof(cfg["position PID"]["kp"].c_str());
+	motorMotionConfig.s.positionPidGains.ki = atof(cfg["position PID"]["ki"].c_str());
 	motorMotionConfig.s.positionPidGains.kd = atof(cfg["position PID"]["kd"].c_str());
-	motorMotionConfig.s.positionPidGains.max_out = atof(cfg["position PID"]["max out"].c_str());
-	motorMotionConfig.s.positionPidGains.i_windup = atof(cfg["position PID"]["windup"].c_str());
-	
+	motorMotionConfig.s.positionPidGains.outMax = atof(cfg["position PID"]["max out"].c_str());
+	motorMotionConfig.s.positionPidGains.intWindup = atof(cfg["position PID"]["windup"].c_str());
+
 	motorMotionConfig.s.velocityPidGains.kp = atof(cfg["velocity PID"]["kp"].c_str());
+	motorMotionConfig.s.velocityPidGains.ki = atof(cfg["velocity PID"]["ki"].c_str());
 	motorMotionConfig.s.velocityPidGains.kd = atof(cfg["velocity PID"]["kd"].c_str());
-	motorMotionConfig.s.velocityPidGains.max_out = atof(cfg["velocity PID"]["max out"].c_str());
-	motorMotionConfig.s.velocityPidGains.i_windup = atof(cfg["velocity PID"]["windup"].c_str());
+	motorMotionConfig.s.velocityPidGains.outMax = atof(cfg["velocity PID"]["max out"].c_str());
+	motorMotionConfig.s.velocityPidGains.intWindup = atof(cfg["velocity PID"]["windup"].c_str());
 
 	static_assert(sizeof(motorMotionConfig.bytes) <= 63);
 
-	txBuffer[0] = 0x72;
-	memcpy(&txBuffer[1], motorMotionConfig.bytes,sizeof(motorMotionConfig.bytes));
+	txBuffer[0] = mab::FRAME_MOTOR_MOTION_CONFIG;
+	memcpy(&txBuffer[1], motorMotionConfig.bytes, sizeof(motorMotionConfig.bytes));
 
-	if(!candle->sengGenericFDCanFrame(id, 64, txBuffer, rxBuffer, 100))
-		return;
+	if (!candle->sengGenericFDCanFrame(id, 64, txBuffer, rxBuffer, 100))
+	{
+		std::cout << "FAILED to setup motion motor" << std::endl;
+	}
 
 	candle->configMd80Save(id);
+}
+
+void MainWorker::setupDiagnosticExtended(std::vector<std::string>& args)
+{
+	if (args.size() != 4)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+	int id = atoi(args[3].c_str());
+	checkSpeedForId(id);
+	if (!candle->addMd80(id))
+		return;
+
+	mab::motorParameters_ut motorParameters;
+	memset(motorParameters.bytes, 0, sizeof(motorParameters.bytes));
+
+	candle->setupMd80DiagnosticExtended(id, &motorParameters);
+	ui::printDriveInfoExtended(&motorParameters, id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity(), candle->md80s[0].getTorque(), candle->md80s[0].getTemperature(), candle->md80s[0].getErrorVector(), candle->getCurrentBaudrate());
 }
 
 void MainWorker::testMove(std::vector<std::string>& args)

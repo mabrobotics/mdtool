@@ -22,4 +22,6 @@ void printPositionAndVelocity(int id, float pos, float velocity);
 void printDriveInfo(int id, float pos, float vel, float torque, float temperature, unsigned short error, mab::CANdleBaudrate_E baud);
 void printScanOutput(mab::Candle* candle);
 void printFoundDrives(std::vector<uint16_t> ids);
+void printUnableToFindCfgFile(std::string path);
+void printDriveInfoExtended(mab::motorParameters_ut* motorParameters, int id, float pos, float vel, float torque, float temperature, unsigned short error, mab::CANdleBaudrate_E baud);
 }  // namespace ui

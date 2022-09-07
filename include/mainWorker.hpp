@@ -30,9 +30,25 @@ class MainWorker
 
 	typedef struct
 	{
-		mab::RegImpedance_t impedancePdGains;
-		mab::RegPid_t velocityPidGains;
-		mab::RegPid_t positionPidGains;
+		float kp;
+		float kd;
+		float outMax;
+	} ImpedanceControllerGains_t;
+
+	typedef struct
+	{
+		float kp;
+		float ki;
+		float kd;
+		float intWindup;
+		float outMax;
+	} PidControllerGains_t;
+
+	typedef struct
+	{
+		ImpedanceControllerGains_t impedancePdGains;
+		PidControllerGains_t velocityPidGains;
+		PidControllerGains_t positionPidGains;
 	} motorMotionConfig_t;
 
 #pragma pack(pop)
@@ -48,7 +64,8 @@ class MainWorker
 		uint8_t bytes[sizeof(motorMotionConfig_t)];
 	} motorMotionConfig_ut;
 
-	const std::string mdtoolConfigPath = "/.config/MDtool.ini";
+	const std::string mdtoolConfigFileName = "MDtool.ini";
+	const std::string mdtoolConfigPath = "/.config/";
 	const std::string motorConfigPath = "/MDtool_motors/";
 	std::string pathFull = "";
 
@@ -62,9 +79,12 @@ class MainWorker
 	void configSave(std::vector<std::string>& args);
 	void configZero(std::vector<std::string>& args);
 	void configCurrent(std::vector<std::string>& args);
+	void configBandwidth(std::vector<std::string>& args);
+
 	void setupCalibration(std::vector<std::string>& args);
 	void setupDiagnostic(std::vector<std::string>& args);
 	void setupMotor(std::vector<std::string>& args);
+	void setupDiagnosticExtended(std::vector<std::string>& args);
 
 	void testMove(std::vector<std::string>& args);
 	void blink(std::vector<std::string>& args);
