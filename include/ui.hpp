@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "candle.hpp"
+#include "mainWorker.hpp"
 
 namespace ui
 {
@@ -24,4 +25,17 @@ void printScanOutput(mab::Candle* candle);
 void printFoundDrives(std::vector<uint16_t> ids);
 void printUnableToFindCfgFile(std::string path);
 void printDriveInfoExtended(mab::motorParameters_ut* motorParameters, int id, float pos, float vel, float torque, float temperature, unsigned short error, mab::CANdleBaudrate_E baud);
+void printErrorDetails(unsigned short error);
+void printParameterOutOfBounds(std::string category, std::string field);
+void printFailedToSetupMotor();
+
+template <class T>
+bool checkParamLimit(T value, T min, T max)
+{
+	if (value > max)
+		return false;
+	if (value < min)
+		return false;
+	return true;
+}
 }  // namespace ui

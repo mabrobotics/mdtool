@@ -135,37 +135,7 @@ void printDriveInfo(int id, float pos, float vel, float torque, float temperatur
 	vout << "- torque: " << torque << " Nm" << std::endl;
 	vout << "- temperature: " << temperature << " *C" << std::endl;
 	vout << "- error: 0x" << std::hex << (unsigned short)error << std::dec;
-
-	if (error != 0)
-	{
-		vout << "  (";
-		if (error & (1 << ERROR_BRIDGE_OCP))
-			vout << "ERROR_BRIDGE_OCP, ";
-		if (error & (1 << ERROR_BRIDGE_FAULT))
-			vout << "ERROR_BRIDGE_FAULT, ";
-		if (error & (1 << ERROR_OUT_ENCODER_E))
-			vout << "ERROR_OUT_ENCODER_E, ";
-		if (error & (1 << ERROR_OUT_ENCODER_COM_E))
-			vout << "ERROR_OUT_ENCODER_COM_E, ";
-		if (error & (1 << ERROR_PARAM_IDENT))
-			vout << "ERROR_PARAM_IDENT, ";
-		if (error & (1 << ERROR_UNDERVOLTAGE))
-			vout << "ERROR_UNDERVOLTAGE, ";
-		if (error & (1 << ERROR_OVERVOLTAGE))
-			vout << "ERROR_OVERVOLTAGE, ";
-		if (error & (1 << ERROR_TEMP_W))
-			vout << "ERROR_TEMP_W, ";
-		if (error & (1 << ERROR_TEMP_SD))
-			vout << "ERROR_TEMP_SD, ";
-		if (error & (1 << ERROR_CALIBRATION))
-			vout << "ERROR_CALIBRATION, ";
-		if (error & (1 << ERROR_OCD))
-			vout << "ERROR_OCD, ";
-		if (error & (1 << ERROR_CAN_WD))
-			vout << "ERROR_CAN_WD, ";
-		vout << ")";
-	}
-	vout << std::endl;
+	printErrorDetails(error);
 }
 
 void printScanOutput(mab::Candle* candle)
@@ -226,7 +196,52 @@ void printDriveInfoExtended(mab::motorParameters_ut* motorParameters, int id, fl
 	vout << "- velocity: " << vel << " rad/s" << std::endl;
 	vout << "- torque: " << torque << " Nm" << std::endl;
 	vout << "- temperature: " << temperature << " *C" << std::endl;
-	vout << "- error: 0x" << std::hex << (unsigned short)error << std::dec << std::endl;
+	vout << "- error: 0x" << std::hex << (unsigned short)error << std::dec;
+	printErrorDetails(error);
+}
+
+void printErrorDetails(unsigned short error)
+{
+	if (error != 0)
+	{
+		vout << "  (";
+		if (error & (1 << ERROR_BRIDGE_OCP))
+			vout << "ERROR_BRIDGE_OCP, ";
+		if (error & (1 << ERROR_BRIDGE_FAULT))
+			vout << "ERROR_BRIDGE_FAULT, ";
+		if (error & (1 << ERROR_OUT_ENCODER_E))
+			vout << "ERROR_OUT_ENCODER_E, ";
+		if (error & (1 << ERROR_OUT_ENCODER_COM_E))
+			vout << "ERROR_OUT_ENCODER_COM_E, ";
+		if (error & (1 << ERROR_PARAM_IDENT))
+			vout << "ERROR_PARAM_IDENT, ";
+		if (error & (1 << ERROR_UNDERVOLTAGE))
+			vout << "ERROR_UNDERVOLTAGE, ";
+		if (error & (1 << ERROR_OVERVOLTAGE))
+			vout << "ERROR_OVERVOLTAGE, ";
+		if (error & (1 << ERROR_TEMP_W))
+			vout << "ERROR_TEMP_W, ";
+		if (error & (1 << ERROR_TEMP_SD))
+			vout << "ERROR_TEMP_SD, ";
+		if (error & (1 << ERROR_CALIBRATION))
+			vout << "ERROR_CALIBRATION, ";
+		if (error & (1 << ERROR_OCD))
+			vout << "ERROR_OCD, ";
+		if (error & (1 << ERROR_CAN_WD))
+			vout << "ERROR_CAN_WD, ";
+		vout << ")";
+	}
+	vout << std::endl;
+}
+
+void printParameterOutOfBounds(std::string category, std::string field)
+{
+	vout << "Motor config parameter in category [" << category << "] named [" << field << "] is out of bounds!" << std::endl;
+}
+
+void printFailedToSetupMotor()
+{
+	vout << "Failed to setup motor!" << std::endl;
 }
 
 }  // namespace ui

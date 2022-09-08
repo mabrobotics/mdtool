@@ -2,6 +2,7 @@
 
 #include "bus.hpp"
 #include "candle.hpp"
+#include "mini/ini.h"
 
 class MainWorker
 {
@@ -64,10 +65,9 @@ class MainWorker
 		uint8_t bytes[sizeof(motorMotionConfig_t)];
 	} motorMotionConfig_ut;
 
-	const std::string mdtoolConfigFileName = "MDtool.ini";
-	const std::string mdtoolConfigPath = "/.config/";
+	const std::string mdtoolConfigFileName = "mdtool.ini";
+	const std::string mdtoolConfigPath = "/etc/mdtool/";
 	const std::string motorConfigPath = "/MDtool_motors/";
-	std::string pathFull = "";
 
 	mab::Candle* candle;
 
@@ -93,4 +93,8 @@ class MainWorker
 
 	void changeDefaultConfig(std::string bus);
 	mab::CANdleBaudrate_E checkSpeedForId(uint16_t id);
+	void checkConfigLimits(motorConfig_ut* motorConfig, motorMotionConfig_ut* motorMotionConfig);
+
+	template <class T>
+	bool getField(mINI::INIStructure& cfg, mINI::INIStructure& ini, std::string category, std::string field, T& value);
 };

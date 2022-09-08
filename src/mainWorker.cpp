@@ -4,7 +4,6 @@
 
 #include <filesystem>
 
-#include "mini/ini.h"
 #include "ui.hpp"
 
 enum class toolsCmd_E
@@ -92,12 +91,6 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 	mab::BusType_E busType = mab::BusType_E::USB;
 	mab::CANdleBaudrate_E baud = mab::CANdleBaudrate_E::CAN_BAUD_1M;
 
-	/* get user home directory */
-	pathFull = (std::string(getenv("HOME")) + mdtoolConfigPath);
-
-	/* create .config directory if doesnt exist already */
-	std::filesystem::create_directory(std::string(getenv("HOME")) + mdtoolConfigPath);
-
 	if (args.size() > 1)
 		cmd = str2cmd(args[1]);
 	if (cmd == toolsCmd_E::NONE)
@@ -116,7 +109,7 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 			printVerbose = false;
 	}
 
-	mINI::INIFile file(pathFull + mdtoolConfigFileName);
+	mINI::INIFile file(mdtoolConfigPath + mdtoolConfigFileName);
 	mINI::INIStructure ini;
 	file.read(ini);
 
@@ -338,6 +331,10 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	mINI::INIFile motorCfg(path);
 	mINI::INIStructure cfg;
 
+	mINI::INIFile file(mdtoolConfigPath + mdtoolConfigFileName);
+	mINI::INIStructure ini;
+	file.read(ini);
+
 	if (!motorCfg.read(cfg))
 	{
 		ui::printUnableToFindCfgFile(path);
@@ -348,17 +345,18 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	memset(motorConfig.bytes, 0, sizeof(motorConfig));
 
 	memcpy(motorConfig.s.motorName, (cfg["motor"]["name"]).c_str(), sizeof(motorConfig.s.motorName));
-	motorConfig.s.polePairs = atoi(cfg["motor"]["pole pairs"].c_str());
-	motorConfig.s.motorKt = atof(cfg["motor"]["torque constant"].c_str());
-	motorConfig.s.gearRatio = atof(cfg["motor"]["gear ratio"].c_str());
-	motorConfig.s.iMax = atoi(cfg["motor"]["max current"].c_str());
-	motorConfig.s.motorKt_a = atof(cfg["motor"]["torque constant a"].c_str());
-	motorConfig.s.motorKt_b = atof(cfg["motor"]["torque constant b"].c_str());
-	motorConfig.s.motorKt_c = atof(cfg["motor"]["torque constant c"].c_str());
-	motorConfig.s.torqueBandwidth = atoi(cfg["motor"]["torque bandwidth"].c_str());
 
-	motorConfig.s.outputEncoder = atoi(cfg["output encoder"]["output encoder"].c_str());
-	motorConfig.s.outputEncoderDir = atoi(cfg["output encoder"]["output encoder dir"].c_str());
+	if (!getField(cfg, ini, "motor", "pole pairs", motorConfig.s.polePairs)) return;
+	if (!getField(cfg, ini, "motor", "torque constant", motorConfig.s.motorKt)) return;
+	if (!getField(cfg, ini, "motor", "gear ratio", motorConfig.s.gearRatio)) return;
+	if (!getField(cfg, ini, "motor", "max current", motorConfig.s.iMax)) return;
+	if (!getField(cfg, ini, "motor", "torque constant a", motorConfig.s.motorKt_a)) return;
+	if (!getField(cfg, ini, "motor", "torque constant b", motorConfig.s.motorKt_b)) return;
+	if (!getField(cfg, ini, "motor", "torque constant c", motorConfig.s.motorKt_c)) return;
+	if (!getField(cfg, ini, "motor", "torque bandwidth", motorConfig.s.torqueBandwidth)) return;
+
+	if (!getField(cfg, ini, "output encoder", "output encoder", motorConfig.s.outputEncoder)) return;
+	if (!getField(cfg, ini, "output encoder", "output encoder dir", motorConfig.s.outputEncoderDir)) return;
 
 	char txBuffer[64] = {0};
 	char rxBuffer[64] = {0};
@@ -369,9 +367,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	memcpy(&txBuffer[1], motorConfig.bytes, sizeof(motorConfig.bytes));
 
 	if (!candle->sengGenericFDCanFrame(id, 64, txBuffer, rxBuffer, 100))
-	{
-		std::cout << "FAILED to setup motor" << std::endl;
-	}
+		ui::printFailedToSetupMotor();
 
 	motorMotionConfig_ut motorMotionConfig;
 	memset(motorMotionConfig.bytes, 0, sizeof(motorMotionConfig));
@@ -398,9 +394,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	memcpy(&txBuffer[1], motorMotionConfig.bytes, sizeof(motorMotionConfig.bytes));
 
 	if (!candle->sengGenericFDCanFrame(id, 64, txBuffer, rxBuffer, 100))
-	{
-		std::cout << "FAILED to setup motion motor" << std::endl;
-	}
+		ui::printFailedToSetupMotor();
 
 	candle->configMd80Save(id);
 }
@@ -520,7 +514,7 @@ void MainWorker::bus(std::vector<std::string>& args)
 
 void MainWorker::changeDefaultConfig(std::string bus)
 {
-	mINI::INIFile file(pathFull);
+	mINI::INIFile file(mdtoolConfigPath + mdtoolConfigFileName);
 	mINI::INIStructure ini;
 	file.read(ini);
 	if (!bus.empty()) ini["communication"]["bus"] = bus;
@@ -539,4 +533,33 @@ mab::CANdleBaudrate_E MainWorker::checkSpeedForId(uint16_t id)
 	}
 
 	return mab::CANdleBaudrate_E::CAN_BAUD_1M;
+}
+
+/* gets field only if the value is within bounds form the ini file */
+template <class T>
+bool MainWorker::getField(mINI::INIStructure& cfg, mINI::INIStructure& ini, std::string category, std::string field, T& value)
+{
+	T min = 0;
+	T max = 0;
+
+	if (std::is_same<T, std::uint16_t>::value || std::is_same<T, std::uint8_t>::value || std::is_same<T, std::int8_t>::value)
+	{
+		value = atoi(cfg[category][field].c_str());
+		min = atoi(ini["limit min"][field].c_str());
+		max = atoi(ini["limit max"][field].c_str());
+	}
+	else if (std::is_same<T, std::float_t>::value)
+	{
+		value = strtof(cfg[category][field].c_str(), nullptr);
+		min = strtof(ini["limit min"][field].c_str(), nullptr);
+		max = strtof(ini["limit max"][field].c_str(), nullptr);
+	}
+
+	if (ui::checkParamLimit(value, min, max))
+		return true;
+	else
+	{
+		ui::printParameterOutOfBounds(category, field);
+		return false;
+	}
 }
