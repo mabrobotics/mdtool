@@ -1,4 +1,5 @@
 TARGETS="amd64 aarm64 armhf"
+rm -rf build
 mkdir -p build
 cd build
 
@@ -8,7 +9,7 @@ do
     mkdir -p ${TARGET}
     cd ${TARGET}
     cmake -DARCH=${TARGET} ../..
-    make
+    make -j
     cpack -G DEB
     cd - 
 done

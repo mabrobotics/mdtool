@@ -84,7 +84,7 @@ class MainWorker
 	void setupCalibration(std::vector<std::string>& args);
 	void setupDiagnostic(std::vector<std::string>& args);
 	void setupMotor(std::vector<std::string>& args);
-	void setupDiagnosticExtended(std::vector<std::string>& args);
+	void setupInfo(std::vector<std::string>& args);
 
 	void testMove(std::vector<std::string>& args);
 	void blink(std::vector<std::string>& args);

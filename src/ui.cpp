@@ -80,13 +80,15 @@ void printHelpConfig()
 	vout << "\tmdtool config can 100 105 8M 100" << std::endl;
 	vout << "\tmdtool config save 105" << std::endl;
 	vout << "\tmdtool config current 105 12.5" << std::endl;
+	vout << "\tmdtool config bandwidth 105 500" << std::endl;
 	vout << std::endl;
 	vout << "Supported options: " << std::endl;
 	vout << "\t zero [id] \t\t\t\t sets current drive position as zero reference position." << std::endl;
 	vout << "\t can [id] [new_id] [baudrate] [timeout]  changes FDCAN parameters of the drive. [id] - currend drive id, [new_id] - new id to be set."
 		 << "[baudrate] - can be either 1M, 2M, 5M or 8M, [timeout] - FDCAN communication watchdog timeout in ms." << std::endl;
-	vout << "\t save [id] \t\t\t\t saves current, can(FDCAN) and calibration config to flash, if changed." << std::endl;
+	vout << "\t save [id] \t\t\t\t saves parameters to flash memory." << std::endl;
 	vout << "\t current [id] [current] \t\t sets max phase current the drive will output. Check MD80 docs for more info. [current] - current limit in Amps." << std::endl;
+	vout << "\t bandwidth [id] \t\t\t\t sets the torque bandwidth parameter" << std::endl;
 }
 void printHelpSetup()
 {
@@ -97,10 +99,14 @@ void printHelpSetup()
 	vout << "Example: " << std::endl;
 	vout << "\tmdtool setup calibration 74 500" << std::endl;
 	vout << "\tmdtool setup diagnostic 211" << std::endl;
+	vout << "\tmdtool setup motor 100 AK80-9.cfg" << std::endl;
+	vout << "\tmdtool setup info 100" << std::endl;
 	vout << std::endl;
 	vout << "Supported options: " << std::endl;
 	vout << "\t calibration [id] [torque bandwidth] \t Starts motor calibration procedure for a given torque bandwidth in Hz. For more information please refer to the manual." << std::endl;
 	vout << "\t diagnostic  [id] \t\t\t Prints diagnostic information." << std::endl;
+	vout << "\t motor  [id] [*.cfg] \t\t\t loads selected config." << std::endl;
+	vout << "\t info  [id] \t\t\t Prints detailed info about controller." << std::endl;
 }
 bool getCalibrationConfirmation()
 {

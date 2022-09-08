@@ -28,7 +28,7 @@ enum class toolsOptions_E
 	CALIBRATION,
 	DIAGNOSTIC,
 	MOTOR,
-	DIAGNOSTIC_EX,
+	INFO,
 };
 toolsOptions_E str2option(std::string& opt)
 {
@@ -48,8 +48,8 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::DIAGNOSTIC;
 	if (opt == "motor")
 		return toolsOptions_E::MOTOR;
-	if (opt == "diagnostic_ex")
-		return toolsOptions_E::DIAGNOSTIC_EX;
+	if (opt == "info")
+		return toolsOptions_E::INFO;
 	return toolsOptions_E::NONE;
 }
 toolsCmd_E str2cmd(std::string& cmd)
@@ -158,8 +158,8 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 				setupDiagnostic(args);
 			if (option == toolsOptions_E::MOTOR)
 				setupMotor(args);
-			if (option == toolsOptions_E::DIAGNOSTIC_EX)
-				setupDiagnosticExtended(args);
+			if (option == toolsOptions_E::INFO)
+				setupInfo(args);
 			break;
 		}
 		case toolsCmd_E::TEST:
@@ -399,7 +399,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	candle->configMd80Save(id);
 }
 
-void MainWorker::setupDiagnosticExtended(std::vector<std::string>& args)
+void MainWorker::setupInfo(std::vector<std::string>& args)
 {
 	if (args.size() != 4)
 	{

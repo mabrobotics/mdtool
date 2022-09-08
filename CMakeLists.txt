@@ -50,3 +50,5 @@ install(TARGETS ${PROJECT_NAME}
     DESTINATION /usr/local/bin)
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/template_package/etc"
     DESTINATION /)
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/template_package/MDtool_motors"
+    DESTINATION ${HOME})
