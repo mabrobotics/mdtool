@@ -14,3 +14,9 @@ cd build
 cmake ..
 make
 ```
+for native architecture, or 
+
+```
+./release.sh
+```
+if you want to build for all architectures at once
