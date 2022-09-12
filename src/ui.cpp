@@ -103,7 +103,7 @@ void printHelpSetup()
 	vout << "\tmdtool setup info 100" << std::endl;
 	vout << std::endl;
 	vout << "Supported options: " << std::endl;
-	vout << "\t calibration [id] [torque bandwidth] \t Starts motor calibration procedure for a given torque bandwidth in Hz. For more information please refer to the manual." << std::endl;
+	vout << "\t calibration [id] \t\t\tStarts motor calibration procedure. For more information please refer to the manual." << std::endl;
 	vout << "\t diagnostic  [id] \t\t\t Prints diagnostic information." << std::endl;
 	vout << "\t motor  [id] [*.cfg] \t\t\t loads selected config." << std::endl;
 	vout << "\t info  [id] \t\t\t Prints detailed info about controller." << std::endl;

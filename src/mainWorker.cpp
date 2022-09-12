@@ -287,7 +287,7 @@ void MainWorker::configBandwidth(std::vector<std::string>& args)
 
 void MainWorker::setupCalibration(std::vector<std::string>& args)
 {
-	if (args.size() != 5)
+	if (args.size() != 4)
 	{
 		ui::printTooFewArgsNoHelp();
 		return;
@@ -299,7 +299,8 @@ void MainWorker::setupCalibration(std::vector<std::string>& args)
 	checkSpeedForId(id);
 	if (!candle->addMd80(id))
 		return;
-	candle->setupMd80Calibration(id, (uint16_t)atoi(args[4].c_str()));
+
+	candle->setupMd80Calibration(id);
 }
 void MainWorker::setupDiagnostic(std::vector<std::string>& args)
 {
