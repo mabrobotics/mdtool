@@ -354,6 +354,8 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!getField(cfg, ini, "motor", "torque constant b", motorConfig.s.motorKt_b)) return;
 	if (!getField(cfg, ini, "motor", "torque constant c", motorConfig.s.motorKt_c)) return;
 	if (!getField(cfg, ini, "motor", "torque bandwidth", motorConfig.s.torqueBandwidth)) return;
+	if (!getField(cfg, ini, "motor", "dynamic friction", motorConfig.s.friction)) return;
+	if (!getField(cfg, ini, "motor", "static friction", motorConfig.s.stiction)) return;
 
 	if (!getField(cfg, ini, "output encoder", "output encoder", motorConfig.s.outputEncoder)) return;
 	if (!getField(cfg, ini, "output encoder", "output encoder dir", motorConfig.s.outputEncoderDir)) return;

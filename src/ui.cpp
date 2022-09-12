@@ -187,17 +187,20 @@ void printUnableToFindCfgFile(std::string path)
 
 void printDriveInfoExtended(mab::motorParameters_ut* motorParameters, int id, float pos, float vel, float torque, float temperature, unsigned short error, mab::CANdleBaudrate_E baud)
 {
+	auto getStringBuildDate = [](uint32_t date)
+	{ return std::to_string(date % 100) + '.' + std::to_string((date / 100) % 100) + '.' + "20" + std::to_string(date / 10000); };
+
 	vout << "Drive " << id << ":" << std::endl;
 	vout << "- actuator name: " << motorParameters->s.motorName << std::endl;
-	vout << "- firmware version: " << motorParameters->s.firmwareVersion << std::endl;
-	vout << "- build date: " << motorParameters->s.buildDate << std::endl;
+	vout << "- firmware version: V" << motorParameters->s.firmwareVersion / 10 << "." << motorParameters->s.firmwareVersion % 10 << std::endl;
+	vout << "- build date: " << getStringBuildDate(motorParameters->s.buildDate) << std::endl;
 	vout << "- commit hash: " << motorParameters->s.commitHash << std::endl;
 	vout << "- max current: " << motorParameters->s.iMax << " A" << std::endl;
-	vout << "- bridge type: " << motorParameters->s.DRVType << std::endl;
+	vout << "- bridge type: " << std::to_string(motorParameters->s.DRVType) << std::endl;
 	vout << "- d-axis resistance: " << motorParameters->s.resistance << " Ohm" << std::endl;
 	vout << "- d-axis inductance: " << motorParameters->s.inductance << " H" << std::endl;
 	vout << "- torque bandwidth: " << motorParameters->s.torqueBandwidth << " Hz" << std::endl;
-	vout << "- CAN speed: " << baud << "M" << std::endl;
+	vout << "- CAN speed: " << baud << " M" << std::endl;
 	vout << "- position: " << pos << " rad" << std::endl;
 	vout << "- velocity: " << vel << " rad/s" << std::endl;
 	vout << "- torque: " << torque << " Nm" << std::endl;

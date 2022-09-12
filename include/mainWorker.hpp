@@ -13,7 +13,7 @@ class MainWorker
 #pragma pack(push, 1)
 	typedef struct
 	{
-		char motorName[20];
+		char motorName[18];
 		uint16_t canId;
 		uint32_t canBaudrate;
 		uint16_t canWdgPeriod;
@@ -27,6 +27,8 @@ class MainWorker
 		uint8_t outputEncoder;
 		int8_t outputEncoderDir;
 		uint16_t torqueBandwidth;
+		float friction;
+		float stiction;
 	} motorConfig_t;
 
 	typedef struct

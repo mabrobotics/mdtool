@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 TARGETS="amd64 aarm64 armhf"
 rm -rf build
 mkdir -p build
