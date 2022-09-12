@@ -8,7 +8,7 @@ do
     # create one build dir per target architecture
     mkdir -p ${TARGET}
     cd ${TARGET}
-    cmake -DARCH=${TARGET} ../..
+    cmake -DDISABLE_TESTS=ON -DARCH=${TARGET} ../..
     make -j
     cpack -G DEB
     cd - 

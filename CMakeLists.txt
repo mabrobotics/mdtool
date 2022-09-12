@@ -29,6 +29,8 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 
 file(GLOB SRC "src/*.cpp")
 
+enable_testing()
+
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CANDLE_BUILD_STATIC ON)
 set(CANDLE_OMIT_EXAMPLES ON)
@@ -38,6 +40,10 @@ add_executable(${PROJECT_NAME} ${SRC})
 target_link_libraries(${PROJECT_NAME} candle)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/candle/include ${CMAKE_SOURCE_DIR}/3rd_party/mINI/src)
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "mdtool")
+
+if(NOT DISABLE_TESTS)
+    add_subdirectory(test)
+endif()
 
 set(CPACK_PROJECT_NAME "mdtool")
 set(CPACK_PACKAGE_NAME "mdtool")
@@ -50,5 +56,3 @@ install(TARGETS ${PROJECT_NAME}
     DESTINATION /usr/local/bin)
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/template_package/etc"
     DESTINATION /)
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/template_package/MDtool_motors"
-    DESTINATION ${HOME})
