@@ -24,8 +24,8 @@ class MainWorker
 		float motorKt_c;
 		float iMax;
 		float gearRatio;
-		uint8_t outputEncoder;
-		int8_t outputEncoderDir;
+		int outputEncoder;
+		float outputEncoderDir;
 		uint16_t torqueBandwidth;
 		float friction;
 		float stiction;

@@ -357,46 +357,45 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!getField(cfg, ini, "motor", "torque bandwidth", motorConfig.s.torqueBandwidth)) return;
 	if (!getField(cfg, ini, "motor", "dynamic friction", motorConfig.s.friction)) return;
 	if (!getField(cfg, ini, "motor", "static friction", motorConfig.s.stiction)) return;
-
 	if (!getField(cfg, ini, "output encoder", "output encoder", motorConfig.s.outputEncoder)) return;
 	if (!getField(cfg, ini, "output encoder", "output encoder dir", motorConfig.s.outputEncoderDir)) return;
 
-	char txBuffer[64] = {0};
-	char rxBuffer[64] = {0};
-
-	static_assert(sizeof(motorConfig.bytes) <= 63);
-
-	txBuffer[0] = mab::FRAME_MOTOR_CONFIG;
-	memcpy(&txBuffer[1], motorConfig.bytes, sizeof(motorConfig.bytes));
-
-	if (!candle->sengGenericFDCanFrame(id, 64, txBuffer, rxBuffer, 100))
+	if (!candle->writeMd80Register(id,
+								   mab::Md80Reg_E::motorName, motorConfig.s.motorName,
+								   mab::Md80Reg_E::motorPolePairs, motorConfig.s.polePairs,
+								   mab::Md80Reg_E::motorKt, motorConfig.s.motorKt,
+								   mab::Md80Reg_E::motorGearRatio, motorConfig.s.gearRatio,
+								   mab::Md80Reg_E::motorIMax, motorConfig.s.iMax,
+								   mab::Md80Reg_E::motorTorgueBandwidth, motorConfig.s.torqueBandwidth))
 		ui::printFailedToSetupMotor();
 
-	motorMotionConfig_ut motorMotionConfig;
-	memset(motorMotionConfig.bytes, 0, sizeof(motorMotionConfig));
+	if (!candle->writeMd80Register(id,
+								   mab::Md80Reg_E::motorFriction, motorConfig.s.friction,
+								   mab::Md80Reg_E::motorStiction, motorConfig.s.stiction,
+								   mab::Md80Reg_E::motorKt_a, motorConfig.s.motorKt_a,
+								   mab::Md80Reg_E::motorKt_b, motorConfig.s.motorKt_b,
+								   mab::Md80Reg_E::motorKt_c, motorConfig.s.motorKt_c,
+								   mab::Md80Reg_E::outputEncoder, motorConfig.s.outputEncoder,
+								   mab::Md80Reg_E::outputEncoderDir, motorConfig.s.outputEncoderDir))
+		ui::printFailedToSetupMotor();
 
-	motorMotionConfig.s.impedancePdGains.kp = atof(cfg["impedance PD"]["kp"].c_str());
-	motorMotionConfig.s.impedancePdGains.kd = atof(cfg["impedance PD"]["kd"].c_str());
-	motorMotionConfig.s.impedancePdGains.outMax = atof(cfg["impedance PD"]["max out"].c_str());
+	if (!candle->writeMd80Register(100,
+								   mab::Md80Reg_E::motorImpPidKp, (float)atof(cfg["impedance PD"]["kp"].c_str()),
+								   mab::Md80Reg_E::motorImpPidKd, (float)atof(cfg["impedance PD"]["kd"].c_str()),
+								   mab::Md80Reg_E::motorPosPidKp, (float)atof(cfg["position PID"]["kp"].c_str()),
+								   mab::Md80Reg_E::motorPosPidKi, (float)atof(cfg["position PID"]["ki"].c_str()),
+								   mab::Md80Reg_E::motorPosPidKd, (float)atof(cfg["position PID"]["kd"].c_str()),
+								   mab::Md80Reg_E::motorVelPidKp, (float)atof(cfg["velocity PID"]["kp"].c_str()),
+								   mab::Md80Reg_E::motorVelPidKi, (float)atof(cfg["velocity PID"]["ki"].c_str()),
+								   mab::Md80Reg_E::motorVelPidKd, (float)atof(cfg["velocity PID"]["kd"].c_str())))
+		ui::printFailedToSetupMotor();
 
-	motorMotionConfig.s.positionPidGains.kp = atof(cfg["position PID"]["kp"].c_str());
-	motorMotionConfig.s.positionPidGains.ki = atof(cfg["position PID"]["ki"].c_str());
-	motorMotionConfig.s.positionPidGains.kd = atof(cfg["position PID"]["kd"].c_str());
-	motorMotionConfig.s.positionPidGains.outMax = atof(cfg["position PID"]["max out"].c_str());
-	motorMotionConfig.s.positionPidGains.intWindup = atof(cfg["position PID"]["windup"].c_str());
-
-	motorMotionConfig.s.velocityPidGains.kp = atof(cfg["velocity PID"]["kp"].c_str());
-	motorMotionConfig.s.velocityPidGains.ki = atof(cfg["velocity PID"]["ki"].c_str());
-	motorMotionConfig.s.velocityPidGains.kd = atof(cfg["velocity PID"]["kd"].c_str());
-	motorMotionConfig.s.velocityPidGains.outMax = atof(cfg["velocity PID"]["max out"].c_str());
-	motorMotionConfig.s.velocityPidGains.intWindup = atof(cfg["velocity PID"]["windup"].c_str());
-
-	static_assert(sizeof(motorMotionConfig.bytes) <= 63);
-
-	txBuffer[0] = mab::FRAME_MOTOR_MOTION_CONFIG;
-	memcpy(&txBuffer[1], motorMotionConfig.bytes, sizeof(motorMotionConfig.bytes));
-
-	if (!candle->sengGenericFDCanFrame(id, 64, txBuffer, rxBuffer, 100))
+	if (!candle->writeMd80Register(100,
+								   mab::Md80Reg_E::motorImpPidOutMax, (float)atof(cfg["impedance PD"]["max out"].c_str()),
+								   mab::Md80Reg_E::motorPosPidOutMax, (float)atof(cfg["position PID"]["max out"].c_str()),
+								   mab::Md80Reg_E::motorPosPidWindup, (float)atof(cfg["position PID"]["windup"].c_str()),
+								   mab::Md80Reg_E::motorVelPidOutMax, (float)atof(cfg["velocity PID"]["max out"].c_str()),
+								   mab::Md80Reg_E::motorVelPidWindup, (float)atof(cfg["velocity PID"]["windup"].c_str())))
 		ui::printFailedToSetupMotor();
 
 	candle->configMd80Save(id);
