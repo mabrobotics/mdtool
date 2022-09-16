@@ -24,7 +24,7 @@ void printDriveInfo(int id, float pos, float vel, float torque, float temperatur
 void printScanOutput(mab::Candle* candle);
 void printFoundDrives(std::vector<uint16_t> ids);
 void printUnableToFindCfgFile(std::string path);
-void printDriveInfoExtended(mab::motorParameters_ut* motorParameters, int id, float pos, float vel, float torque, float temperature, unsigned short error, mab::CANdleBaudrate_E baud);
+void printDriveInfoExtended(mab::Md80& drive);
 void printErrorDetails(unsigned short error);
 void printParameterOutOfBounds(std::string category, std::string field);
 void printFailedToSetupMotor();

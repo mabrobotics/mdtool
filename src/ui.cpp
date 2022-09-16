@@ -185,28 +185,30 @@ void printUnableToFindCfgFile(std::string path)
 	vout << "Unable to find selected config file. Received location: " + path << std::endl;
 }
 
-void printDriveInfoExtended(mab::motorParameters_ut* motorParameters, int id, float pos, float vel, float torque, float temperature, unsigned short error, mab::CANdleBaudrate_E baud)
+void printDriveInfoExtended(mab::Md80& drive)
 {
 	auto getStringBuildDate = [](uint32_t date)
 	{ return std::to_string(date % 100) + '.' + std::to_string((date / 100) % 100) + '.' + "20" + std::to_string(date / 10000); };
 
-	vout << "Drive " << id << ":" << std::endl;
-	vout << "- actuator name: " << motorParameters->s.motorName << std::endl;
-	vout << "- firmware version: V" << motorParameters->s.firmwareVersion / 10 << "." << motorParameters->s.firmwareVersion % 10 << std::endl;
-	vout << "- build date: " << getStringBuildDate(motorParameters->s.buildDate) << std::endl;
-	vout << "- commit hash: " << motorParameters->s.commitHash << std::endl;
-	vout << "- max current: " << motorParameters->s.iMax << " A" << std::endl;
-	vout << "- bridge type: " << std::to_string(motorParameters->s.DRVType) << std::endl;
-	vout << "- d-axis resistance: " << motorParameters->s.resistance << " Ohm" << std::endl;
-	vout << "- d-axis inductance: " << motorParameters->s.inductance << " H" << std::endl;
-	vout << "- torque bandwidth: " << motorParameters->s.torqueBandwidth << " Hz" << std::endl;
-	vout << "- CAN speed: " << baud << " M" << std::endl;
-	vout << "- position: " << pos << " rad" << std::endl;
-	vout << "- velocity: " << vel << " rad/s" << std::endl;
-	vout << "- torque: " << torque << " Nm" << std::endl;
-	vout << "- temperature: " << temperature << " *C" << std::endl;
-	vout << "- error: 0x" << std::hex << (unsigned short)error << std::dec;
-	printErrorDetails(error);
+	vout << "Drive " << drive.getId() << ":" << std::endl;
+	vout << "- actuator name: " << drive.getReadReg().RW.motorName << std::endl;
+	vout << "- gear ratio: " << drive.getReadReg().RW.gearRatio << std::endl;
+	vout << "- firmware version: V" << drive.getReadReg().RO.firmwareVersion / 10 << "." << drive.getReadReg().RO.firmwareVersion % 10 << std::endl;
+	vout << "- build date: " << getStringBuildDate(drive.getReadReg().RO.buildDate) << std::endl;
+	vout << "- commit hash: " << drive.getReadReg().RO.commitHash << std::endl;
+	vout << "- max current: " << drive.getReadReg().RW.iMax << " A" << std::endl;
+	vout << "- bridge type: " << std::to_string(drive.getReadReg().RO.bridgeType) << std::endl;
+	vout << "- d-axis resistance: " << drive.getReadReg().RO.resistance << " Ohm" << std::endl;
+	vout << "- d-axis inductance: " << drive.getReadReg().RO.inductance << " H" << std::endl;
+	vout << "- torque bandwidth: " << drive.getReadReg().RW.torqueBandwidth << " Hz" << std::endl;
+	vout << "- CAN speed: " << drive.getReadReg().RW.canBaudrate / 1000000 << " M" << std::endl;
+	vout << "- CAN watchdog: " << drive.getReadReg().RW.canWatchdog << " ms" << std::endl;
+	vout << "- position: " << drive.getPosition() << " rad" << std::endl;
+	vout << "- velocity: " << drive.getVelocity() << " rad/s" << std::endl;
+	vout << "- torque: " << drive.getTorque() << " Nm" << std::endl;
+	vout << "- temperature: " << drive.getReadReg().RO.temperature << " *C" << std::endl;
+	vout << "- error: 0x" << std::hex << (unsigned short)drive.getReadReg().RO.errorVector << std::dec;
+	printErrorDetails(drive.getReadReg().RO.errorVector);
 }
 
 void printErrorDetails(unsigned short error)
