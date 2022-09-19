@@ -67,9 +67,15 @@ class MainWorker
 		uint8_t bytes[sizeof(motorMotionConfig_t)];
 	} motorMotionConfig_ut;
 
-	const std::string mdtoolConfigFileName = "mdtool.ini";
-	const std::string mdtoolConfigPath = "/etc/mdtool/";
-	const std::string motorConfigPath = "/MDtool_motors/";
+	const std::string mdtoolHomeConfigDirName = ".config";
+	const std::string mdtoolDirName = "mdtool";
+	const std::string mdtoolMotorCfgDirName = "mdtool_motors";
+	const std::string mdtoolIniFileName = "mdtool.ini";
+
+	const std::string mdtoolConfigPath = "/etc/";
+
+	std::string mdtoolBaseDir;
+	std::string mdtoolIniFilePath;
 
 	mab::Candle* candle;
 

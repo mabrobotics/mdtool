@@ -8,7 +8,7 @@
 #define ERROR_OUT_ENCODER_E		2  // 4
 #define ERROR_OUT_ENCODER_COM_E 3  // 8
 #define ERROR_PARAM_IDENT		4  // 16
-#define ERROR_EMPTY4			5  // 32           //NOT USED YET
+#define ERROR_MOTOR_SETUP		5  // 32           //NOT USED YET
 #define ERROR_EMPTY5			6  // 64           //NOT USED YET
 #define ERROR_EMPTY6			7  // 128          //NOT USED YET
 
@@ -226,6 +226,8 @@ void printErrorDetails(unsigned short error)
 			vout << "ERROR_OUT_ENCODER_COM_E, ";
 		if (error & (1 << ERROR_PARAM_IDENT))
 			vout << "ERROR_PARAM_IDENT, ";
+		if (error & (1 << ERROR_MOTOR_SETUP))
+			vout << "ERROR_MOTOR_SETUP, ";
 		if (error & (1 << ERROR_UNDERVOLTAGE))
 			vout << "ERROR_UNDERVOLTAGE, ";
 		if (error & (1 << ERROR_OVERVOLTAGE))

@@ -86,8 +86,16 @@ mab::CANdleBaudrate_E str2baud(std::string& baud)
 
 MainWorker::MainWorker(std::vector<std::string>& args)
 {
-	toolsCmd_E cmd = toolsCmd_E::NONE;
+	mdtoolBaseDir = std::string(getenv("HOME")) + "/" + mdtoolHomeConfigDirName + "/" + mdtoolDirName;
+	mdtoolIniFilePath = mdtoolBaseDir + "/" + mdtoolIniFileName;
+
+	/* copy motors configs directory - not the best practice to use system() but std::filesystem is not available until C++17 */
+	struct stat info;
+	if (stat(mdtoolBaseDir.c_str(), &info) != 0)
+		system(("cp -r " + mdtoolConfigPath + mdtoolDirName + " " + mdtoolBaseDir).c_str());
+
 	/* defaults */
+	toolsCmd_E cmd = toolsCmd_E::NONE;
 	mab::BusType_E busType = mab::BusType_E::USB;
 	mab::CANdleBaudrate_E baud = mab::CANdleBaudrate_E::CAN_BAUD_1M;
 
@@ -109,7 +117,7 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 			printVerbose = false;
 	}
 
-	mINI::INIFile file(mdtoolConfigPath + mdtoolConfigFileName);
+	mINI::INIFile file(mdtoolIniFilePath);
 	mINI::INIStructure ini;
 	file.read(ini);
 
@@ -324,15 +332,12 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!candle->addMd80(id))
 		return;
 
-	std::string path = (std::string(getenv("HOME")) + motorConfigPath + args[4].c_str());
-
-	/* create motor configs directory if it doesnt exist already */
-	std::filesystem::create_directory(std::string(getenv("HOME")) + motorConfigPath);
+	std::string path = (mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" + args[4].c_str());
 
 	mINI::INIFile motorCfg(path);
 	mINI::INIStructure cfg;
 
-	mINI::INIFile file(mdtoolConfigPath + mdtoolConfigFileName);
+	mINI::INIFile file(mdtoolIniFilePath);
 	mINI::INIStructure ini;
 	file.read(ini);
 
@@ -515,7 +520,7 @@ void MainWorker::bus(std::vector<std::string>& args)
 
 void MainWorker::changeDefaultConfig(std::string bus)
 {
-	mINI::INIFile file(mdtoolConfigPath + mdtoolConfigFileName);
+	mINI::INIFile file(mdtoolIniFilePath);
 	mINI::INIStructure ini;
 	file.read(ini);
 	if (!bus.empty()) ini["communication"]["bus"] = bus;

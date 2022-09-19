@@ -22,7 +22,7 @@ endif()
 
 project(mdtool-${ARCH} VERSION ${MDTOOL_VERSION})
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 add_compile_options(-Wall -Wextra -Wpedantic)
 
 file(GLOB SRC "src/*.cpp")
@@ -43,16 +43,19 @@ if(MAKE_TESTS)
     add_subdirectory(test)
 endif()
 
+set(CPACK_GENERATOR "DEB")
 set(CPACK_PROJECT_NAME "mdtool")
 set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "MAB Robotics <contact@mabrobotics.pl>")
-set(CPACK_GENERATOR "DEB")
+set(CPACK_PACKAGE_VENDOR "MAB Robotics")
+set(CPACK_PACKAGE_DESCRIPTION "Console tool for configuring and setting up MD80 via CANdle")
+set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${ARCH})
+set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${PROJECT_SOURCE_DIR}/template_package/postinst")
+
 include(CPack)
 
 install(TARGETS ${PROJECT_NAME}
     DESTINATION /usr/local/bin)
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/template_package/etc"
     DESTINATION /)
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/template_package/MDtool_motors"
-    DESTINATION /etc/mdtool/)

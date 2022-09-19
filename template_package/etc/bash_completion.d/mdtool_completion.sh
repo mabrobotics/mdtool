@@ -5,7 +5,7 @@ _have mdtool &&
 _mdtool_complete()
 {
 	local cur prev prev2
-	local MEMO_DIR=$HOME/MDtool_motors
+	local MEMO_DIR=$HOME/.config/mdtool/mdtool_motors
 	
 	COMPREPLY=()
 	cur=${COMP_WORDS[COMP_CWORD]}
