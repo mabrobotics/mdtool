@@ -10,63 +10,6 @@ class MainWorker
 	MainWorker(std::vector<std::string>& args);
 
    private:
-#pragma pack(push, 1)
-	typedef struct
-	{
-		char motorName[18];
-		uint16_t canId;
-		uint32_t canBaudrate;
-		uint16_t canWdgPeriod;
-		uint8_t polePairs;
-		float motorKt;
-		float motorKt_a;
-		float motorKt_b;
-		float motorKt_c;
-		float iMax;
-		float gearRatio;
-		int outputEncoder;
-		float outputEncoderDir;
-		uint16_t torqueBandwidth;
-		float friction;
-		float stiction;
-	} motorConfig_t;
-
-	typedef struct
-	{
-		float kp;
-		float kd;
-		float outMax;
-	} ImpedanceControllerGains_t;
-
-	typedef struct
-	{
-		float kp;
-		float ki;
-		float kd;
-		float intWindup;
-		float outMax;
-	} PidControllerGains_t;
-
-	typedef struct
-	{
-		ImpedanceControllerGains_t impedancePdGains;
-		PidControllerGains_t velocityPidGains;
-		PidControllerGains_t positionPidGains;
-	} motorMotionConfig_t;
-
-#pragma pack(pop)
-	typedef union
-	{
-		motorConfig_t s;
-		uint8_t bytes[sizeof(motorConfig_t)];
-	} motorConfig_ut;
-
-	typedef union
-	{
-		motorMotionConfig_t s;
-		uint8_t bytes[sizeof(motorMotionConfig_t)];
-	} motorMotionConfig_ut;
-
 	const std::string mdtoolHomeConfigDirName = ".config";
 	const std::string mdtoolDirName = "mdtool";
 	const std::string mdtoolMotorCfgDirName = "mdtool_motors";
@@ -101,7 +44,6 @@ class MainWorker
 
 	void changeDefaultConfig(std::string bus);
 	mab::CANdleBaudrate_E checkSpeedForId(uint16_t id);
-	void checkConfigLimits(motorConfig_ut* motorConfig, motorMotionConfig_ut* motorMotionConfig);
 
 	template <class T>
 	bool getField(mINI::INIStructure& cfg, mINI::INIStructure& ini, std::string category, std::string field, T& value);
