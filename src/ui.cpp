@@ -8,8 +8,8 @@
 #define ERROR_OUT_ENCODER_E		2  // 4
 #define ERROR_OUT_ENCODER_COM_E 3  // 8
 #define ERROR_PARAM_IDENT		4  // 16
-#define ERROR_MOTOR_SETUP		5  // 32           //NOT USED YET
-#define ERROR_EMPTY5			6  // 64           //NOT USED YET
+#define ERROR_MOTOR_SETUP		5  // 32
+#define ERROR_POLE_PAIR_DET		6  // 64
 #define ERROR_EMPTY6			7  // 128          //NOT USED YET
 
 #define ERROR_UNDERVOLTAGE		8	// 256
@@ -190,19 +190,47 @@ void printDriveInfoExtended(mab::Md80& drive)
 	auto getStringBuildDate = [](uint32_t date)
 	{ return std::to_string(date % 100) + '.' + std::to_string((date / 100) % 100) + '.' + "20" + std::to_string(date / 10000); };
 
-	vout << "Drive " << drive.getId() << ":" << std::endl;
+	auto getHardwareVersion = [](uint8_t version)
+	{
+		switch (version)
+		{
+			case 0:
+				return "HV13";
+			case 1:
+				return "HW11";
+			case 2:
+				return "TR10";
+			default:
+				return "UNKNOWN";
+		}
+	};
+
+	vout
+		<< "Drive " << drive.getId() << ":" << std::endl;
 	vout << "- actuator name: " << drive.getReadReg().RW.motorName << std::endl;
+	vout << "- CAN speed: " << drive.getReadReg().RW.canBaudrate / 1000000 << " M" << std::endl;
 	vout << "- gear ratio: " << drive.getReadReg().RW.gearRatio << std::endl;
 	vout << "- firmware version: V" << drive.getReadReg().RO.firmwareVersion / 10 << "." << drive.getReadReg().RO.firmwareVersion % 10 << std::endl;
+	vout << "- hardware version: " << getHardwareVersion(drive.getReadReg().RO.hardwareVersion) << std::endl;
 	vout << "- build date: " << getStringBuildDate(drive.getReadReg().RO.buildDate) << std::endl;
 	vout << "- commit hash: " << drive.getReadReg().RO.commitHash << std::endl;
 	vout << "- max current: " << drive.getReadReg().RW.iMax << " A" << std::endl;
 	vout << "- bridge type: " << std::to_string(drive.getReadReg().RO.bridgeType) << std::endl;
+	vout << "- pole pairs: " << std::to_string(drive.getReadReg().RW.polePairs) << std::endl;
+	vout << "- KV rating: " << std::to_string(drive.getReadReg().RW.motorKV) << " rpm/V" << std::endl;
+	vout << "- motor torque constant: " << drive.getReadReg().RW.motorKt << " Nm/A" << std::endl;
+	vout << "- motor stiction: " << drive.getReadReg().RW.stiction << " Nm" << std::endl;
+	vout << "- motor friction: " << drive.getReadReg().RW.friction << " Nm" << std::endl;
 	vout << "- d-axis resistance: " << drive.getReadReg().RO.resistance << " Ohm" << std::endl;
 	vout << "- d-axis inductance: " << drive.getReadReg().RO.inductance << " H" << std::endl;
 	vout << "- torque bandwidth: " << drive.getReadReg().RW.torqueBandwidth << " Hz" << std::endl;
-	vout << "- CAN speed: " << drive.getReadReg().RW.canBaudrate / 1000000 << " M" << std::endl;
 	vout << "- CAN watchdog: " << drive.getReadReg().RW.canWatchdog << " ms" << std::endl;
+	vout << "- output encoder: " << (drive.getReadReg().RW.outputEncoder ? "yes" : "no") << std::endl;
+	if (drive.getReadReg().RW.outputEncoder != 0)
+	{
+		vout << "- output direction: " << drive.getReadReg().RW.outputEncoderDir << std::endl;
+		vout << "- output encoder default baudrate: " << drive.getReadReg().RW.outputEncoderDefaultBaud << std::endl;
+	}
 	vout << "- position: " << drive.getPosition() << " rad" << std::endl;
 	vout << "- velocity: " << drive.getVelocity() << " rad/s" << std::endl;
 	vout << "- torque: " << drive.getTorque() << " Nm" << std::endl;
@@ -228,6 +256,8 @@ void printErrorDetails(unsigned short error)
 			vout << "ERROR_PARAM_IDENT, ";
 		if (error & (1 << ERROR_MOTOR_SETUP))
 			vout << "ERROR_MOTOR_SETUP, ";
+		if (error & (1 << ERROR_POLE_PAIR_DET))
+			vout << "ERROR_MOTOR_POLE_PAIR_DET, ";
 		if (error & (1 << ERROR_UNDERVOLTAGE))
 			vout << "ERROR_UNDERVOLTAGE, ";
 		if (error & (1 << ERROR_OVERVOLTAGE))

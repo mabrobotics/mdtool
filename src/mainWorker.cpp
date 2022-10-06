@@ -130,7 +130,7 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 	else if (busString == "USB")
 		busType = mab::BusType_E::USB;
 
-	candle = new mab::Candle(baud, printVerbose, mab::CANdleFastMode_E::NORMAL, true, busType);
+	candle = new mab::Candle(baud, printVerbose, busType);
 
 	toolsOptions_E option = toolsOptions_E::NONE;
 	if (args.size() > 2)
@@ -349,9 +349,11 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 
 	mab::regWrite_st& regW = candle->getMd80FromList(id).getWriteReg();
 
+	/* add a field here only if you want to test it against limits form the mdtool.ini file */
 	memcpy(regW.RW.motorName, (cfg["motor"]["name"]).c_str(), strlen((cfg["motor"]["name"]).c_str()));
 	if (!getField(cfg, ini, "motor", "pole pairs", regW.RW.polePairs)) return;
 	if (!getField(cfg, ini, "motor", "torque constant", regW.RW.motorKt)) return;
+	if (!getField(cfg, ini, "motor", "KV", regW.RW.motorKV)) return;
 	if (!getField(cfg, ini, "motor", "gear ratio", regW.RW.gearRatio)) return;
 	if (!getField(cfg, ini, "motor", "max current", regW.RW.iMax)) return;
 	if (!getField(cfg, ini, "motor", "torque constant a", regW.RW.motorKt_a)) return;
@@ -362,12 +364,14 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!getField(cfg, ini, "motor", "static friction", regW.RW.stiction)) return;
 	if (!getField(cfg, ini, "output encoder", "output encoder", regW.RW.outputEncoder)) return;
 	if (!getField(cfg, ini, "output encoder", "output encoder dir", regW.RW.outputEncoderDir)) return;
+	regW.RW.outputEncoderDefaultBaud = atoi(cfg["output encoder"]["output encoder default baud"].c_str());
 
 	/* motor base config */
 	if (!candle->writeMd80Register(id,
 								   mab::Md80Reg_E::motorName, regW.RW.motorName,
 								   mab::Md80Reg_E::motorPolePairs, regW.RW.polePairs,
 								   mab::Md80Reg_E::motorKt, regW.RW.motorKt,
+								   mab::Md80Reg_E::motorKV, regW.RW.motorKV,
 								   mab::Md80Reg_E::motorGearRatio, regW.RW.gearRatio,
 								   mab::Md80Reg_E::motorIMax, regW.RW.iMax,
 								   mab::Md80Reg_E::motorTorgueBandwidth, regW.RW.torqueBandwidth))
@@ -381,7 +385,8 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 								   mab::Md80Reg_E::motorKt_b, regW.RW.motorKt_b,
 								   mab::Md80Reg_E::motorKt_c, regW.RW.motorKt_c,
 								   mab::Md80Reg_E::outputEncoder, regW.RW.outputEncoder,
-								   mab::Md80Reg_E::outputEncoderDir, regW.RW.outputEncoderDir))
+								   mab::Md80Reg_E::outputEncoderDir, regW.RW.outputEncoderDir,
+								   mab::Md80Reg_E::outputEncoderDefaultBaud, regW.RW.outputEncoderDefaultBaud))
 		ui::printFailedToSetupMotor();
 
 	/* motor motion config - Position and velocity PID*/
@@ -406,6 +411,8 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 		ui::printFailedToSetupMotor();
 
 	candle->configMd80Save(id);
+
+	sleep(3);
 }
 
 void MainWorker::setupInfo(std::vector<std::string>& args)
