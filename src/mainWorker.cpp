@@ -224,7 +224,7 @@ void MainWorker::ping(std::vector<std::string>& args)
 
 void MainWorker::configCan(std::vector<std::string>& args)
 {
-	if (args.size() != 7)
+	if (args.size() < 7)
 	{
 		ui::printTooFewArgsNoHelp();
 		return;
@@ -236,7 +236,8 @@ void MainWorker::configCan(std::vector<std::string>& args)
 	int new_id = atoi(args[4].c_str());
 	mab::CANdleBaudrate_E baud = str2baud(args[5]);
 	int timeout = atoi(args[6].c_str());
-	candle->configMd80Can(id, new_id, baud, timeout);
+	bool canTermination = (args.size() > 7 && atoi(args[7].c_str()) > 0) ? true : false;
+	candle->configMd80Can(id, new_id, baud, timeout, canTermination);
 }
 void MainWorker::configSave(std::vector<std::string>& args)
 {
