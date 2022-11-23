@@ -363,6 +363,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!getField(cfg, ini, "motor", "torque bandwidth", regW.RW.torqueBandwidth)) return;
 	if (!getField(cfg, ini, "motor", "dynamic friction", regW.RW.friction)) return;
 	if (!getField(cfg, ini, "motor", "static friction", regW.RW.stiction)) return;
+	if (!getField(cfg, ini, "motor", "shutdown temp", regW.RW.motorShutdownTemp)) return;
 	if (!getField(cfg, ini, "output encoder", "output encoder", regW.RW.outputEncoder)) return;
 	if (!getField(cfg, ini, "output encoder", "output encoder dir", regW.RW.outputEncoderDir)) return;
 	regW.RW.outputEncoderDefaultBaud = atoi(cfg["output encoder"]["output encoder default baud"].c_str());
@@ -408,11 +409,13 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!candle->writeMd80Register(id,
 								   mab::Md80Reg_E::motorImpPidKp, (float)atof(cfg["impedance PD"]["kp"].c_str()),
 								   mab::Md80Reg_E::motorImpPidKd, (float)atof(cfg["impedance PD"]["kd"].c_str()),
-								   mab::Md80Reg_E::motorImpPidOutMax, (float)atof(cfg["impedance PD"]["max out"].c_str())))
+								   mab::Md80Reg_E::motorImpPidOutMax, (float)atof(cfg["impedance PD"]["max out"].c_str()),
+								   mab::Md80Reg_E::motorShutdownTemp, regW.RW.motorShutdownTemp))
 		ui::printFailedToSetupMotor();
 
 	candle->configMd80Save(id);
 
+	/* wait for a full reboot */
 	sleep(3);
 }
 
@@ -450,6 +453,15 @@ void MainWorker::testMove(std::vector<std::string>& args)
 
 	if (!candle->addMd80(id))
 		return;
+
+	/* check if no critical errors are present */
+	if (candle->md80s[0].getErrorVector() & 0x0BFFF)
+	{
+		std::cout << "Could not proceed due to errors: ";
+		ui::printErrorDetails(candle->md80s[0].getErrorVector());
+		return;
+	}
+
 	candle->controlMd80SetEncoderZero(id);
 	candle->controlMd80Mode(id, mab::Md80Mode_E::IMPEDANCE);
 	candle->controlMd80Enable(id, true);
@@ -465,6 +477,7 @@ void MainWorker::testMove(std::vector<std::string>& args)
 		usleep(10000);
 		ui::printPosition(id, candle->md80s[0].getPosition());
 	}
+	std::cout << std::endl;
 
 	candle->end();
 	candle->controlMd80Enable(id, false);

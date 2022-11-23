@@ -1,5 +1,6 @@
 #include "ui.hpp"
 
+#include <iomanip>
 #include <iostream>
 #include <streambuf>
 
@@ -14,13 +15,19 @@
 
 #define ERROR_UNDERVOLTAGE		8	// 256
 #define ERROR_OVERVOLTAGE		9	// 512
-#define ERROR_TEMP_W			10	// 1024         //NOT USED YET
-#define ERROR_TEMP_SD			11	// 2048
+#define ERROR_MOTOR_TEMP		10	// 1024
+#define ERROR_MOSFET_TEMP		11	// 2048
 #define ERROR_CALIBRATION		12	// 4096         //NOT USED YET
 #define ERROR_OCD				13	// 8092
 #define ERROR_CAN_WD			14	// 16384
-#define ERROR_EMPTY7			15	// 32768        //NOT USED YET
+#define ERROR_LOOPBACK			15	// 32768        //NOT USED YET
 
+/* ERROR COLORING NOTE: may not work on all terminals! */
+#define REDSTART  "\033[1;31m"
+#define REDGREEN  "\033[1;32m"
+#define RESETTEXT "\033[0m"
+#define RED(x)	  REDSTART x RESETTEXT
+#define GREEN(x)  GREENSTART x RESETTEXT
 namespace ui
 {
 class mystreambuf : public std::streambuf
@@ -126,7 +133,7 @@ bool getCalibrationConfirmation()
 }
 void printPosition(int id, float pos)
 {
-	vout << "Drive " << id << " Position: " << pos << std::endl;
+	vout << std::fixed << std::setprecision(3) << "\rDrive " << id << " Position: " << pos;
 }
 void printPositionAndVelocity(int id, float pos, float velocity)
 {
@@ -205,37 +212,39 @@ void printDriveInfoExtended(mab::Md80& drive)
 		}
 	};
 
-	vout
-		<< "Drive " << drive.getId() << ":" << std::endl;
+	vout << std::fixed;
+	vout << "Drive " << drive.getId() << ":" << std::endl;
 	vout << "- actuator name: " << drive.getReadReg().RW.motorName << std::endl;
 	vout << "- CAN speed: " << drive.getReadReg().RW.canBaudrate / 1000000 << " M" << std::endl;
 	vout << "- CAN termination resistor: " << ((drive.getReadReg().RW.canTermination == true) ? "enabled" : "disabled") << std::endl;
-	vout << "- gear ratio: " << drive.getReadReg().RW.gearRatio << std::endl;
+	vout << "- gear ratio: " << std::setprecision(3) << drive.getReadReg().RW.gearRatio << std::endl;
 	vout << "- firmware version: V" << drive.getReadReg().RO.firmwareVersion / 10 << "." << drive.getReadReg().RO.firmwareVersion % 10 << std::endl;
 	vout << "- hardware version: " << getHardwareVersion(drive.getReadReg().RO.hardwareVersion) << std::endl;
 	vout << "- build date: " << getStringBuildDate(drive.getReadReg().RO.buildDate) << std::endl;
 	vout << "- commit hash: " << drive.getReadReg().RO.commitHash << std::endl;
-	vout << "- max current: " << drive.getReadReg().RW.iMax << " A" << std::endl;
+	vout << "- max current: " << std::setprecision(1) << drive.getReadReg().RW.iMax << " A" << std::endl;
 	vout << "- bridge type: " << std::to_string(drive.getReadReg().RO.bridgeType) << std::endl;
 	vout << "- pole pairs: " << std::to_string(drive.getReadReg().RW.polePairs) << std::endl;
 	vout << "- KV rating: " << std::to_string(drive.getReadReg().RW.motorKV) << " rpm/V" << std::endl;
+	vout << "- motor shutdown temperature: " << std::to_string(drive.getReadReg().RW.motorShutdownTemp) << " *C" << std::endl;
 	vout << "- motor torque constant: " << drive.getReadReg().RW.motorKt << " Nm/A" << std::endl;
-	vout << "- motor stiction: " << drive.getReadReg().RW.stiction << " Nm" << std::endl;
-	vout << "- motor friction: " << drive.getReadReg().RW.friction << " Nm" << std::endl;
-	vout << "- d-axis resistance: " << drive.getReadReg().RO.resistance << " Ohm" << std::endl;
-	vout << "- d-axis inductance: " << drive.getReadReg().RO.inductance << " H" << std::endl;
+	vout << "- motor stiction: " << std::setprecision(3) << drive.getReadReg().RW.stiction << " Nm" << std::endl;
+	vout << "- motor friction: " << std::setprecision(3) << drive.getReadReg().RW.friction << " Nm" << std::endl;
+	vout << "- d-axis resistance: " << std::setprecision(3) << drive.getReadReg().RO.resistance << " Ohm" << std::endl;
+	vout << "- d-axis inductance: " << std::setprecision(6) << drive.getReadReg().RO.inductance << " H" << std::endl;
 	vout << "- torque bandwidth: " << drive.getReadReg().RW.torqueBandwidth << " Hz" << std::endl;
 	vout << "- CAN watchdog: " << drive.getReadReg().RW.canWatchdog << " ms" << std::endl;
 	vout << "- output encoder: " << (drive.getReadReg().RW.outputEncoder ? "yes" : "no") << std::endl;
 	if (drive.getReadReg().RW.outputEncoder != 0)
 	{
-		vout << "- output direction: " << drive.getReadReg().RW.outputEncoderDir << std::endl;
+		vout << "- output encoder direction: " << drive.getReadReg().RW.outputEncoderDir << std::endl;
 		vout << "- output encoder default baudrate: " << drive.getReadReg().RW.outputEncoderDefaultBaud << std::endl;
 	}
-	vout << "- position: " << drive.getPosition() << " rad" << std::endl;
-	vout << "- velocity: " << drive.getVelocity() << " rad/s" << std::endl;
-	vout << "- torque: " << drive.getTorque() << " Nm" << std::endl;
-	vout << "- temperature: " << drive.getReadReg().RO.temperature << " *C" << std::endl;
+	vout << "- position: " << std::setprecision(2) << drive.getPosition() << " rad" << std::endl;
+	vout << "- velocity: " << std::setprecision(2) << drive.getVelocity() << " rad/s" << std::endl;
+	vout << "- torque: " << std::setprecision(2) << drive.getTorque() << " Nm" << std::endl;
+	vout << "- MOSFET temperature: " << std::setprecision(2) << drive.getReadReg().RO.mosfetTemperature << " *C" << std::endl;
+	vout << "- motor temperature: " << std::setprecision(2) << drive.getReadReg().RO.motorTemperature << " *C" << std::endl;
 	vout << "- error: 0x" << std::hex << (unsigned short)drive.getReadReg().RO.errorVector << std::dec;
 	printErrorDetails(drive.getReadReg().RO.errorVector);
 }
@@ -246,33 +255,33 @@ void printErrorDetails(unsigned short error)
 	{
 		vout << "  (";
 		if (error & (1 << ERROR_BRIDGE_OCP))
-			vout << "ERROR_BRIDGE_OCP, ";
+			vout << RED("ERROR_BRIDGE_OCP, ");
 		if (error & (1 << ERROR_BRIDGE_FAULT))
-			vout << "ERROR_BRIDGE_FAULT, ";
+			vout << RED("ERROR_BRIDGE_FAULT, ");
 		if (error & (1 << ERROR_OUT_ENCODER_E))
-			vout << "ERROR_OUT_ENCODER_E, ";
+			vout << RED("ERROR_OUT_ENCODER_E, ");
 		if (error & (1 << ERROR_OUT_ENCODER_COM_E))
-			vout << "ERROR_OUT_ENCODER_COM_E, ";
+			vout << RED("ERROR_OUT_ENCODER_COM_E, ");
 		if (error & (1 << ERROR_PARAM_IDENT))
-			vout << "ERROR_PARAM_IDENT, ";
+			vout << RED("ERROR_PARAM_IDENT, ");
 		if (error & (1 << ERROR_MOTOR_SETUP))
-			vout << "ERROR_MOTOR_SETUP, ";
+			vout << RED("ERROR_MOTOR_SETUP, ");
 		if (error & (1 << ERROR_POLE_PAIR_DET))
-			vout << "ERROR_MOTOR_POLE_PAIR_DET, ";
+			vout << RED("ERROR_MOTOR_POLE_PAIR_DET, ");
 		if (error & (1 << ERROR_UNDERVOLTAGE))
-			vout << "ERROR_UNDERVOLTAGE, ";
+			vout << RED("ERROR_UNDERVOLTAGE, ");
 		if (error & (1 << ERROR_OVERVOLTAGE))
-			vout << "ERROR_OVERVOLTAGE, ";
-		if (error & (1 << ERROR_TEMP_W))
-			vout << "ERROR_TEMP_W, ";
-		if (error & (1 << ERROR_TEMP_SD))
-			vout << "ERROR_TEMP_SD, ";
+			vout << RED("ERROR_OVERVOLTAGE, ");
+		if (error & (1 << ERROR_MOTOR_TEMP))
+			vout << RED("ERROR_MOTOR_TEMP, ");
+		if (error & (1 << ERROR_MOSFET_TEMP))
+			vout << RED("ERROR_MOSFET_TEMP, ");
 		if (error & (1 << ERROR_CALIBRATION))
-			vout << "ERROR_CALIBRATION, ";
+			vout << RED("ERROR_CALIBRATION, ");
 		if (error & (1 << ERROR_OCD))
-			vout << "ERROR_OCD, ";
+			vout << RED("ERROR_OCD, ");
 		if (error & (1 << ERROR_CAN_WD))
-			vout << "ERROR_CAN_WD, ";
+			vout << "CAN_WD_TRIGGERED, ";
 		vout << ")";
 	}
 	vout << std::endl;
