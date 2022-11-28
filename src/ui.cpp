@@ -133,7 +133,7 @@ bool getCalibrationConfirmation()
 }
 void printPosition(int id, float pos)
 {
-	vout << std::fixed << std::setprecision(3) << "\rDrive " << id << " Position: " << pos;
+	vout << "Drive " << id << " Position: " << pos << std::endl;
 }
 void printPositionAndVelocity(int id, float pos, float velocity)
 {
@@ -206,7 +206,7 @@ void printDriveInfoExtended(mab::Md80& drive)
 			case 1:
 				return "HW11";
 			case 2:
-				return "TR10";
+				return "HW20";
 			default:
 				return "UNKNOWN";
 		}
