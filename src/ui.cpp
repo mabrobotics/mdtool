@@ -239,6 +239,8 @@ void printDriveInfoExtended(mab::Md80& drive)
 	{
 		vout << "- output encoder direction: " << drive.getReadReg().RW.outputEncoderDir << std::endl;
 		vout << "- output encoder default baudrate: " << drive.getReadReg().RW.outputEncoderDefaultBaud << std::endl;
+		vout << "- output encoder position: " << drive.getReadReg().RO.outputEncoderPosition << " rad" << std::endl;
+		vout << "- output encoder velocity: " << drive.getReadReg().RO.outputEncoderVelocity << " rad/s" << std::endl;
 	}
 	vout << "- position: " << std::setprecision(2) << drive.getPosition() << " rad" << std::endl;
 	vout << "- velocity: " << std::setprecision(2) << drive.getVelocity() << " rad/s" << std::endl;
