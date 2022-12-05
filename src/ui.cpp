@@ -95,7 +95,7 @@ void printHelpConfig()
 		 << "[baudrate] - can be either 1M, 2M, 5M or 8M, [timeout] - FDCAN communication watchdog timeout in ms." << std::endl;
 	vout << "\t save [id] \t\t\t\t saves parameters to flash memory." << std::endl;
 	vout << "\t current [id] [current] \t\t sets max phase current the drive will output. Check MD80 docs for more info. [current] - current limit in Amps." << std::endl;
-	vout << "\t bandwidth [id] \t\t\t\t sets the torque bandwidth parameter" << std::endl;
+	vout << "\t bandwidth [id] \t\t\t sets the torque bandwidth parameter" << std::endl;
 }
 void printHelpSetup()
 {
@@ -110,10 +110,10 @@ void printHelpSetup()
 	vout << "\tmdtool setup info 100" << std::endl;
 	vout << std::endl;
 	vout << "Supported options: " << std::endl;
-	vout << "\t calibration [id] \t\t\tStarts motor calibration procedure. For more information please refer to the manual." << std::endl;
-	vout << "\t diagnostic  [id] \t\t\t Prints diagnostic information." << std::endl;
-	vout << "\t motor  [id] [*.cfg] \t\t\t loads selected config." << std::endl;
-	vout << "\t info  [id] \t\t\t Prints detailed info about controller." << std::endl;
+	vout << "\t calibration [id] \t\t\tstarts motor calibration procedure. For more information please refer to the manual." << std::endl;
+	vout << "\t diagnostic  [id] \t\t\tprints diagnostic information." << std::endl;
+	vout << "\t motor  [id] [*.cfg] \t\t\tloads selected config." << std::endl;
+	vout << "\t info  [id] \t\t\t\tprints detailed info about controller." << std::endl;
 }
 bool getCalibrationConfirmation()
 {
