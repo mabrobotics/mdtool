@@ -84,15 +84,15 @@ void printHelpConfig()
 	vout << std::endl;
 	vout << "Example: " << std::endl;
 	vout << "\tmdtool config zero 14" << std::endl;
-	vout << "\tmdtool config can 100 105 8M 100" << std::endl;
+	vout << "\tmdtool config can 100 105 8M 100 0" << std::endl;
 	vout << "\tmdtool config save 105" << std::endl;
 	vout << "\tmdtool config current 105 12.5" << std::endl;
 	vout << "\tmdtool config bandwidth 105 500" << std::endl;
 	vout << std::endl;
 	vout << "Supported options: " << std::endl;
 	vout << "\t zero [id] \t\t\t\t sets current drive position as zero reference position." << std::endl;
-	vout << "\t can [id] [new_id] [baudrate] [timeout]  changes FDCAN parameters of the drive. [id] - currend drive id, [new_id] - new id to be set."
-		 << "[baudrate] - can be either 1M, 2M, 5M or 8M, [timeout] - FDCAN communication watchdog timeout in ms." << std::endl;
+	vout << "\t can [id] [new_id] [baudrate] [timeout] [termination] changes FDCAN parameters of the drive. [id] - currend drive id, [new_id] - new id to be set."
+		 << "[baudrate] - can be either 1M, 2M, 5M or 8M, [timeout] - FDCAN communication watchdog timeout in ms, [termination] - works from HW V2.0 - 1 to turn on, 0 to turn off" << std::endl;
 	vout << "\t save [id] \t\t\t\t saves parameters to flash memory." << std::endl;
 	vout << "\t current [id] [current] \t\t sets max phase current the drive will output. Check MD80 docs for more info. [current] - current limit in Amps." << std::endl;
 	vout << "\t bandwidth [id] \t\t\t sets the torque bandwidth parameter" << std::endl;
