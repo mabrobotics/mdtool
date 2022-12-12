@@ -29,6 +29,8 @@ enum class toolsOptions_E
 	DIAGNOSTIC,
 	MOTOR,
 	INFO,
+	MOVE,
+	LATENCY,
 };
 toolsOptions_E str2option(std::string& opt)
 {
@@ -50,6 +52,10 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::MOTOR;
 	if (opt == "info")
 		return toolsOptions_E::INFO;
+	if (opt == "latency")
+		return toolsOptions_E::LATENCY;
+	if (opt == "move")
+		return toolsOptions_E::MOVE;
 	return toolsOptions_E::NONE;
 }
 toolsCmd_E str2cmd(std::string& cmd)
@@ -172,7 +178,12 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 		}
 		case toolsCmd_E::TEST:
 		{
-			testMove(args);
+			if (option == toolsOptions_E::NONE)
+				ui::printHelpTest();
+			if (option == toolsOptions_E::LATENCY)
+				testLatency(args);
+			if (option == toolsOptions_E::MOVE)
+				testMove(args);
 			break;
 		}
 		case toolsCmd_E::BLINK:
@@ -437,15 +448,15 @@ void MainWorker::setupInfo(std::vector<std::string>& args)
 
 void MainWorker::testMove(std::vector<std::string>& args)
 {
-	if (args.size() != 4)
+	if (args.size() != 5)
 	{
 		ui::printTooFewArgsNoHelp();
 		return;
 	}
 
-	int id = atoi(args[2].c_str());
+	int id = atoi(args[3].c_str());
 	checkSpeedForId(id);
-	float targetPos = atof(args[3].c_str());
+	float targetPos = atof(args[4].c_str());
 	if (targetPos > 10.0f)
 		targetPos = 10.0f;
 	if (targetPos < -10.0f)
@@ -482,6 +493,58 @@ void MainWorker::testMove(std::vector<std::string>& args)
 	candle->end();
 	candle->controlMd80Enable(id, false);
 }
+
+void MainWorker::testLatency(std::vector<std::string>& args)
+{
+	if (args.size() != 4)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+
+	auto ids = candle->ping(str2baud(args[3]));
+
+	if (ids.size() == 0)
+		return;
+
+	checkSpeedForId(ids[0]);
+
+	for (auto& id : ids)
+	{
+		candle->addMd80(id);
+		candle->controlMd80SetEncoderZero(id);
+		candle->controlMd80Mode(id, mab::Md80Mode_E::IMPEDANCE);
+		candle->controlMd80Enable(id, true);
+	}
+
+	candle->begin();
+	usleep(100000);
+
+	uint32_t average = 0;
+	const uint32_t timelen = 10000;
+	const uint32_t sampletime = 1000;
+
+	float pos = 0.0f;
+	for (uint32_t i = 0; i < timelen; i++)
+	{
+		for (uint32_t j = 0; j < ids.size(); j++)
+			candle->md80s[j].setTargetPosition(pos);
+		usleep(1000);
+
+		if (i % sampletime == 0 && i != 0)
+		{
+			int sample = candle->getActualCommunicationFrequency();
+			average += sample;
+			std::cout << "Current average communication speed: " << sample << std::endl;
+		}
+	}
+	std::cout << "Average communication speed over 10s: " << average / (timelen / sampletime) << std::endl;
+
+	candle->end();
+	for (auto& id : ids)
+		candle->controlMd80Enable(id, false);
+}
+
 void MainWorker::blink(std::vector<std::string>& args)
 {
 	if (args.size() != 3)

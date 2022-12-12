@@ -16,6 +16,7 @@ void printUnknownCmd(std::string arg);
 void printHelp();
 void printHelpConfig();
 void printHelpSetup();
+void printHelpTest();
 
 bool getCalibrationConfirmation();
 void printPosition(int id, float pos);

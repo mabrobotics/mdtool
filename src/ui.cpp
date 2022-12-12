@@ -69,7 +69,7 @@ void printHelp()
 	vout << "\t ping [can speed] \t\t discovers all drives available on FDCAN bus at [can speed] (1M/2M/5M/8M), use 'all' keyword for scanning all speeds at once." << std::endl;
 	vout << "\t config [options] [arguments] \t sets configuration options. use `mdtool config` for more info." << std::endl;
 	vout << "\t setup [options] \t\t launches a setup procedure. Use `mdtool setup` for more info." << std::endl;
-	vout << "\t test [id] [position] \t\t simple test movement from current location to [position]. [position] should be <-10, 10> rad." << std::endl;
+	vout << "\t test [options] \t\t tests the setup. use 'mdtool test' for more info" << std::endl;
 	vout << "\t blink [id] \t\t\t blink LEDs on driver board." << std::endl;
 	vout << "\t encoder [id] \t\t\t prints current position and velocity in a loop." << std::endl;
 	vout << "\t bus [type] \t\t\t changes default CANdle CAN bus [type] (SPI/USB/UART)." << std::endl;
@@ -114,6 +114,20 @@ void printHelpSetup()
 	vout << "\t diagnostic  [id] \t\t\tprints diagnostic information." << std::endl;
 	vout << "\t motor  [id] [*.cfg] \t\t\tloads selected config." << std::endl;
 	vout << "\t info  [id] \t\t\t\tprints detailed info about controller." << std::endl;
+}
+void printHelpTest()
+{
+	vout << std::endl;
+	vout << "Usage: " << std::endl;
+	vout << "\tmdtool test [options] [arguments]" << std::endl;
+	vout << std::endl;
+	vout << "Example: " << std::endl;
+	vout << "\tmdtool test 100 5" << std::endl;
+	vout << "\tmdtool test latency 1M" << std::endl;
+	vout << std::endl;
+	vout << "Supported options: " << std::endl;
+	vout << "\t move [id] [position] \t\t\tsimple test movement from current location to [position]. [position] should be <-10, 10> rad." << std::endl;
+	vout << "\t latency  [baudrate] \t\t\ttests the overall TX message frequency. [baudrate] should be the baudrate of actuators on the CAN bus." << std::endl;
 }
 bool getCalibrationConfirmation()
 {
