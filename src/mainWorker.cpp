@@ -510,12 +510,7 @@ void MainWorker::testLatency(std::vector<std::string>& args)
 	checkSpeedForId(ids[0]);
 
 	for (auto& id : ids)
-	{
 		candle->addMd80(id);
-		candle->controlMd80SetEncoderZero(id);
-		candle->controlMd80Mode(id, mab::Md80Mode_E::IMPEDANCE);
-		candle->controlMd80Enable(id, true);
-	}
 
 	candle->begin();
 	usleep(100000);
@@ -524,25 +519,26 @@ void MainWorker::testLatency(std::vector<std::string>& args)
 	const uint32_t timelen = 10000;
 	const uint32_t sampletime = 1000;
 
-	float pos = 0.0f;
 	for (uint32_t i = 0; i < timelen; i++)
 	{
-		for (uint32_t j = 0; j < ids.size(); j++)
-			candle->md80s[j].setTargetPosition(pos);
 		usleep(1000);
 
 		if (i % sampletime == 0 && i != 0)
 		{
 			int sample = candle->getActualCommunicationFrequency();
 			average += sample;
-			std::cout << "Current average communication speed: " << sample << std::endl;
+			std::cout << "Current average communication speed: " << sample << " Hz" << std::endl;
 		}
 	}
-	std::cout << "Average communication speed over 10s: " << average / (timelen / sampletime) << std::endl;
+	std::cout << "******************************************************************************************************************************" << std::endl;
+	std::cout << std::endl;
+	std::cout << "Average communication speed over 10s with " << ids.size() << " actuators: " << average / ((timelen / sampletime) - 1) << "Hz" << std::endl;
+	std::cout << std::endl;
+	std::cout << "Please note: the result is highly dependent on your PC hardware and reflects the PC <> CANdle rather than PC <> MD80 communication speed." << std::endl;
+	std::cout << "For more information on this test please refer to the manual." << std::endl;
+	std::cout << "******************************************************************************************************************************" << std::endl;
 
 	candle->end();
-	for (auto& id : ids)
-		candle->controlMd80Enable(id, false);
 }
 
 void MainWorker::blink(std::vector<std::string>& args)
