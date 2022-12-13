@@ -3,6 +3,7 @@
 #include <unistd.h>
 
 #include <filesystem>
+#include <numeric>
 
 #include "ui.hpp"
 
@@ -486,7 +487,7 @@ void MainWorker::testMove(std::vector<std::string>& args)
 		pos += dp;
 		candle->md80s[0].setTargetPosition(pos);
 		usleep(10000);
-		ui::printPosition(id, candle->md80s[0].getPosition());
+		ui::printPositionAndVelocity(id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity());
 	}
 	std::cout << std::endl;
 
@@ -513,30 +514,28 @@ void MainWorker::testLatency(std::vector<std::string>& args)
 		candle->addMd80(id);
 
 	candle->begin();
-	usleep(100000);
 
-	uint32_t average = 0;
-	const uint32_t timelen = 10000;
-	const uint32_t sampletime = 1000;
+	std::vector<uint32_t> samples;
+	const uint32_t timelen = 10;
 
 	for (uint32_t i = 0; i < timelen; i++)
 	{
-		usleep(1000);
-
-		if (i % sampletime == 0 && i != 0)
-		{
-			int sample = candle->getActualCommunicationFrequency();
-			average += sample;
-			std::cout << "Current average communication speed: " << sample << " Hz" << std::endl;
-		}
+		sleep(1);
+		samples.push_back(candle->getActualCommunicationFrequency());
+		std::cout << "Current average communication speed: " << samples[i] << " Hz" << std::endl;
 	}
-	std::cout << "******************************************************************************************************************************" << std::endl;
-	std::cout << std::endl;
-	std::cout << "Average communication speed over 10s with " << ids.size() << " actuators: " << average / ((timelen / sampletime) - 1) << "Hz" << std::endl;
-	std::cout << std::endl;
-	std::cout << "Please note: the result is highly dependent on your PC hardware and reflects the PC <> CANdle rather than PC <> MD80 communication speed." << std::endl;
-	std::cout << "For more information on this test please refer to the manual." << std::endl;
-	std::cout << "******************************************************************************************************************************" << std::endl;
+
+	/* calculate mean and stdev */
+	float sum = std::accumulate(std::begin(samples), std::end(samples), 0.0);
+	float m = sum / samples.size();
+
+	float accum = 0.0;
+	std::for_each(std::begin(samples), std::end(samples), [&](const float d)
+				  { accum += (d - m) * (d - m); });
+
+	float stdev = sqrt(accum / (samples.size() - 1));
+
+	ui::printLatencyTestResult(ids.size(), m, stdev);
 
 	candle->end();
 }

@@ -28,6 +28,9 @@ _mdtool_complete()
 			"setup")
 			COMPREPLY=( $(compgen -W "calibration diagnostic motor info" -- $cur) )
 			;;
+			"test")
+			COMPREPLY=( $(compgen -W "move latency" -- $cur) )
+			;;
 			*)
 			;;
 		esac

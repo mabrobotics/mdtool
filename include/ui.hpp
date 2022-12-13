@@ -17,6 +17,7 @@ void printHelp();
 void printHelpConfig();
 void printHelpSetup();
 void printHelpTest();
+void printLatencyTestResult(uint8_t actuatorCount, float average, float stdev);
 
 bool getCalibrationConfirmation();
 void printPosition(int id, float pos);

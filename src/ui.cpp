@@ -129,6 +129,22 @@ void printHelpTest()
 	vout << "\t move [id] [position] \t\t\tsimple test movement from current location to [position]. [position] should be <-10, 10> rad." << std::endl;
 	vout << "\t latency  [baudrate] \t\t\ttests the overall TX message frequency. [baudrate] should be the baudrate of actuators on the CAN bus." << std::endl;
 }
+
+void printLatencyTestResult(uint8_t actuatorCount, float average, float stdev)
+{
+	vout << std::fixed;
+	vout << "******************************************************************************************************************************" << std::endl;
+	vout << std::endl;
+	vout << "Communication speed results during 10s test for " << actuatorCount << " actuators " << std::endl;
+	vout << "Average speed: " << std::setprecision(2) << average << "Hz" << std::endl;
+	vout << "Standard deviation: " << std::setprecision(2) << stdev << "Hz" << std::endl;
+	vout << std::endl;
+	vout << "Please note: the result is highly dependent on your PC hardware and reflects the PC <> CANdle rather than PC <> MD80 communication speed." << std::endl;
+	vout << "For more information on this test please refer to the manual." << std::endl;
+	vout << std::endl;
+	vout << "******************************************************************************************************************************" << std::endl;
+}
+
 bool getCalibrationConfirmation()
 {
 	vout << "This step will start drive calibration. If calibration is done incorrectly or fails the drive will not move. In such case please rerun the calibration and if the problem persists contact MABRobotics." << std::endl;
@@ -145,7 +161,7 @@ bool getCalibrationConfirmation()
 	}
 	return true;
 }
-void printPosition(int id, float pos)
+void printPositionVelocity(int id, float pos)
 {
 	vout << "Drive " << id << " Position: " << pos << std::endl;
 }
