@@ -130,12 +130,12 @@ void printHelpTest()
 	vout << "\t latency  [baudrate] \t\t\ttests the overall TX message frequency. [baudrate] should be the baudrate of actuators on the CAN bus." << std::endl;
 }
 
-void printLatencyTestResult(uint8_t actuatorCount, float average, float stdev)
+void printLatencyTestResult(uint8_t actuatorCount, float average, float stdev, std::string bus)
 {
 	vout << std::fixed;
 	vout << "******************************************************************************************************************************" << std::endl;
 	vout << std::endl;
-	vout << "Communication speed results during 10s test for " << actuatorCount << " actuators " << std::endl;
+	vout << "Communication speed results during 10s test for " << actuatorCount << " actuators and " << bus << " bus" << std::endl;
 	vout << "Average speed: " << std::setprecision(2) << average << "Hz" << std::endl;
 	vout << "Standard deviation: " << std::setprecision(2) << stdev << "Hz" << std::endl;
 	vout << std::endl;
@@ -284,38 +284,39 @@ void printDriveInfoExtended(mab::Md80& drive)
 void printErrorDetails(unsigned short error)
 {
 	if (error != 0)
-	{
-		vout << "  (";
-		if (error & (1 << ERROR_BRIDGE_OCP))
-			vout << RED("ERROR_BRIDGE_OCP, ");
-		if (error & (1 << ERROR_BRIDGE_FAULT))
-			vout << RED("ERROR_BRIDGE_FAULT, ");
-		if (error & (1 << ERROR_OUT_ENCODER_E))
-			vout << RED("ERROR_OUT_ENCODER_E, ");
-		if (error & (1 << ERROR_OUT_ENCODER_COM_E))
-			vout << RED("ERROR_OUT_ENCODER_COM_E, ");
-		if (error & (1 << ERROR_PARAM_IDENT))
-			vout << RED("ERROR_PARAM_IDENT, ");
-		if (error & (1 << ERROR_MOTOR_SETUP))
-			vout << RED("ERROR_MOTOR_SETUP, ");
-		if (error & (1 << ERROR_POLE_PAIR_DET))
-			vout << RED("ERROR_MOTOR_POLE_PAIR_DET, ");
-		if (error & (1 << ERROR_UNDERVOLTAGE))
-			vout << RED("ERROR_UNDERVOLTAGE, ");
-		if (error & (1 << ERROR_OVERVOLTAGE))
-			vout << RED("ERROR_OVERVOLTAGE, ");
-		if (error & (1 << ERROR_MOTOR_TEMP))
-			vout << RED("ERROR_MOTOR_TEMP, ");
-		if (error & (1 << ERROR_MOSFET_TEMP))
-			vout << RED("ERROR_MOSFET_TEMP, ");
-		if (error & (1 << ERROR_CALIBRATION))
-			vout << RED("ERROR_CALIBRATION, ");
-		if (error & (1 << ERROR_OCD))
-			vout << RED("ERROR_OCD, ");
-		if (error & (1 << ERROR_CAN_WD))
-			vout << "CAN_WD_TRIGGERED, ";
-		vout << ")";
-	}
+		return;
+
+	vout << "  (";
+	if (error & (1 << ERROR_BRIDGE_OCP))
+		vout << RED("ERROR_BRIDGE_OCP, ");
+	if (error & (1 << ERROR_BRIDGE_FAULT))
+		vout << RED("ERROR_BRIDGE_FAULT, ");
+	if (error & (1 << ERROR_OUT_ENCODER_E))
+		vout << RED("ERROR_OUT_ENCODER_E, ");
+	if (error & (1 << ERROR_OUT_ENCODER_COM_E))
+		vout << RED("ERROR_OUT_ENCODER_COM_E, ");
+	if (error & (1 << ERROR_PARAM_IDENT))
+		vout << RED("ERROR_PARAM_IDENT, ");
+	if (error & (1 << ERROR_MOTOR_SETUP))
+		vout << RED("ERROR_MOTOR_SETUP, ");
+	if (error & (1 << ERROR_POLE_PAIR_DET))
+		vout << RED("ERROR_MOTOR_POLE_PAIR_DET, ");
+	if (error & (1 << ERROR_UNDERVOLTAGE))
+		vout << RED("ERROR_UNDERVOLTAGE, ");
+	if (error & (1 << ERROR_OVERVOLTAGE))
+		vout << RED("ERROR_OVERVOLTAGE, ");
+	if (error & (1 << ERROR_MOTOR_TEMP))
+		vout << RED("ERROR_MOTOR_TEMP, ");
+	if (error & (1 << ERROR_MOSFET_TEMP))
+		vout << RED("ERROR_MOSFET_TEMP, ");
+	if (error & (1 << ERROR_CALIBRATION))
+		vout << RED("ERROR_CALIBRATION, ");
+	if (error & (1 << ERROR_OCD))
+		vout << RED("ERROR_OCD, ");
+	if (error & (1 << ERROR_CAN_WD))
+		vout << "CAN_WD_TRIGGERED, ";
+	vout << ")";
+
 	vout << std::endl;
 }
 

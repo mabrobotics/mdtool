@@ -17,7 +17,7 @@ void printHelp();
 void printHelpConfig();
 void printHelpSetup();
 void printHelpTest();
-void printLatencyTestResult(uint8_t actuatorCount, float average, float stdev);
+void printLatencyTestResult(uint8_t actuatorCount, float average, float stdev, std::string bus);
 
 bool getCalibrationConfirmation();
 void printPosition(int id, float pos);

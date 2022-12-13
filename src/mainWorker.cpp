@@ -144,7 +144,7 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 	mINI::INIStructure ini;
 	file.read(ini);
 
-	std::string& busString = ini["communication"]["bus"];
+	busString = ini["communication"]["bus"];
 
 	if (busString == "SPI")
 		busType = mab::BusType_E::SPI;
@@ -556,7 +556,7 @@ void MainWorker::testLatency(std::vector<std::string>& args)
 
 	float stdev = sqrt(accum / (samples.size() - 1));
 
-	ui::printLatencyTestResult(ids.size(), m, stdev);
+	ui::printLatencyTestResult(ids.size(), m, stdev, busString);
 
 	candle->end();
 }

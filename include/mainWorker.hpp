@@ -24,6 +24,8 @@ class MainWorker
 
 	mab::Candle* candle;
 
+	std::string busString;
+
 	mab::CANdleBaudrate_E CurrentBaudrate;
 	bool printVerbose = false;
 
