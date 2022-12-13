@@ -43,7 +43,7 @@ class MainWorker
 	void encoder(std::vector<std::string>& args);
 	void bus(std::vector<std::string>& args);
 
-	void changeDefaultConfig(std::string bus);
+	void changeDefaultConfig(std::string bus, std::string device);
 	mab::CANdleBaudrate_E checkSpeedForId(uint16_t id);
 
 	template <class T>

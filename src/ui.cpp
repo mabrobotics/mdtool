@@ -72,7 +72,7 @@ void printHelp()
 	vout << "\t test [options] \t\t tests the setup. use 'mdtool test' for more info" << std::endl;
 	vout << "\t blink [id] \t\t\t blink LEDs on driver board." << std::endl;
 	vout << "\t encoder [id] \t\t\t prints current position and velocity in a loop." << std::endl;
-	vout << "\t bus [type] \t\t\t changes default CANdle CAN bus [type] (SPI/USB/UART)." << std::endl;
+	vout << "\t bus [type] [device] \t\t\t changes default CANdle CAN bus [type] (SPI/USB/UART) and optionally [device] if default is not suitable (applies only for UART and SPI)." << std::endl;
 	vout << std::endl;
 	vout << "Add '-sv' after arguments to suppress output" << std::endl;
 }

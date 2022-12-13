@@ -137,7 +137,12 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 	else if (busString == "USB")
 		busType = mab::BusType_E::USB;
 
-	candle = new mab::Candle(baud, printVerbose, busType);
+	std::string& device = ini["communication"]["device"];
+
+	if (device != "" && busType != mab::BusType_E::USB)
+		candle = new mab::Candle(baud, printVerbose, busType, device);
+	else
+		candle = new mab::Candle(baud, printVerbose, busType);
 
 	toolsOptions_E option = toolsOptions_E::NONE;
 	if (args.size() > 2)
@@ -579,7 +584,7 @@ void MainWorker::encoder(std::vector<std::string>& args)
 }
 void MainWorker::bus(std::vector<std::string>& args)
 {
-	if (args.size() < 3 || args.size() > 3)
+	if (args.size() < 3 || args.size() > 4)
 	{
 		ui::printTooFewArgsNoHelp();
 		return;
@@ -591,18 +596,20 @@ void MainWorker::bus(std::vector<std::string>& args)
 		return;
 	}
 
-	if (args.size() == 4)
-		changeDefaultConfig(args[2]);
-	else
-		changeDefaultConfig(args[2]);
+	changeDefaultConfig(args[2], args[3]);
 }
 
-void MainWorker::changeDefaultConfig(std::string bus)
+void MainWorker::changeDefaultConfig(std::string bus, std::string device)
 {
 	mINI::INIFile file(mdtoolIniFilePath);
 	mINI::INIStructure ini;
 	file.read(ini);
-	if (!bus.empty()) ini["communication"]["bus"] = bus;
+	if (!bus.empty())
+		ini["communication"]["bus"] = bus;
+	if (!device.empty() && (bus == "SPI" || bus == "UART"))
+		ini["communication"]["device"] = device;
+	else
+		ini["communication"]["device"] = "";
 	file.write(ini);
 }
 
