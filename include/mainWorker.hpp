@@ -4,6 +4,8 @@
 #include "candle.hpp"
 #include "mini/ini.h"
 
+const std::string version = "1.2.1";
+
 class MainWorker
 {
    public:

@@ -100,9 +100,20 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 	struct stat info;
 	if (stat(mdtoolBaseDir.c_str(), &info) != 0)
 		system(("cp -r " + mdtoolConfigPath + mdtoolDirName + " " + mdtoolBaseDir).c_str());
-	else /* if the directory is not empty we should only copy the ini file and all default config files */
+	else /* if the directory is not empty we should only copy the ini file (only if the version is newer) and all default config files */
 	{
-		system(("cp " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolIniFileName + " " + mdtoolBaseDir + "/").c_str());
+		mINI::INIFile file(mdtoolIniFilePath);
+		mINI::INIStructure ini;
+		file.read(ini);
+
+		if (ini["general"]["version"] != version)
+		{
+			system(("cp " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolIniFileName + " " + mdtoolBaseDir + "/").c_str());
+			file.read(ini);
+			ini["general"]["version"] = version;
+			file.write(ini);
+		}
+
 		system(("cp -a " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName + "/." + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/").c_str());
 	}
 

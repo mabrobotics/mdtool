@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-set(MDTOOL_VERSION 1.2.0)
+set(MDTOOL_VERSION 1.2.1)
 
 if(NOT DEFINED ARCH)
     set(ARCH "native")
