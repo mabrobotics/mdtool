@@ -103,7 +103,7 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 	else /* if the directory is not empty we should only copy the ini file and all default config files */
 	{
 		system(("cp " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolIniFileName + " " + mdtoolBaseDir + "/").c_str());
-		system(("cp -a" + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName + "/." + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/").c_str());
+		system(("cp -a " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName + "/." + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/").c_str());
 	}
 
 	/* defaults */
