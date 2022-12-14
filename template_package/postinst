@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+echo reloading bash autocompletion script...
+. /etc/bash_completion
