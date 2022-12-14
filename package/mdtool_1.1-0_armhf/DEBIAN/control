@@ -1,6 +1,0 @@
-Package: mdtool
-Version: 1.1
-Maintainer: MAB Robotics <contact@mabrobotics.pl>
-Architecture: armhf
-Description: Tools for configuring md80 motor drives.
-Depends: setserial
