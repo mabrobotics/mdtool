@@ -283,7 +283,7 @@ void printDriveInfoExtended(mab::Md80& drive)
 
 void printErrorDetails(unsigned short error)
 {
-	if (error != 0)
+	if (error == 0)
 		return;
 
 	vout << "  (";
