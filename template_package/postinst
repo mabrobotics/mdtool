@@ -1,3 +1,17 @@
 #!/usr/bin/env bash
-echo reloading bash autocompletion script...
+echo "************************************************************************************"
+echo "* Before first use please make sure the current user is added to the dialout group:*"
+echo "*                                                                                  *"
+echo "*                      sudo adduser <current user> dialout                         *"
+echo "*                                                                                  *"
+echo "* and perform a reboot:                                                            *"
+echo "*                                                                                  *"
+echo "*                                  sudo reboot                                     *"
+echo "*                                                                                  *"
+echo "* Installing setservice package is also recommended:                               *"
+echo "*                                                                                  *"
+echo "*                          sudo apt install setserial                              *"
+echo "*                                                                                  *"
+echo "*    For more please refer to the manual: https://mabrobotics.pl/servos/manual     *"
+echo "************************************************************************************"
 . /etc/bash_completion
