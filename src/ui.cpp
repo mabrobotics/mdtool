@@ -284,7 +284,10 @@ void printDriveInfoExtended(mab::Md80& drive)
 void printErrorDetails(unsigned short error)
 {
 	if (error == 0)
+	{
+		vout << std::endl;
 		return;
+	}
 
 	vout << "  (";
 	if (error & (1 << ERROR_BRIDGE_OCP))
