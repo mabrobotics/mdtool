@@ -31,6 +31,9 @@ void printErrorDetails(unsigned short error);
 void printParameterOutOfBounds(std::string category, std::string field);
 void printFailedToSetupMotor();
 
+const std::vector<std::string> encoderTypes = {"NONE", "AMS5047_CENTER", "AMS5047_OFFAXIS"};
+const std::vector<std::string> encoderModes = {"NONE", "STARTUP", "MOTION", "REPORT"};
+
 template <class T>
 bool checkParamLimit(T value, T min, T max)
 {

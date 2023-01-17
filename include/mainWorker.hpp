@@ -50,6 +50,12 @@ class MainWorker
 	void changeDefaultConfig(std::string bus, std::string device);
 	mab::CANdleBaudrate_E checkSpeedForId(uint16_t id);
 
+	uint8_t getEncoderType(std::string& encoderType);
+	uint8_t getEncoderMode(std::string& encoderMode);
+
+	std::string getEncoderType(uint8_t encoderType);
+	std::string getEncoderMode(uint8_t encoderMode);
+
 	template <class T>
 	bool getField(mINI::INIStructure& cfg, mINI::INIStructure& ini, std::string category, std::string field, T& value);
 };

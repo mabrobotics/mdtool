@@ -397,9 +397,11 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!getField(cfg, ini, "motor", "dynamic friction", regW.RW.friction)) return;
 	if (!getField(cfg, ini, "motor", "static friction", regW.RW.stiction)) return;
 	if (!getField(cfg, ini, "motor", "shutdown temp", regW.RW.motorShutdownTemp)) return;
-	if (!getField(cfg, ini, "output encoder", "output encoder", regW.RW.outputEncoder)) return;
-	if (!getField(cfg, ini, "output encoder", "output encoder dir", regW.RW.outputEncoderDir)) return;
+
 	regW.RW.outputEncoderDefaultBaud = atoi(cfg["output encoder"]["output encoder default baud"].c_str());
+
+	regW.RW.outputEncoder = getEncoderType(cfg["output encoder"]["output encoder"]);
+	regW.RW.outputEncoderMode = getEncoderMode(cfg["output encoder"]["output encoder mode"]);
 
 	/* motor base config */
 	if (!candle->writeMd80Register(id,
@@ -420,7 +422,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 								   mab::Md80Reg_E::motorKt_b, regW.RW.motorKt_b,
 								   mab::Md80Reg_E::motorKt_c, regW.RW.motorKt_c,
 								   mab::Md80Reg_E::outputEncoder, regW.RW.outputEncoder,
-								   mab::Md80Reg_E::outputEncoderDir, regW.RW.outputEncoderDir,
+								   mab::Md80Reg_E::outputEncoderMode, regW.RW.outputEncoderMode,
 								   mab::Md80Reg_E::outputEncoderDefaultBaud, regW.RW.outputEncoderDefaultBaud))
 		ui::printFailedToSetupMotor();
 
@@ -641,6 +643,39 @@ mab::CANdleBaudrate_E MainWorker::checkSpeedForId(uint16_t id)
 	}
 
 	return mab::CANdleBaudrate_E::CAN_BAUD_1M;
+}
+
+uint8_t MainWorker::getEncoderType(std::string& encoderType)
+{
+	int i = 0;
+	for (auto& type : ui::encoderTypes)
+	{
+		if (type == encoderType)
+			return i;
+		i++;
+	}
+	return 0;
+}
+
+uint8_t MainWorker::getEncoderMode(std::string& encoderMode)
+{
+	int i = 0;
+	for (auto& mode : ui::encoderModes)
+	{
+		if (mode == encoderMode)
+			return i;
+		i++;
+	}
+	return 0;
+}
+
+std::string MainWorker::getEncoderType(uint8_t encoderType)
+{
+	return ui::encoderTypes[encoderType];
+}
+std::string MainWorker::getEncoderMode(uint8_t encoderMode)
+{
+	return ui::encoderModes[encoderMode];
 }
 
 /* gets field only if the value is within bounds form the ini file */

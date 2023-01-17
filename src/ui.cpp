@@ -264,11 +264,10 @@ void printDriveInfoExtended(mab::Md80& drive)
 	vout << "- d-axis inductance: " << std::setprecision(6) << drive.getReadReg().RO.inductance << " H" << std::endl;
 	vout << "- torque bandwidth: " << drive.getReadReg().RW.torqueBandwidth << " Hz" << std::endl;
 	vout << "- CAN watchdog: " << drive.getReadReg().RW.canWatchdog << " ms" << std::endl;
-	vout << "- output encoder: " << (drive.getReadReg().RW.outputEncoder ? "yes" : "no") << std::endl;
+	vout << "- output encoder: " << (drive.getReadReg().RW.outputEncoder ? encoderTypes[drive.getReadReg().RW.outputEncoder] : "no") << std::endl;
 	if (drive.getReadReg().RW.outputEncoder != 0)
 	{
-		vout << "- output encoder direction: " << drive.getReadReg().RW.outputEncoderDir << std::endl;
-		vout << "- output encoder default baudrate: " << drive.getReadReg().RW.outputEncoderDefaultBaud << std::endl;
+		vout << "- output encoder mode: " << encoderModes[drive.getReadReg().RW.outputEncoderMode] << std::endl;
 		vout << "- output encoder position: " << drive.getReadReg().RO.outputEncoderPosition << " rad" << std::endl;
 		vout << "- output encoder velocity: " << drive.getReadReg().RO.outputEncoderVelocity << " rad/s" << std::endl;
 	}
