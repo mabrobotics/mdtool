@@ -4,30 +4,13 @@
 #include <iostream>
 #include <streambuf>
 
-#define ERROR_BRIDGE_OCP		0  // 1
-#define ERROR_BRIDGE_FAULT		1  // 2
-#define ERROR_OUT_ENCODER_E		2  // 4
-#define ERROR_OUT_ENCODER_COM_E 3  // 8
-#define ERROR_PARAM_IDENT		4  // 16
-#define ERROR_MOTOR_SETUP		5  // 32
-#define ERROR_POLE_PAIR_DET		6  // 64
-#define ERROR_EMPTY6			7  // 128          //NOT USED YET
-
-#define ERROR_UNDERVOLTAGE		8	// 256
-#define ERROR_OVERVOLTAGE		9	// 512
-#define ERROR_MOTOR_TEMP		10	// 1024
-#define ERROR_MOSFET_TEMP		11	// 2048
-#define ERROR_CALIBRATION		12	// 4096         //NOT USED YET
-#define ERROR_OCD				13	// 8092
-#define ERROR_CAN_WD			14	// 16384
-#define ERROR_LOOPBACK			15	// 32768        //NOT USED YET
-
 /* ERROR COLORING NOTE: may not work on all terminals! */
-#define REDSTART  "\033[1;31m"
-#define REDGREEN  "\033[1;32m"
-#define RESETTEXT "\033[0m"
-#define RED(x)	  REDSTART x RESETTEXT
-#define GREEN(x)  GREENSTART x RESETTEXT
+#define REDSTART   "\033[1;31m"
+#define GREENSTART "\033[1;32m"
+#define RESETTEXT  "\033[0m"
+#define RED(x)	   REDSTART x RESETTEXT
+#define RED_(x)	   REDSTART + x + RESETTEXT
+#define GREEN(x)   GREENSTART x RESETTEXT
 namespace ui
 {
 class mystreambuf : public std::streambuf
@@ -187,7 +170,7 @@ void printPositionAndVelocity(int id, float pos, float velocity)
 {
 	vout << "Drive " << id << " Position: " << pos << "\tVelocity: " << velocity << std::endl;
 }
-void printDriveInfo(int id, float pos, float vel, float torque, float temperature, unsigned short error, mab::CANdleBaudrate_E baud)
+void printDriveInfo(int id, float pos, float vel, float torque, float temperature, uint16_t error, mab::CANdleBaudrate_E baud)
 {
 	vout << "Drive " << id << ":" << std::endl;
 	vout << "- CAN speed: " << baud << "M" << std::endl;
@@ -196,7 +179,7 @@ void printDriveInfo(int id, float pos, float vel, float torque, float temperatur
 	vout << "- torque: " << torque << " Nm" << std::endl;
 	vout << "- temperature: " << temperature << " *C" << std::endl;
 	vout << "- error: 0x" << std::hex << (unsigned short)error << std::dec;
-	printErrorDetails(error);
+	printErrorDetails(error, ui::bridgeErrorList);
 }
 
 void printScanOutput(mab::Candle* candle)
@@ -294,49 +277,45 @@ void printDriveInfoExtended(mab::Md80& drive)
 	vout << "- torque: " << std::setprecision(2) << drive.getTorque() << " Nm" << std::endl;
 	vout << "- MOSFET temperature: " << std::setprecision(2) << drive.getReadReg().RO.mosfetTemperature << " *C" << std::endl;
 	vout << "- motor temperature: " << std::setprecision(2) << drive.getReadReg().RO.motorTemperature << " *C" << std::endl;
-	vout << "- error: 0x" << std::hex << (unsigned short)drive.getReadReg().RO.errorVector << std::dec;
-	printErrorDetails(drive.getReadReg().RO.errorVector);
+	vout << std::endl;
+
+	vout << "***** ERRORS *****" << std::endl;
+	vout << "- general error: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.errorVector << std::dec;
+	printErrorDetails(drive.getReadReg().RO.errorVector, errorVectorList);
+	vout << "- main encoder error: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.mainEncoderErrors << std::dec;
+	printErrorDetails(drive.getReadReg().RO.mainEncoderErrors, encoderErrorList);
+
+	if (drive.getReadReg().RW.outputEncoder != 0)
+	{
+		vout << "- output encoder error: 0x" << std::hex << (unsigned short)drive.getReadReg().RO.auxEncoderErrors << std::dec;
+		printErrorDetails(drive.getReadReg().RO.auxEncoderErrors, encoderErrorList);
+	}
+
+	vout << "- calibration error: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.calibrationErrors << std::dec;
+	printErrorDetails(drive.getReadReg().RO.calibrationErrors, calibrationErrorList);
+	vout << "- bridge error: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.bridgeErrors << std::dec;
+	printErrorDetails(drive.getReadReg().RO.bridgeErrors, bridgeErrorList);
+	vout << "- hardware error: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.hardwareErrors << std::dec;
+	printErrorDetails(drive.getReadReg().RO.hardwareErrors, hardwareErrorList);
+	vout << "- communication error: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.communicationErrors << std::dec;
+	printErrorDetails(drive.getReadReg().RO.communicationErrors, communicationErrorList);
 }
 
-void printErrorDetails(unsigned short error)
+void printErrorDetails(uint16_t error, const std::vector<std::string>& errorList)
 {
+	vout << "  (";
 	if (error == 0)
 	{
-		vout << std::endl;
+		vout << GREEN("ALL OK") << ")" << std::endl;
 		return;
 	}
 
-	vout << "  (";
-	if (error & (1 << ERROR_BRIDGE_OCP))
-		vout << RED("ERROR_BRIDGE_OCP, ");
-	if (error & (1 << ERROR_BRIDGE_FAULT))
-		vout << RED("ERROR_BRIDGE_FAULT, ");
-	if (error & (1 << ERROR_OUT_ENCODER_E))
-		vout << RED("ERROR_OUT_ENCODER_E, ");
-	if (error & (1 << ERROR_OUT_ENCODER_COM_E))
-		vout << RED("ERROR_OUT_ENCODER_COM_E, ");
-	if (error & (1 << ERROR_PARAM_IDENT))
-		vout << RED("ERROR_PARAM_IDENT, ");
-	if (error & (1 << ERROR_MOTOR_SETUP))
-		vout << RED("ERROR_MOTOR_SETUP, ");
-	if (error & (1 << ERROR_POLE_PAIR_DET))
-		vout << RED("ERROR_MOTOR_POLE_PAIR_DET, ");
-	if (error & (1 << ERROR_UNDERVOLTAGE))
-		vout << RED("ERROR_UNDERVOLTAGE, ");
-	if (error & (1 << ERROR_OVERVOLTAGE))
-		vout << RED("ERROR_OVERVOLTAGE, ");
-	if (error & (1 << ERROR_MOTOR_TEMP))
-		vout << RED("ERROR_MOTOR_TEMP, ");
-	if (error & (1 << ERROR_MOSFET_TEMP))
-		vout << RED("ERROR_MOSFET_TEMP, ");
-	if (error & (1 << ERROR_CALIBRATION))
-		vout << RED("ERROR_CALIBRATION, ");
-	if (error & (1 << ERROR_OCD))
-		vout << RED("ERROR_OCD, ");
-	if (error & (1 << ERROR_CAN_WD))
-		vout << "CAN_WD_TRIGGERED, ";
+	for (uint32_t i = 0; i < errorList.size(); i++)
+	{
+		if (error & (1 << i))
+			vout << RED_(errorList[i]) << ", ";
+	}
 	vout << ")";
-
 	vout << std::endl;
 }
 
