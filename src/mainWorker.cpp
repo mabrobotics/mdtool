@@ -32,6 +32,7 @@ enum class toolsOptions_E
 	INFO,
 	MOVE,
 	LATENCY,
+	CALIBRATIONAUX,
 };
 toolsOptions_E str2option(std::string& opt)
 {
@@ -47,6 +48,8 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::BANDWIDTH;
 	if (opt == "calibration")
 		return toolsOptions_E::CALIBRATION;
+	if (opt == "calibration_aux")
+		return toolsOptions_E::CALIBRATIONAUX;
 	if (opt == "diagnostic")
 		return toolsOptions_E::DIAGNOSTIC;
 	if (opt == "motor")
@@ -190,6 +193,8 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 				ui::printHelpSetup();
 			if (option == toolsOptions_E::CALIBRATION)
 				setupCalibration(args);
+			if (option == toolsOptions_E::CALIBRATIONAUX)
+				setupCalibrationAux(args);
 			if (option == toolsOptions_E::DIAGNOSTIC)
 				setupDiagnostic(args);
 			if (option == toolsOptions_E::MOTOR)
@@ -343,6 +348,24 @@ void MainWorker::setupCalibration(std::vector<std::string>& args)
 		return;
 
 	candle->setupMd80Calibration(id);
+}
+
+void MainWorker::setupCalibrationAux(std::vector<std::string>& args)
+{
+	if (args.size() != 4)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+
+	if (!ui::getCalibrationAuxConfirmation())
+		return;
+	int id = atoi(args[3].c_str());
+	checkSpeedForId(id);
+	if (!candle->addMd80(id))
+		return;
+
+	candle->setupMd80CalibrationAux(id);
 }
 void MainWorker::setupDiagnostic(std::vector<std::string>& args)
 {

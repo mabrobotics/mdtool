@@ -149,9 +149,9 @@ bool getCalibrationConfirmation()
 {
 	vout << "This step will start drive calibration. If calibration is done incorrectly or fails the drive will not move. In such case please rerun the calibration and if the problem persists contact MABRobotics." << std::endl;
 	vout << "The process takes around 40-50 seconds, and should not be cancelled or stopped." << std::endl;
-	vout << "Ensure that the power supply's voltage is stable @24V and it is able to deliver >1A." << std::endl;
-	vout << "For proper calibration, there mustn't be any load at the drives output shaft (rotor), ideally there shouldn't be anything attached to the output shaft." << std::endl;
-	vout << "Are you sure you want to start calibration? [Y/n]" << std::endl;
+	vout << "Ensure that the power supply's voltage is stable @24V and it is able to deliver more than 1A of current." << std::endl;
+	vout << "For proper calibration, there mustn't be any load on the actuator's output shaft, ideally there shouldn't be anything attached to the output shaft." << std::endl;
+	vout << "Are you sure you want to start the calibration? [Y/n]" << std::endl;
 	char x;
 	std::cin >> x;
 	if (x != 'Y')
@@ -161,6 +161,24 @@ bool getCalibrationConfirmation()
 	}
 	return true;
 }
+
+bool getCalibrationAuxConfirmation()
+{
+	vout << "This step will start output encoder calibration." << std::endl;
+	vout << "The process takes around 40-50 seconds, and should not be cancelled or stopped." << std::endl;
+	vout << "Ensure that the power supply's voltage is stable and it is able to deliver more than 1A of current." << std::endl;
+	vout << "The actuator output shaft (after the gearbox) will move - make sure it is able to rotate for at least two full rotations." << std::endl;
+	vout << "Are you sure you want to start the calibration? [Y/n]" << std::endl;
+	char x;
+	std::cin >> x;
+	if (x != 'Y')
+	{
+		vout << "Output encoder calibration abandoned." << std::endl;
+		return false;
+	}
+	return true;
+}
+
 void printPositionVelocity(int id, float pos)
 {
 	vout << "Drive " << id << " Position: " << pos << std::endl;
