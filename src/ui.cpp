@@ -303,7 +303,7 @@ void printDriveInfoExtended(mab::Md80& drive)
 
 void printErrorDetails(uint16_t error, const std::vector<std::string>& errorList)
 {
-	vout << "  (";
+	vout << "	(";
 	if (error == 0)
 	{
 		vout << GREEN("ALL OK") << ")" << std::endl;

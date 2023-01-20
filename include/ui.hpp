@@ -58,8 +58,10 @@ const std::vector<std::string> encoderErrorList = {"ERROR_COMMUNICATION",
 												   "ERROR_CALIBRATION_FAILED"};
 
 const std::vector<std::string> calibrationErrorList = {"ERROR_OFFSET_CAL",
-													   "ERROR_PARAM_IDENT_CAL",
-													   "ERROR_POLE_PAIR_CAL"};
+													   "ERROR_RESISTANCE_IDENT",
+													   "ERROR_INDUCTANCE_IDENT",
+													   "ERROR_POLE_PAIR_CAL",
+													   "ERROR_SETUP"};
 
 const std::vector<std::string> bridgeErrorList = {"ERROR_BRIDGE_COM",
 												  "ERROR_BRIDGE_OC",
@@ -69,7 +71,8 @@ const std::vector<std::string> hardwareErrorList = {"ERROR_OVER_CURRENT",
 													"ERROR_OVER_VOLTAGE",
 													"ERROR_UNDER_VOLTAGE",
 													"ERROR_MOTOR_TEMP",
-													"ERROR_MOSFET_TEMP"};
+													"ERROR_MOSFET_TEMP",
+													"ERROR_ADC_CURRENT_OFFSETS"};
 
 const std::vector<std::string> communicationErrorList = {"ERROR_CAN_WD"};
 
