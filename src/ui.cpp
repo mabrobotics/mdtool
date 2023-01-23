@@ -4,20 +4,6 @@
 #include <iostream>
 #include <streambuf>
 
-/* ERROR COLORING NOTE: may not work on all terminals! */
-#define REDSTART	"\033[1;31m"
-#define GREENSTART	"\033[1;32m"
-#define YELLOWSTART "\033[1;33m"
-#define RESETTEXT	"\033[0m"
-
-#define RED(x)		REDSTART x RESETTEXT
-#define RED_(x)		REDSTART + x + RESETTEXT
-
-#define GREEN(x)	GREENSTART x RESETTEXT
-#define GREEN_(x)	GREENSTART + x + RESETTEXT
-
-#define YELLOW(x)	YELLOWSTART x RESETTEXT
-#define YELLOW_(x)	YELLOWSTART + x + RESETTEXT
 namespace ui
 {
 class mystreambuf : public std::streambuf

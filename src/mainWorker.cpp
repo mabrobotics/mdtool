@@ -275,12 +275,21 @@ void MainWorker::configCan(std::vector<std::string>& args)
 
 	int id = atoi(args[3].c_str());
 	checkSpeedForId(id);
-
 	int new_id = atoi(args[4].c_str());
-	mab::CANdleBaudrate_E baud = str2baud(args[5]);
+	mab::CANdleBaudrate_E new_baud = str2baud(args[5]);
 	int timeout = atoi(args[6].c_str());
 	bool canTermination = (args.size() > 7 && atoi(args[7].c_str()) > 0) ? true : false;
-	candle->configMd80Can(id, new_id, baud, timeout, canTermination);
+
+	for (uint16_t id_ : candle->ping(new_baud))
+	{
+		if (id_ == new_id)
+		{
+			std::cout << "[MDTOOL] New ID: " << unsigned(new_id) << " is already present on the bus! " << RED("[FAILED]") << std::endl;
+			return;
+		}
+	}
+
+	candle->configMd80Can(id, new_id, new_baud, timeout, canTermination);
 }
 void MainWorker::configSave(std::vector<std::string>& args)
 {
@@ -614,7 +623,7 @@ void MainWorker::testCheckAux(std::vector<std::string>& args)
 	/* check if no critical errors are present */
 	if (candle->md80s[0].getErrorVector() & 0x0BFFF)
 	{
-		std::cout << "Could not proceed due to errors: ";
+		std::cout << "[MDTOOL] Could not proceed due to errors: ";
 		ui::printErrorDetails(candle->md80s[0].getErrorVector(), ui::errorVectorList);
 		return;
 	}
