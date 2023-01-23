@@ -265,7 +265,7 @@ void printDriveInfoExtended(mab::Md80& drive)
 	vout << "- pole pairs: " << std::to_string(drive.getReadReg().RW.polePairs) << std::endl;
 	vout << "- KV rating: " << std::to_string(drive.getReadReg().RW.motorKV) << " rpm/V" << std::endl;
 	vout << "- motor shutdown temperature: " << std::to_string(drive.getReadReg().RW.motorShutdownTemp) << " *C" << std::endl;
-	vout << "- motor torque constant: " << drive.getReadReg().RW.motorKt << " Nm/A" << std::endl;
+	vout << "- motor torque constant: " << std::setprecision(4) << drive.getReadReg().RW.motorKt << " Nm/A" << std::endl;
 	vout << "- motor stiction: " << std::setprecision(3) << drive.getReadReg().RW.stiction << " Nm" << std::endl;
 	vout << "- motor friction: " << std::setprecision(3) << drive.getReadReg().RW.friction << " Nm" << std::endl;
 	vout << "- d-axis resistance: " << std::setprecision(3) << drive.getReadReg().RO.resistance << " Ohm" << std::endl;
