@@ -26,10 +26,10 @@ _mdtool_complete()
 			COMPREPLY=( $(compgen -W "zero can save current bandwidth" -- $cur) )
 			;; 
 			"setup")
-			COMPREPLY=( $(compgen -W "calibration calibration_aux diagnostic motor info" -- $cur) )
+			COMPREPLY=( $(compgen -W "calibration calibration_aux motor info" -- $cur) )
 			;;
 			"test")
-			COMPREPLY=( $(compgen -W "move latency" -- $cur) )
+			COMPREPLY=( $(compgen -W "move latency check_aux" -- $cur) )
 			;;
 			*)
 			;;
