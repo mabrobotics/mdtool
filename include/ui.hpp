@@ -32,6 +32,10 @@ void printErrorDetails(uint16_t error, const std::vector<std::string>& errorList
 void printParameterOutOfBounds(std::string category, std::string field);
 void printFailedToSetupMotor();
 
+/* these are only used to light up the values in */
+constexpr float outputEncoderStdDevMax = 0.05f;
+constexpr float outputEncoderMaxError = 0.18f;
+
 const std::vector<std::string> encoderTypes = {"NONE", "AMS5047_CENTER", "AMS5047_OFFAXIS"};
 const std::vector<std::string> encoderModes = {"NONE", "STARTUP", "MOTION", "REPORT"};
 const std::vector<std::string> errorVectorList = {"ERROR_BRIDGE_OCP",

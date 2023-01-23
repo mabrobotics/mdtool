@@ -33,6 +33,7 @@ enum class toolsOptions_E
 	MOVE,
 	LATENCY,
 	CALIBRATIONAUX,
+	CHECKAUX,
 };
 toolsOptions_E str2option(std::string& opt)
 {
@@ -60,6 +61,8 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::LATENCY;
 	if (opt == "move")
 		return toolsOptions_E::MOVE;
+	if (opt == "check_aux")
+		return toolsOptions_E::CHECKAUX;
 	return toolsOptions_E::NONE;
 }
 toolsCmd_E str2cmd(std::string& cmd)
@@ -211,6 +214,8 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 				testLatency(args);
 			if (option == toolsOptions_E::MOVE)
 				testMove(args);
+			if (option == toolsOptions_E::CHECKAUX)
+				testCheckAux(args);
 			break;
 		}
 		case toolsCmd_E::BLINK:
@@ -584,6 +589,31 @@ void MainWorker::testLatency(std::vector<std::string>& args)
 	ui::printLatencyTestResult(ids.size(), m, stdev, busString);
 
 	candle->end();
+}
+
+void MainWorker::testCheckAux(std::vector<std::string>& args)
+{
+	if (args.size() != 4)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+
+	int id = atoi(args[3].c_str());
+	checkSpeedForId(id);
+
+	if (!candle->addMd80(id))
+		return;
+
+	/* check if no critical errors are present */
+	if (candle->md80s[0].getErrorVector() & 0x0BFFF)
+	{
+		std::cout << "Could not proceed due to errors: ";
+		ui::printErrorDetails(candle->md80s[0].getErrorVector(), ui::errorVectorList);
+		return;
+	}
+
+	candle->setupMd80CheckOutputEncoder(id);
 }
 
 void MainWorker::blink(std::vector<std::string>& args)

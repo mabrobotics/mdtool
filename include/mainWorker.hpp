@@ -44,6 +44,7 @@ class MainWorker
 
 	void testMove(std::vector<std::string>& args);
 	void testLatency(std::vector<std::string>& args);
+	void testCheckAux(std::vector<std::string>& args);
 	void blink(std::vector<std::string>& args);
 	void encoder(std::vector<std::string>& args);
 	void bus(std::vector<std::string>& args);
