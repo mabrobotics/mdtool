@@ -29,23 +29,23 @@ std::ostream nocout(&nostreambuf);
 
 void printTooFewArgs()
 {
-	vout << "Not enough arguments!" << std::endl;
+	vout << "[MDTOOL] Not enough arguments!" << std::endl;
 	printHelp();
 }
 
 void printTooFewArgsNoHelp()
 {
-	vout << "Not enough arguments!" << std::endl;
+	vout << "[MDTOOL] Not enough arguments!" << std::endl;
 }
 
 void printWrongArgumentsSpecified()
 {
-	vout << "Wrong arguments specified!" << std::endl;
+	vout << "[MDTOOL] Wrong arguments specified!" << std::endl;
 }
 
 void printUnknownCmd(std::string arg = "")
 {
-	vout << "Command '" << arg << "' unknown!" << std::endl;
+	vout << "[MDTOOL] Command '" << arg << "' unknown!" << std::endl;
 	printHelp();
 }
 

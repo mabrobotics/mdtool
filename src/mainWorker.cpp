@@ -178,44 +178,44 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 		{
 			if (option == toolsOptions_E::CAN)
 				configCan(args);
-			if (option == toolsOptions_E::SAVE)
+			else if (option == toolsOptions_E::SAVE)
 				configSave(args);
-			if (option == toolsOptions_E::ZERO)
+			else if (option == toolsOptions_E::ZERO)
 				configZero(args);
-			if (option == toolsOptions_E::CURRENT)
+			else if (option == toolsOptions_E::CURRENT)
 				configCurrent(args);
-			if (option == toolsOptions_E::BANDWIDTH)
+			else if (option == toolsOptions_E::BANDWIDTH)
 				configBandwidth(args);
-			if (option == toolsOptions_E::NONE)
+			else
 				ui::printHelpConfig();
 			break;
 		}
 		case toolsCmd_E::SETUP:
 		{
-			if (option == toolsOptions_E::NONE)
-				ui::printHelpSetup();
 			if (option == toolsOptions_E::CALIBRATION)
 				setupCalibration(args);
-			if (option == toolsOptions_E::CALIBRATIONAUX)
+			else if (option == toolsOptions_E::CALIBRATIONAUX)
 				setupCalibrationAux(args);
-			if (option == toolsOptions_E::DIAGNOSTIC)
+			else if (option == toolsOptions_E::DIAGNOSTIC)
 				setupDiagnostic(args);
-			if (option == toolsOptions_E::MOTOR)
+			else if (option == toolsOptions_E::MOTOR)
 				setupMotor(args);
-			if (option == toolsOptions_E::INFO)
+			else if (option == toolsOptions_E::INFO)
 				setupInfo(args);
+			else
+				ui::printHelpSetup();
 			break;
 		}
 		case toolsCmd_E::TEST:
 		{
-			if (option == toolsOptions_E::NONE)
-				ui::printHelpTest();
 			if (option == toolsOptions_E::LATENCY)
 				testLatency(args);
-			if (option == toolsOptions_E::MOVE)
+			else if (option == toolsOptions_E::MOVE)
 				testMove(args);
-			if (option == toolsOptions_E::CHECKAUX)
+			else if (option == toolsOptions_E::CHECKAUX)
 				testCheckAux(args);
+			else
+				ui::printHelpTest();
 			break;
 		}
 		case toolsCmd_E::BLINK:
@@ -389,6 +389,12 @@ void MainWorker::setupDiagnostic(std::vector<std::string>& args)
 
 void MainWorker::setupMotor(std::vector<std::string>& args)
 {
+	if (args.size() != 5)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+
 	int id = atoi(args[3].c_str());
 	checkSpeedForId(id);
 	if (!candle->addMd80(id))
