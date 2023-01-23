@@ -65,6 +65,10 @@ void printHelp()
 	vout << "\t bus [type] [device] \t\t\t changes default CANdle CAN bus [type] (SPI/USB/UART) and optionally [device] if default is not suitable (applies only for UART and SPI)." << std::endl;
 	vout << std::endl;
 	vout << "Add '-sv' after arguments to suppress output" << std::endl;
+	vout << std::endl;
+	vout << "For more information please refer to the manual:" << GREEN("https://mabrobotics.pl/servos/manual");
+	vout << std::endl;
+	vout << std::endl;
 }
 void printHelpConfig()
 {
@@ -86,6 +90,10 @@ void printHelpConfig()
 	vout << "\t save [id] \t\t\t\t saves parameters to flash memory." << std::endl;
 	vout << "\t current [id] [current] \t\t sets max phase current the drive will output. Check MD80 docs for more info. [current] - current limit in Amps." << std::endl;
 	vout << "\t bandwidth [id] \t\t\t sets the torque bandwidth parameter" << std::endl;
+	vout << std::endl;
+	vout << "For more information please refer to the manual:" << GREEN("https://mabrobotics.pl/servos/manual");
+	vout << std::endl;
+	vout << std::endl;
 }
 void printHelpSetup()
 {
@@ -94,16 +102,20 @@ void printHelpSetup()
 	vout << "\tmdtool setup [options] [arguments]" << std::endl;
 	vout << std::endl;
 	vout << "Example: " << std::endl;
-	vout << "\tmdtool setup calibration 74 500" << std::endl;
-	vout << "\tmdtool setup diagnostic 211" << std::endl;
+	vout << "\tmdtool setup calibration 100" << std::endl;
+	vout << "\tmdtool setup calibration_aux 100" << std::endl;
 	vout << "\tmdtool setup motor 100 AK80-9.cfg" << std::endl;
 	vout << "\tmdtool setup info 100" << std::endl;
 	vout << std::endl;
 	vout << "Supported options: " << std::endl;
-	vout << "\t calibration [id] \t\t\tstarts motor calibration procedure. For more information please refer to the manual." << std::endl;
-	vout << "\t diagnostic  [id] \t\t\tprints diagnostic information." << std::endl;
+	vout << "\t calibration [id] \t\t\tstarts motor calibration procedure." << std::endl;
+	vout << "\t calibration_aux [id] \t\t\tstarts external encoder calibration procedure." << std::endl;
 	vout << "\t motor  [id] [*.cfg] \t\t\tloads selected config." << std::endl;
 	vout << "\t info  [id] \t\t\t\tprints detailed info about controller." << std::endl;
+	vout << std::endl;
+	vout << "For more information please refer to the manual:" << GREEN("https://mabrobotics.pl/servos/manual");
+	vout << std::endl;
+	vout << std::endl;
 }
 void printHelpTest()
 {
@@ -114,10 +126,16 @@ void printHelpTest()
 	vout << "Example: " << std::endl;
 	vout << "\tmdtool test 100 5" << std::endl;
 	vout << "\tmdtool test latency 1M" << std::endl;
+	vout << "\tmdtool test check_aux 100" << std::endl;
 	vout << std::endl;
 	vout << "Supported options: " << std::endl;
 	vout << "\t move [id] [position] \t\t\tsimple test movement from current location to [position]. [position] should be <-10, 10> rad." << std::endl;
 	vout << "\t latency  [baudrate] \t\t\ttests the overall TX message frequency. [baudrate] should be the baudrate of actuators on the CAN bus." << std::endl;
+	vout << "\t check_aux  [baudrate] \t\t\ttests the external encoder vs main encoder error. NOTE: this will rotate the output shaft by a single rotation" << std::endl;
+	vout << std::endl;
+	vout << "For more information please refer to the manual:" << GREEN("https://mabrobotics.pl/servos/manual");
+	vout << std::endl;
+	vout << std::endl;
 }
 
 void printLatencyTestResult(uint8_t actuatorCount, float average, float stdev, std::string bus)
@@ -130,7 +148,7 @@ void printLatencyTestResult(uint8_t actuatorCount, float average, float stdev, s
 	vout << "Standard deviation: " << std::setprecision(2) << stdev << "Hz" << std::endl;
 	vout << std::endl;
 	vout << "Please note: the result is highly dependent on your PC hardware and reflects the PC <> CANdle rather than PC <> MD80 communication speed." << std::endl;
-	vout << "For more information on this test please refer to the manual." << std::endl;
+	vout << "For more information on this test please refer to the manual: " << GREEN("https://mabrobotics.pl/servos/manual") << std::endl;
 	vout << std::endl;
 	vout << "******************************************************************************************************************************" << std::endl;
 }
@@ -141,6 +159,9 @@ bool getCalibrationConfirmation()
 	vout << "The process takes around 40-50 seconds, and should not be cancelled or stopped." << std::endl;
 	vout << "Ensure that the power supply's voltage is stable @24V and it is able to deliver more than 1A of current." << std::endl;
 	vout << "For proper calibration, there mustn't be any load on the actuator's output shaft, ideally there shouldn't be anything attached to the output shaft." << std::endl;
+	vout << std::endl;
+	vout << "\t For more information please refer to the manual: " << GREEN("https://mabrobotics.pl/servos/manual");
+	vout << std::endl;
 	vout << "Are you sure you want to start the calibration? [Y/n]" << std::endl;
 	char x;
 	std::cin >> x;
@@ -158,6 +179,9 @@ bool getCalibrationAuxConfirmation()
 	vout << "The process takes around 40-50 seconds, and should not be cancelled or stopped." << std::endl;
 	vout << "Ensure that the power supply's voltage is stable and it is able to deliver more than 1A of current." << std::endl;
 	vout << "The actuator output shaft (after the gearbox) will move - make sure it is able to rotate for at least two full rotations." << std::endl;
+	vout << std::endl;
+	vout << "\t For more information please refer to the manual: " << GREEN("https://mabrobotics.pl/servos/manual");
+	vout << std::endl;
 	vout << "Are you sure you want to start the calibration? [Y/n]" << std::endl;
 	char x;
 	std::cin >> x;
