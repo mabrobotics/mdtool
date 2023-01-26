@@ -535,7 +535,7 @@ void MainWorker::testMove(std::vector<std::string>& args)
 	/* check if no critical errors are present */
 	if (candle->md80s[0].getErrorVector() & 0x0BFFF)
 	{
-		std::cout << "Could not proceed due to errors: ";
+		std::cout << "[MDTOOL] proceed due to errors: ";
 		ui::printErrorDetails(candle->md80s[0].getErrorVector(), ui::errorVectorList);
 		return;
 	}
