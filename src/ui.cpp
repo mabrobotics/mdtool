@@ -39,20 +39,19 @@ void printHelp()
 {
 	vout << std::endl;
 	vout << "Usage: " << std::endl;
-	vout << "\tmdtool <command> [arguments | options]" << std::endl;
+	vout << "\tmdtool <command> [options | arguments]" << std::endl;
 	vout << std::endl;
 	vout << "Supported commands: " << std::endl;
 	vout << "\t ping [can speed] \t\t discovers all drives available on FDCAN bus at [can speed] (1M/2M/5M/8M), use 'all' keyword for scanning all speeds at once." << std::endl;
 	vout << "\t config [options] [arguments] \t sets configuration options. use `mdtool config` for more info." << std::endl;
-	vout << "\t setup [options] \t\t launches a setup procedure. Use `mdtool setup` for more info." << std::endl;
-	vout << "\t test [options] \t\t tests the setup. use 'mdtool test' for more info" << std::endl;
+	vout << "\t setup [options] [arguments] \t launches a setup procedure. Use `mdtool setup` for more info." << std::endl;
+	vout << "\t test [options] [arguments] \t tests the setup. use 'mdtool test' for more info" << std::endl;
 	vout << "\t blink [id] \t\t\t blink LEDs on driver board." << std::endl;
 	vout << "\t encoder [id] \t\t\t prints current position and velocity in a loop." << std::endl;
-	vout << "\t bus [type] [device] \t changes default CANdle CAN bus [type] (SPI/USB/UART) and optionally [device] if default is not suitable (applies only for UART and SPI)." << std::endl;
+	vout << "\t bus [type] [device]\t\t changes default CANdle CAN bus [type] (SPI/USB/UART) and optionally [device] if default is not suitable (applies to UART and SPI)." << std::endl;
 	vout << std::endl;
-	vout << "Add '-sv' after arguments to suppress output" << std::endl;
 	vout << std::endl;
-	vout << "For more information please refer to the manual:" << GREEN("https://mabrobotics.pl/servos/manual");
+	vout << "For more information please refer to the manual:" << GREEN(" https://mabrobotics.pl/servos/manual");
 	vout << std::endl;
 	vout << std::endl;
 }
@@ -77,7 +76,7 @@ void printHelpConfig()
 	vout << "\t current [id] [current] \t\t sets max phase current the drive will output. Check MD80 docs for more info. [current] - current limit in Amps." << std::endl;
 	vout << "\t bandwidth [id] \t\t\t sets the torque bandwidth parameter" << std::endl;
 	vout << std::endl;
-	vout << "For more information please refer to the manual:" << GREEN("https://mabrobotics.pl/servos/manual") << std::endl;
+	vout << "For more information please refer to the manual:" << GREEN(" https://mabrobotics.pl/servos/manual") << std::endl;
 	vout << std::endl;
 }
 void printHelpSetup()
@@ -88,17 +87,17 @@ void printHelpSetup()
 	vout << std::endl;
 	vout << "Example: " << std::endl;
 	vout << "\tmdtool setup calibration 100" << std::endl;
-	vout << "\tmdtool setup calibration_aux 100" << std::endl;
-	vout << "\tmdtool setup motor 100 AK80-9.cfg" << std::endl;
+	vout << "\tmdtool setup calibration_out 100" << std::endl;
+	vout << "\tmdtool setup motor AK80-9.cfg 100" << std::endl;
 	vout << "\tmdtool setup info 100" << std::endl;
 	vout << std::endl;
 	vout << "Supported options: " << std::endl;
 	vout << "\t calibration [id] \t\t\tstarts motor calibration procedure." << std::endl;
-	vout << "\t calibration_aux [id] \t\t\tstarts external encoder calibration procedure." << std::endl;
-	vout << "\t motor  [id] [*.cfg] \t\t\tloads selected config." << std::endl;
+	vout << "\t calibration_out [id] \t\t\tstarts output encoder calibration procedure." << std::endl;
+	vout << "\t motor [*.cfg] [id] \t\t\tloads selected motor config." << std::endl;
 	vout << "\t info  [id] \t\t\t\tprints detailed info about controller." << std::endl;
 	vout << std::endl;
-	vout << "For more information please refer to the manual:" << GREEN("https://mabrobotics.pl/servos/manual") << std::endl;
+	vout << "For more information please refer to the manual:" << GREEN(" https://mabrobotics.pl/servos/manual") << std::endl;
 	vout << std::endl;
 }
 void printHelpTest()
@@ -108,14 +107,15 @@ void printHelpTest()
 	vout << "\tmdtool test [options] [arguments]" << std::endl;
 	vout << std::endl;
 	vout << "Example: " << std::endl;
-	vout << "\tmdtool test 100 5" << std::endl;
+	vout << "\tmdtool test move 100 5" << std::endl;
 	vout << "\tmdtool test latency 1M" << std::endl;
-	vout << "\tmdtool test check_aux 100" << std::endl;
+	vout << "\tmdtool test encoder main 100" << std::endl;
+	vout << "\tmdtool test encoder output 100" << std::endl;
 	vout << std::endl;
 	vout << "Supported options: " << std::endl;
 	vout << "\t move [id] [position] \t\t\tsimple test movement from current location to [position]. [position] should be <-10, 10> rad." << std::endl;
 	vout << "\t latency  [baudrate] \t\t\ttests the overall TX message frequency. [baudrate] should be the baudrate of actuators on the CAN bus." << std::endl;
-	vout << "\t check_aux  [baudrate] \t\t\ttests the external encoder vs main encoder error. NOTE: this will rotate the output shaft by a single rotation" << std::endl;
+	vout << "\t encoder  [type] [id] \t\t\ttests the encoder [type] (main/output)" << std::endl;
 	vout << std::endl;
 	vout << "For more information please refer to the manual:" << GREEN("https://mabrobotics.pl/servos/manual") << std::endl;
 	vout << std::endl;
