@@ -59,6 +59,8 @@ class MainWorker
 	std::string getEncoderType(uint8_t encoderType);
 	std::string getEncoderMode(uint8_t encoderMode);
 
+	bool checkErrors(uint16_t canId);
+
 	template <class T>
 	bool getField(mINI::INIStructure& cfg, mINI::INIStructure& ini, std::string category, std::string field, T& value);
 };

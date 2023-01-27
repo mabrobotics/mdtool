@@ -309,8 +309,11 @@ void printDriveInfoExtended(mab::Md80& drive)
 	vout << std::endl;
 
 	vout << "***** ERRORS *****" << std::endl;
-	vout << "- general error: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.errorVector << std::dec;
-	printErrorDetails(drive.getReadReg().RO.errorVector, errorVectorList);
+	printAllErrors(drive);
+}
+
+void printAllErrors(mab::Md80& drive)
+{
 	vout << "- main encoder error: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.mainEncoderErrors << std::dec;
 	printErrorDetails(drive.getReadReg().RO.mainEncoderErrors, encoderErrorList);
 

@@ -44,6 +44,7 @@ void printScanOutput(mab::Candle* candle);
 void printFoundDrives(std::vector<uint16_t> ids);
 void printUnableToFindCfgFile(std::string path);
 void printDriveInfoExtended(mab::Md80& drive);
+void printAllErrors(mab::Md80& drive);
 void printErrorDetails(uint16_t error, const std::vector<std::string>& errorList);
 void printParameterOutOfBounds(std::string category, std::string field);
 void printFailedToSetupMotor();

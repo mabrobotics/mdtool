@@ -552,10 +552,10 @@ void MainWorker::testMove(std::vector<std::string>& args)
 		return;
 
 	/* check if no critical errors are present */
-	if (candle->md80s[0].getErrorVector() & 0x0BFFF)
+	if (checkErrors(id))
 	{
-		std::cout << "[MDTOOL] proceed due to errors: ";
-		ui::printErrorDetails(candle->md80s[0].getErrorVector(), ui::errorVectorList);
+		std::cout << "[MDTOOL] Could not proceed due to errors: " << std::endl;
+		ui::printAllErrors(candle->md80s[0]);
 		return;
 	}
 
@@ -640,10 +640,10 @@ void MainWorker::testEncoderOutput(std::vector<std::string>& args)
 		return;
 
 	/* check if no critical errors are present */
-	if (candle->md80s[0].getErrorVector() & 0x0BFFF)
+	if (checkErrors(id))
 	{
-		std::cout << "[MDTOOL] Could not proceed due to errors: ";
-		ui::printErrorDetails(candle->md80s[0].getErrorVector(), ui::errorVectorList);
+		std::cout << "[MDTOOL] Could not proceed due to errors: " << std::endl;
+		ui::printAllErrors(candle->md80s[0]);
 		return;
 	}
 
@@ -665,10 +665,10 @@ void MainWorker::testEncoderMain(std::vector<std::string>& args)
 		return;
 
 	/* check if no critical errors are present */
-	if (candle->md80s[0].getErrorVector() & 0x0BFFF)
+	if (checkErrors(id))
 	{
-		std::cout << "[MDTOOL] Could not proceed due to errors: ";
-		ui::printErrorDetails(candle->md80s[0].getErrorVector(), ui::errorVectorList);
+		std::cout << "[MDTOOL] Could not proceed due to errors: " << std::endl;
+		ui::printAllErrors(candle->md80s[0]);
 		return;
 	}
 
@@ -788,6 +788,21 @@ std::string MainWorker::getEncoderType(uint8_t encoderType)
 std::string MainWorker::getEncoderMode(uint8_t encoderMode)
 {
 	return ui::encoderModes[encoderMode];
+}
+
+bool MainWorker::checkErrors(uint16_t canId)
+{
+	candle->setupMd80DiagnosticExtended(canId);
+
+	if (candle->getMd80FromList(canId).getReadReg().RO.mainEncoderErrors ||
+		candle->getMd80FromList(canId).getReadReg().RO.auxEncoderErrors ||
+		candle->getMd80FromList(canId).getReadReg().RO.calibrationErrors ||
+		candle->getMd80FromList(canId).getReadReg().RO.hardwareErrors ||
+		candle->getMd80FromList(canId).getReadReg().RO.bridgeErrors ||
+		candle->getMd80FromList(canId).getReadReg().RO.communicationErrors)
+		return true;
+
+	return false;
 }
 
 /* gets field only if the value is within bounds form the ini file */
