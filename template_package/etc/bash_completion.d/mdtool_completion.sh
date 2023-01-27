@@ -4,13 +4,12 @@ _have mdtool &&
 
 _mdtool_complete()
 {
-	local cur prev prev2
+	local cur prev
 	local MEMO_DIR=$HOME/.config/mdtool/mdtool_motors
 	
 	COMPREPLY=()
 	cur=${COMP_WORDS[COMP_CWORD]}
 	prev=${COMP_WORDS[COMP_CWORD-1]}
-	prev2=${COMP_WORDS[COMP_CWORD-2]}
 	
 	if [ $COMP_CWORD -eq 1 ]; then
 		COMPREPLY=( $(compgen -W "bus ping config setup test blink encoder" -- $cur) )
@@ -26,17 +25,20 @@ _mdtool_complete()
 			COMPREPLY=( $(compgen -W "zero can save current bandwidth" -- $cur) )
 			;; 
 			"setup")
-			COMPREPLY=( $(compgen -W "calibration calibration_aux motor info" -- $cur) )
+			COMPREPLY=( $(compgen -W "calibration calibration_out motor info" -- $cur) )
 			;;
 			"test")
-			COMPREPLY=( $(compgen -W "move latency check_aux" -- $cur) )
+			COMPREPLY=( $(compgen -W "move latency encoder" -- $cur) )
 			;;
 			*)
 			;;
 		esac
-	elif [ $COMP_CWORD -eq 4 ]; then
-		if [[ "$prev2" == "motor" ]]; then
-
+	elif [ $COMP_CWORD -eq 3 ]; then
+		case "$prev" in
+			"encoder")
+			COMPREPLY=( $(compgen -W "main output" -- $cur) )
+			;;
+			"motor")
 			local arr i file
 
 			arr=( $( cd "$MEMO_DIR" && compgen -f -- "$cur" ) )
@@ -48,7 +50,10 @@ _mdtool_complete()
 				fi
 				COMPREPLY[i]=$file
 			done
-		fi
+			;;
+			*)
+			;;
+		esac
 	fi
 	
 	return 0

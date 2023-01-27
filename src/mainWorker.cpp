@@ -32,8 +32,10 @@ enum class toolsOptions_E
 	INFO,
 	MOVE,
 	LATENCY,
-	CALIBRATIONAUX,
-	CHECKAUX,
+	CALIBRATIONOUT,
+	ENCODER,
+	MAIN,
+	OUTPUT,
 };
 toolsOptions_E str2option(std::string& opt)
 {
@@ -49,8 +51,8 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::BANDWIDTH;
 	if (opt == "calibration")
 		return toolsOptions_E::CALIBRATION;
-	if (opt == "calibration_aux")
-		return toolsOptions_E::CALIBRATIONAUX;
+	if (opt == "calibration_out")
+		return toolsOptions_E::CALIBRATIONOUT;
 	if (opt == "diagnostic")
 		return toolsOptions_E::DIAGNOSTIC;
 	if (opt == "motor")
@@ -61,8 +63,13 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::LATENCY;
 	if (opt == "move")
 		return toolsOptions_E::MOVE;
-	if (opt == "check_aux")
-		return toolsOptions_E::CHECKAUX;
+	if (opt == "encoder")
+		return toolsOptions_E::ENCODER;
+	if (opt == "main")
+		return toolsOptions_E::MAIN;
+	if (opt == "output")
+		return toolsOptions_E::OUTPUT;
+
 	return toolsOptions_E::NONE;
 }
 toolsCmd_E str2cmd(std::string& cmd)
@@ -167,8 +174,13 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 		candle = new mab::Candle(baud, printVerbose, busType);
 
 	toolsOptions_E option = toolsOptions_E::NONE;
+	toolsOptions_E option2 = toolsOptions_E::NONE;
+
 	if (args.size() > 2)
 		option = str2option(args[2]);
+	if (args.size() > 3)
+		option2 = str2option(args[3]);
+
 	switch (cmd)
 	{
 		case toolsCmd_E::PING:
@@ -194,8 +206,8 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 		{
 			if (option == toolsOptions_E::CALIBRATION)
 				setupCalibration(args);
-			else if (option == toolsOptions_E::CALIBRATIONAUX)
-				setupCalibrationAux(args);
+			else if (option == toolsOptions_E::CALIBRATIONOUT)
+				setupCalibrationOut(args);
 			else if (option == toolsOptions_E::DIAGNOSTIC)
 				setupDiagnostic(args);
 			else if (option == toolsOptions_E::MOTOR)
@@ -212,8 +224,15 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 				testLatency(args);
 			else if (option == toolsOptions_E::MOVE)
 				testMove(args);
-			else if (option == toolsOptions_E::CHECKAUX)
-				testCheckAux(args);
+			else if (option == toolsOptions_E::ENCODER)
+			{
+				if (option2 == toolsOptions_E::MAIN)
+					testEncoderMain(args);
+				else if (option2 == toolsOptions_E::OUTPUT)
+					testEncoderOutput(args);
+				else
+					ui::printHelpTest();
+			}
 			else
 				ui::printHelpTest();
 			break;
@@ -364,7 +383,7 @@ void MainWorker::setupCalibration(std::vector<std::string>& args)
 	candle->setupMd80Calibration(id);
 }
 
-void MainWorker::setupCalibrationAux(std::vector<std::string>& args)
+void MainWorker::setupCalibrationOut(std::vector<std::string>& args)
 {
 	if (args.size() != 4)
 	{
@@ -404,12 +423,12 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 		return;
 	}
 
-	int id = atoi(args[3].c_str());
+	int id = atoi(args[4].c_str());
 	checkSpeedForId(id);
 	if (!candle->addMd80(id))
 		return;
 
-	std::string path = (mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" + args[4].c_str());
+	std::string path = (mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" + args[3].c_str());
 
 	mINI::INIFile motorCfg(path);
 	mINI::INIStructure cfg;
@@ -606,15 +625,15 @@ void MainWorker::testLatency(std::vector<std::string>& args)
 	candle->end();
 }
 
-void MainWorker::testCheckAux(std::vector<std::string>& args)
+void MainWorker::testEncoderOutput(std::vector<std::string>& args)
 {
-	if (args.size() != 4)
+	if (args.size() != 5)
 	{
 		ui::printTooFewArgsNoHelp();
 		return;
 	}
 
-	int id = atoi(args[3].c_str());
+	int id = atoi(args[4].c_str());
 	checkSpeedForId(id);
 
 	if (!candle->addMd80(id))
@@ -628,7 +647,32 @@ void MainWorker::testCheckAux(std::vector<std::string>& args)
 		return;
 	}
 
-	candle->setupMd80CheckOutputEncoder(id);
+	candle->setupMd80TestOutputEncoder(id);
+}
+
+void MainWorker::testEncoderMain(std::vector<std::string>& args)
+{
+	if (args.size() != 5)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+
+	int id = atoi(args[4].c_str());
+	checkSpeedForId(id);
+
+	if (!candle->addMd80(id))
+		return;
+
+	/* check if no critical errors are present */
+	if (candle->md80s[0].getErrorVector() & 0x0BFFF)
+	{
+		std::cout << "[MDTOOL] Could not proceed due to errors: ";
+		ui::printErrorDetails(candle->md80s[0].getErrorVector(), ui::errorVectorList);
+		return;
+	}
+
+	candle->setupMd80TestMainEncoder(id);
 }
 
 void MainWorker::blink(std::vector<std::string>& args)

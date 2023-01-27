@@ -37,14 +37,15 @@ class MainWorker
 	void configBandwidth(std::vector<std::string>& args);
 
 	void setupCalibration(std::vector<std::string>& args);
-	void setupCalibrationAux(std::vector<std::string>& args);
+	void setupCalibrationOut(std::vector<std::string>& args);
 	void setupDiagnostic(std::vector<std::string>& args);
 	void setupMotor(std::vector<std::string>& args);
 	void setupInfo(std::vector<std::string>& args);
 
 	void testMove(std::vector<std::string>& args);
 	void testLatency(std::vector<std::string>& args);
-	void testCheckAux(std::vector<std::string>& args);
+	void testEncoderOutput(std::vector<std::string>& args);
+	void testEncoderMain(std::vector<std::string>& args);
 	void blink(std::vector<std::string>& args);
 	void encoder(std::vector<std::string>& args);
 	void bus(std::vector<std::string>& args);

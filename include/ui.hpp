@@ -52,6 +52,9 @@ void printFailedToSetupMotor();
 constexpr float outputEncoderStdDevMax = 0.05f;
 constexpr float outputEncoderMaxError = 0.18f;
 
+constexpr float mainEncoderStdDevMax = 0.005f;
+constexpr float mainEncoderMaxError = 0.011f;
+
 const std::vector<std::string> encoderTypes = {"NONE", "AS5047_CENTER", "AS5047_OFFAXIS"};
 const std::vector<std::string> encoderModes = {"NONE", "STARTUP", "MOTION", "REPORT"};
 const std::vector<std::string> errorVectorList = {"ERROR_BRIDGE_OCP",

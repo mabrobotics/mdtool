@@ -279,7 +279,16 @@ void printDriveInfoExtended(mab::Md80& drive)
 	vout << "- d-axis inductance: " << std::setprecision(6) << drive.getReadReg().RO.inductance << " H" << std::endl;
 	vout << "- torque bandwidth: " << drive.getReadReg().RW.torqueBandwidth << " Hz" << std::endl;
 	vout << "- CAN watchdog: " << drive.getReadReg().RW.canWatchdog << " ms" << std::endl;
+
+	float stddevE = drive.getReadReg().RO.calMainEncoderStdDev;
+	float minE = drive.getReadReg().RO.calMainEncoderMinE;
+	float maxE = drive.getReadReg().RO.calMainEncoderMaxE;
+	vout << "- main encoder last check error stddev: " << (stddevE < mainEncoderStdDevMax ? std::to_string(stddevE) : YELLOW_(std::to_string(stddevE))) << " rad" << std::endl;
+	vout << "- main encoder last check min error " << (minE > -mainEncoderMaxError ? std::to_string(minE) : YELLOW_(std::to_string(minE))) << " rad" << std::endl;
+	vout << "- main encoder last check max error: " << (maxE < mainEncoderMaxError ? std::to_string(maxE) : YELLOW_(std::to_string(maxE))) << " rad" << std::endl;
+
 	vout << "- output encoder: " << (drive.getReadReg().RW.outputEncoder ? encoderTypes[drive.getReadReg().RW.outputEncoder] : "no") << std::endl;
+
 	if (drive.getReadReg().RW.outputEncoder != 0)
 	{
 		float stddevE = drive.getReadReg().RO.calOutputEncoderStdDev;
