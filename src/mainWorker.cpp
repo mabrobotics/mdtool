@@ -414,12 +414,12 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 		return;
 	}
 
-	int id = atoi(args[4].c_str());
+	int id = atoi(args[3].c_str());
 	checkSpeedForId(id);
 	if (!candle->addMd80(id))
 		return;
 
-	std::string path = (mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" + args[3].c_str());
+	std::string path = (mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" + args[4].c_str());
 
 	mINI::INIFile motorCfg(path);
 	mINI::INIStructure cfg;

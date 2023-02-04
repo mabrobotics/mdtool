@@ -10,6 +10,7 @@ _mdtool_complete()
 	COMPREPLY=()
 	cur=${COMP_WORDS[COMP_CWORD]}
 	prev=${COMP_WORDS[COMP_CWORD-1]}
+	prev2=${COMP_WORDS[COMP_CWORD-2]}
 	
 	if [ $COMP_CWORD -eq 1 ]; then
 		COMPREPLY=( $(compgen -W "bus ping config setup test blink encoder" -- $cur) )
@@ -34,11 +35,14 @@ _mdtool_complete()
 			;;
 		esac
 	elif [ $COMP_CWORD -eq 3 ]; then
-		case "$prev" in
-			"encoder")
+		if [[ "$prev" == "encoder" ]]; then
 			COMPREPLY=( $(compgen -W "main output" -- $cur) )
-			;;
-			"motor")
+
+		fi
+
+	elif [ $COMP_CWORD -eq 4 ]; then
+		if [[ "$prev2" == "motor" ]]; then
+
 			local arr i file
 
 			arr=( $( cd "$MEMO_DIR" && compgen -f -- "$cur" ) )
@@ -50,10 +54,7 @@ _mdtool_complete()
 				fi
 				COMPREPLY[i]=$file
 			done
-			;;
-			*)
-			;;
-		esac
+		fi
 	fi
 	
 	return 0

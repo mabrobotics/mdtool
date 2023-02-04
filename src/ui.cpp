@@ -88,13 +88,13 @@ void printHelpSetup()
 	vout << "Example: " << std::endl;
 	vout << "\tmdtool setup calibration 100" << std::endl;
 	vout << "\tmdtool setup calibration_out 100" << std::endl;
-	vout << "\tmdtool setup motor AK80-9.cfg 100" << std::endl;
+	vout << "\tmdtool setup motor 100 AK80-9.cfg" << std::endl;
 	vout << "\tmdtool setup info 100" << std::endl;
 	vout << std::endl;
 	vout << "Supported options: " << std::endl;
 	vout << "\t calibration [id] \t\t\tstarts motor calibration procedure." << std::endl;
 	vout << "\t calibration_out [id] \t\t\tstarts output encoder calibration procedure." << std::endl;
-	vout << "\t motor [*.cfg] [id] \t\t\tloads selected motor config." << std::endl;
+	vout << "\t motor [id] [*.cfg] \t\t\tloads selected motor config." << std::endl;
 	vout << "\t info  [id] \t\t\t\tprints detailed info about controller." << std::endl;
 	vout << std::endl;
 	vout << "For more information please refer to the manual:" << GREEN(" https://mabrobotics.pl/servos/manual") << std::endl;
