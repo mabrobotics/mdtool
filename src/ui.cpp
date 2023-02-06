@@ -42,10 +42,10 @@ void printHelp()
 	vout << "\tmdtool <command> [options | arguments]" << std::endl;
 	vout << std::endl;
 	vout << "Supported commands: " << std::endl;
-	vout << "\t ping [can speed] \t\t discovers all drives available on FDCAN bus at [can speed] (1M/2M/5M/8M), use 'all' keyword for scanning all speeds at once." << std::endl;
-	vout << "\t config [options] [arguments] \t sets configuration options. use `mdtool config` for more info." << std::endl;
+	vout << "\t ping [can speed] \t\t discovers all drives available on FDCAN bus at [can speed] (1M/2M/5M/8M). Use 'all' keyword for scanning all speeds at once." << std::endl;
+	vout << "\t config [options] [arguments] \t sets configuration options. Use `mdtool config` for more info." << std::endl;
 	vout << "\t setup [options] [arguments] \t launches a setup procedure. Use `mdtool setup` for more info." << std::endl;
-	vout << "\t test [options] [arguments] \t tests the setup. use 'mdtool test' for more info" << std::endl;
+	vout << "\t test [options] [arguments] \t tests the setup. Use 'mdtool test' for more info" << std::endl;
 	vout << "\t blink [id] \t\t\t blink LEDs on driver board." << std::endl;
 	vout << "\t encoder [id] \t\t\t prints current position and velocity in a loop." << std::endl;
 	vout << "\t bus [type] [device]\t\t changes default CANdle CAN bus [type] (SPI/USB/UART) and optionally [device] if default is not suitable (applies to UART and SPI)." << std::endl;
