@@ -168,10 +168,17 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 
 	std::string& device = ini["communication"]["device"];
 
-	if (device != "" && busType != mab::BusType_E::USB)
-		candle = new mab::Candle(baud, printVerbose, busType, device);
-	else
-		candle = new mab::Candle(baud, printVerbose, busType);
+	try
+	{
+		if (device != "" && busType != mab::BusType_E::USB)
+			candle = new mab::Candle(baud, printVerbose, busType, device);
+		else
+			candle = new mab::Candle(baud, printVerbose, busType);
+	}
+	catch (const char* e)
+	{
+		return;
+	}
 
 	toolsOptions_E option = toolsOptions_E::NONE;
 	toolsOptions_E option2 = toolsOptions_E::NONE;
