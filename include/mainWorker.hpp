@@ -4,14 +4,19 @@
 #include "candle.hpp"
 #include "mini/ini.h"
 
-const std::string version = "1.2.2";
-
 class MainWorker
 {
    public:
 	MainWorker(std::vector<std::string>& args);
+	static std::string getVersion();
 
    private:
+	// static const uint8_t VMAJOR = 1;
+	// static const uint8_t VMINOR = 2;
+	// static const uint8_t VREVISION = 2;
+	// static const char VTAG = 'd';
+	// static const mab::version_ut mdtoolVersion;
+
 	const std::string mdtoolHomeConfigDirName = ".config";
 	const std::string mdtoolDirName = "mdtool";
 	const std::string mdtoolMotorCfgDirName = "mdtool_motors";
