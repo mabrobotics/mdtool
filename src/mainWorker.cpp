@@ -471,10 +471,9 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!getField(cfg, ini, "motor", "shutdown temp", regW.RW.motorShutdownTemp)) return;
 
 	regW.RW.outputEncoderDefaultBaud = atoi(cfg["output encoder"]["output encoder default baud"].c_str());
-
 	regW.RW.outputEncoder = getEncoderType(cfg["output encoder"]["output encoder"]);
 	regW.RW.outputEncoderMode = getEncoderMode(cfg["output encoder"]["output encoder mode"]);
-
+	regW.RW.outputEncoderCalibrationMode = getEncoderCalibrationMode(cfg["output encoder"]["output encoder calibration mode"]);
 	/* motor base config */
 	if (!candle->writeMd80Register(id,
 								   mab::Md80Reg_E::motorName, regW.RW.motorName,
@@ -484,7 +483,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 								   mab::Md80Reg_E::motorGearRatio, regW.RW.gearRatio,
 								   mab::Md80Reg_E::motorIMax, regW.RW.iMax,
 								   mab::Md80Reg_E::motorTorgueBandwidth, regW.RW.torqueBandwidth))
-		ui::printFailedToSetupMotor();
+		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorTorgueBandwidth);
 
 	/* motor advanced config */
 	if (!candle->writeMd80Register(id,
@@ -496,7 +495,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 								   mab::Md80Reg_E::outputEncoder, regW.RW.outputEncoder,
 								   mab::Md80Reg_E::outputEncoderMode, regW.RW.outputEncoderMode,
 								   mab::Md80Reg_E::outputEncoderDefaultBaud, regW.RW.outputEncoderDefaultBaud))
-		ui::printFailedToSetupMotor();
+		ui::printFailedToSetupMotor(mab::Md80Reg_E::outputEncoderDefaultBaud);
 
 	/* motor motion config - Position and velocity PID*/
 	if (!candle->writeMd80Register(id,
@@ -510,7 +509,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 								   mab::Md80Reg_E::motorVelPidKd, (float)atof(cfg["velocity PID"]["kd"].c_str()),
 								   mab::Md80Reg_E::motorVelPidOutMax, (float)atof(cfg["velocity PID"]["max out"].c_str()),
 								   mab::Md80Reg_E::motorVelPidWindup, (float)atof(cfg["velocity PID"]["windup"].c_str())))
-		ui::printFailedToSetupMotor();
+		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorVelPidWindup);
 
 	/* motor motion config - Impedance PD*/
 	if (!candle->writeMd80Register(id,
@@ -518,7 +517,10 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 								   mab::Md80Reg_E::motorImpPidKd, (float)atof(cfg["impedance PD"]["kd"].c_str()),
 								   mab::Md80Reg_E::motorImpPidOutMax, (float)atof(cfg["impedance PD"]["max out"].c_str()),
 								   mab::Md80Reg_E::motorShutdownTemp, regW.RW.motorShutdownTemp))
-		ui::printFailedToSetupMotor();
+		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorShutdownTemp);
+
+	if (!candle->writeMd80Register(id, mab::Md80Reg_E::outputEncoderCalibrationMode, regW.RW.outputEncoderCalibrationMode))
+		ui::printFailedToSetupMotor(mab::Md80Reg_E::outputEncoderCalibrationMode);
 
 	candle->configMd80Save(id);
 
@@ -791,6 +793,18 @@ uint8_t MainWorker::getEncoderMode(std::string& encoderMode)
 	return 0;
 }
 
+uint8_t MainWorker::getEncoderCalibrationMode(std::string& encoderCalibrationMode)
+{
+	int i = 0;
+	for (auto& mode : ui::encoderCalibrationModes)
+	{
+		if (mode == encoderCalibrationMode)
+			return i;
+		i++;
+	}
+	return 0;
+}
+
 std::string MainWorker::getEncoderType(uint8_t encoderType)
 {
 	return ui::encoderTypes[encoderType];
@@ -798,6 +812,11 @@ std::string MainWorker::getEncoderType(uint8_t encoderType)
 std::string MainWorker::getEncoderMode(uint8_t encoderMode)
 {
 	return ui::encoderModes[encoderMode];
+}
+
+std::string MainWorker::getEncoderCalibrationMode(uint8_t encoderCalibrationMode)
+{
+	return ui::encoderCalibrationModes[encoderCalibrationMode];
 }
 
 bool MainWorker::checkErrors(uint16_t canId)

@@ -297,6 +297,7 @@ void printDriveInfoExtended(mab::Md80& drive)
 		float minE = drive.getReadReg().RO.calOutputEncoderMinE;
 		float maxE = drive.getReadReg().RO.calOutputEncoderMaxE;
 		vout << "- output encoder mode: " << encoderModes[drive.getReadReg().RW.outputEncoderMode] << std::endl;
+		vout << "- output encoder calibration mode: " << encoderCalibrationModes[drive.getReadReg().RW.outputEncoderCalibrationMode] << std::endl;
 		vout << "- output encoder position: " << drive.getReadReg().RO.outputEncoderPosition << " rad" << std::endl;
 		vout << "- output encoder velocity: " << drive.getReadReg().RO.outputEncoderVelocity << " rad/s" << std::endl;
 		vout << "- output encoder last check error stddev: " << (stddevE < outputEncoderStdDevMax ? std::to_string(stddevE) : YELLOW_(std::to_string(stddevE))) << " rad" << std::endl;
@@ -358,9 +359,9 @@ void printParameterOutOfBounds(std::string category, std::string field)
 	vout << "Motor config parameter in category [" << category << "] named [" << field << "] is out of bounds!" << std::endl;
 }
 
-void printFailedToSetupMotor()
+void printFailedToSetupMotor(mab::Md80Reg_E regId)
 {
-	vout << "Failed to setup motor!" << std::endl;
+	vout << "Failed to setup motor! Error while writing: 0x" << std::hex << static_cast<uint16_t>(regId) << " register" << std::endl;
 }
 
 }  // namespace ui

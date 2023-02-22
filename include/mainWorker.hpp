@@ -11,12 +11,6 @@ class MainWorker
 	static std::string getVersion();
 
    private:
-	// static const uint8_t VMAJOR = 1;
-	// static const uint8_t VMINOR = 2;
-	// static const uint8_t VREVISION = 2;
-	// static const char VTAG = 'd';
-	// static const mab::version_ut mdtoolVersion;
-
 	const std::string mdtoolHomeConfigDirName = ".config";
 	const std::string mdtoolDirName = "mdtool";
 	const std::string mdtoolMotorCfgDirName = "mdtool_motors";
@@ -60,9 +54,11 @@ class MainWorker
 
 	uint8_t getEncoderType(std::string& encoderType);
 	uint8_t getEncoderMode(std::string& encoderMode);
+	uint8_t getEncoderCalibrationMode(std::string& encoderCalibrationMode);
 
 	std::string getEncoderType(uint8_t encoderType);
 	std::string getEncoderMode(uint8_t encoderMode);
+	std::string getEncoderCalibrationMode(uint8_t encoderCalibrationMode);
 
 	bool checkErrors(uint16_t canId);
 

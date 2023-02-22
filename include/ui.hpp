@@ -47,7 +47,7 @@ void printDriveInfoExtended(mab::Md80& drive);
 void printAllErrors(mab::Md80& drive);
 void printErrorDetails(uint16_t error, const std::vector<std::string>& errorList);
 void printParameterOutOfBounds(std::string category, std::string field);
-void printFailedToSetupMotor();
+void printFailedToSetupMotor(mab::Md80Reg_E regId);
 
 /* these are only used to light up the values in */
 constexpr float outputEncoderStdDevMax = 0.05f;
@@ -58,6 +58,7 @@ constexpr float mainEncoderMaxError = 0.05f;
 
 const std::vector<std::string> encoderTypes = {"NONE", "AS5047_CENTER", "AS5047_OFFAXIS"};
 const std::vector<std::string> encoderModes = {"NONE", "STARTUP", "MOTION", "REPORT"};
+const std::vector<std::string> encoderCalibrationModes = {"FULL", "DIRONLY"};
 const std::vector<std::string> errorVectorList = {"ERROR_BRIDGE_OCP",
 												  "ERROR_BRIDGE_FAULT",
 												  "ERROR_OUT_ENCODER_E",
