@@ -59,6 +59,7 @@ constexpr float mainEncoderMaxError = 0.05f;
 const std::vector<std::string> encoderTypes = {"NONE", "AS5047_CENTER", "AS5047_OFFAXIS"};
 const std::vector<std::string> encoderModes = {"NONE", "STARTUP", "MOTION", "REPORT"};
 const std::vector<std::string> encoderCalibrationModes = {"FULL", "DIRONLY"};
+const std::vector<std::string> motorCalibrationModes = {"FULL", "NOPPDET"};
 const std::vector<std::string> errorVectorList = {"ERROR_BRIDGE_OCP",
 												  "ERROR_BRIDGE_FAULT",
 												  "ERROR_OUT_ENCODER_E",

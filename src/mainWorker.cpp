@@ -470,10 +470,13 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!getField(cfg, ini, "motor", "static friction", regW.RW.stiction)) return;
 	if (!getField(cfg, ini, "motor", "shutdown temp", regW.RW.motorShutdownTemp)) return;
 
+	regW.RW.motorCalibrationMode = getNumericParamFromList(cfg["motor"]["calibration mode"], ui::motorCalibrationModes);
+
 	regW.RW.outputEncoderDefaultBaud = atoi(cfg["output encoder"]["output encoder default baud"].c_str());
-	regW.RW.outputEncoder = getEncoderType(cfg["output encoder"]["output encoder"]);
-	regW.RW.outputEncoderMode = getEncoderMode(cfg["output encoder"]["output encoder mode"]);
-	regW.RW.outputEncoderCalibrationMode = getEncoderCalibrationMode(cfg["output encoder"]["output encoder calibration mode"]);
+	regW.RW.outputEncoder = getNumericParamFromList(cfg["output encoder"]["output encoder"], ui::encoderTypes);
+	regW.RW.outputEncoderMode = getNumericParamFromList(cfg["output encoder"]["output encoder mode"], ui::encoderModes);
+	regW.RW.outputEncoderCalibrationMode = getNumericParamFromList(cfg["output encoder"]["output encoder calibration mode"], ui::encoderCalibrationModes);
+
 	/* motor base config */
 	if (!candle->writeMd80Register(id,
 								   mab::Md80Reg_E::motorName, regW.RW.motorName,
@@ -521,6 +524,9 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 
 	if (!candle->writeMd80Register(id, mab::Md80Reg_E::outputEncoderCalibrationMode, regW.RW.outputEncoderCalibrationMode))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::outputEncoderCalibrationMode);
+
+	if (!candle->writeMd80Register(id, mab::Md80Reg_E::motorCalibrationMode, regW.RW.motorCalibrationMode))
+		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorCalibrationMode);
 
 	candle->configMd80Save(id);
 
@@ -769,54 +775,16 @@ mab::CANdleBaudrate_E MainWorker::checkSpeedForId(uint16_t id)
 	return mab::CANdleBaudrate_E::CAN_BAUD_1M;
 }
 
-uint8_t MainWorker::getEncoderType(std::string& encoderType)
+uint8_t MainWorker::getNumericParamFromList(std::string& param, const std::vector<std::string>& list)
 {
 	int i = 0;
-	for (auto& type : ui::encoderTypes)
+	for (auto& type : list)
 	{
-		if (type == encoderType)
+		if (type == param)
 			return i;
 		i++;
 	}
 	return 0;
-}
-
-uint8_t MainWorker::getEncoderMode(std::string& encoderMode)
-{
-	int i = 0;
-	for (auto& mode : ui::encoderModes)
-	{
-		if (mode == encoderMode)
-			return i;
-		i++;
-	}
-	return 0;
-}
-
-uint8_t MainWorker::getEncoderCalibrationMode(std::string& encoderCalibrationMode)
-{
-	int i = 0;
-	for (auto& mode : ui::encoderCalibrationModes)
-	{
-		if (mode == encoderCalibrationMode)
-			return i;
-		i++;
-	}
-	return 0;
-}
-
-std::string MainWorker::getEncoderType(uint8_t encoderType)
-{
-	return ui::encoderTypes[encoderType];
-}
-std::string MainWorker::getEncoderMode(uint8_t encoderMode)
-{
-	return ui::encoderModes[encoderMode];
-}
-
-std::string MainWorker::getEncoderCalibrationMode(uint8_t encoderCalibrationMode)
-{
-	return ui::encoderCalibrationModes[encoderCalibrationMode];
 }
 
 bool MainWorker::checkErrors(uint16_t canId)

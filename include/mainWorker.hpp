@@ -52,13 +52,11 @@ class MainWorker
 	void changeDefaultConfig(std::string bus, std::string device);
 	mab::CANdleBaudrate_E checkSpeedForId(uint16_t id);
 
-	uint8_t getEncoderType(std::string& encoderType);
-	uint8_t getEncoderMode(std::string& encoderMode);
-	uint8_t getEncoderCalibrationMode(std::string& encoderCalibrationMode);
-
-	std::string getEncoderType(uint8_t encoderType);
-	std::string getEncoderMode(uint8_t encoderMode);
-	std::string getEncoderCalibrationMode(uint8_t encoderCalibrationMode);
+	uint8_t getNumericParamFromList(std::string& param, const std::vector<std::string>& list);
+	// uint8_t getEncoderType(std::string& encoderType);
+	// uint8_t getEncoderMode(std::string& encoderMode);
+	// uint8_t getEncoderCalibrationMode(std::string& encoderCalibrationMode);
+	// uint8_t getMotorCalibrationMode(std::string& motorCalibrationMode);
 
 	bool checkErrors(uint16_t canId);
 
