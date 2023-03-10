@@ -454,6 +454,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	}
 
 	mab::regWrite_st& regW = candle->getMd80FromList(id).getWriteReg();
+	mab::regRead_st& regR = candle->getMd80FromList(id).getReadReg();
 
 	/* add a field here only if you want to test it against limits form the mdtool.ini file */
 	memcpy(regW.RW.motorName, (cfg["motor"]["name"]).c_str(), strlen((cfg["motor"]["name"]).c_str()));
@@ -469,6 +470,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!getField(cfg, ini, "motor", "dynamic friction", regW.RW.friction)) return;
 	if (!getField(cfg, ini, "motor", "static friction", regW.RW.stiction)) return;
 	if (!getField(cfg, ini, "motor", "shutdown temp", regW.RW.motorShutdownTemp)) return;
+	if (!getField(cfg, ini, "hardware", "shunt resistance", regR.RO.shuntResistance)) return;
 
 	regW.RW.motorCalibrationMode = getNumericParamFromList(cfg["motor"]["calibration mode"], ui::motorCalibrationModes);
 
@@ -527,6 +529,12 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 
 	if (!candle->writeMd80Register(id, mab::Md80Reg_E::motorCalibrationMode, regW.RW.motorCalibrationMode))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorCalibrationMode);
+
+	if (regR.RO.shuntResistance != 0)
+	{
+		if (!candle->writeMd80Register(id, mab::Md80Reg_E::shuntResistance, regR.RO.shuntResistance))
+			ui::printFailedToSetupMotor(mab::Md80Reg_E::shuntResistance);
+	}
 
 	candle->configMd80Save(id);
 

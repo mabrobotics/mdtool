@@ -271,6 +271,7 @@ void printDriveInfoExtended(mab::Md80& drive)
 	vout << "- commit hash: " << drive.getReadReg().RO.commitHash << std::endl;
 	vout << "- max current: " << std::setprecision(1) << drive.getReadReg().RW.iMax << " A" << std::endl;
 	vout << "- bridge type: " << std::to_string(drive.getReadReg().RO.bridgeType) << std::endl;
+	vout << "- shunt resistance: " << std::setprecision(4) << drive.getReadReg().RO.shuntResistance << " Ohm" << std::endl;
 	vout << "- pole pairs: " << std::to_string(drive.getReadReg().RW.polePairs) << std::endl;
 	vout << "- KV rating: " << std::to_string(drive.getReadReg().RW.motorKV) << " rpm/V" << std::endl;
 	vout << "- motor shutdown temperature: " << std::to_string(drive.getReadReg().RW.motorShutdownTemp) << " *C" << std::endl;
