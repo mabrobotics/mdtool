@@ -470,7 +470,14 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!getField(cfg, ini, "motor", "dynamic friction", regW.RW.friction)) return;
 	if (!getField(cfg, ini, "motor", "static friction", regW.RW.stiction)) return;
 	if (!getField(cfg, ini, "motor", "shutdown temp", regW.RW.motorShutdownTemp)) return;
-	if (!getField(cfg, ini, "hardware", "shunt resistance", regR.RO.shuntResistance)) return;
+
+	if (cfg["hardware"]["shunt resistance"] != "")
+	{
+		if (!getField(cfg, ini, "hardware", "shunt resistance", regR.RO.shuntResistance))
+			return;
+	}
+	else
+		regR.RO.shuntResistance = 0;
 
 	regW.RW.motorCalibrationMode = getNumericParamFromList(cfg["motor"]["calibration mode"], ui::motorCalibrationModes);
 
