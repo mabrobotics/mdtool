@@ -621,6 +621,8 @@ void MainWorker::testLatency(std::vector<std::string>& args)
 	std::vector<uint32_t> samples;
 	const uint32_t timelen = 10;
 
+	sleep(1);
+
 	for (uint32_t i = 0; i < timelen; i++)
 	{
 		sleep(1);
