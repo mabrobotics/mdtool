@@ -237,7 +237,7 @@ void printUnableToFindCfgFile(std::string path)
 	vout << "Unable to find selected config file. Received location: " + path << std::endl;
 }
 
-void printDriveInfoExtended(mab::Md80& drive)
+void printDriveInfoExtended(mab::Md80& drive, bool printAll)
 {
 	auto getStringBuildDate = [](uint32_t date)
 	{ return std::to_string(date % 100) + '.' + std::to_string((date / 100) % 100) + '.' + "20" + std::to_string(date / 10000); };
@@ -284,27 +284,34 @@ void printDriveInfoExtended(mab::Md80& drive)
 	vout << "- torque bandwidth: " << drive.getReadReg().RW.torqueBandwidth << " Hz" << std::endl;
 	vout << "- CAN watchdog: " << drive.getReadReg().RW.canWatchdog << " ms" << std::endl;
 
-	float stddevE = drive.getReadReg().RO.calMainEncoderStdDev;
-	float minE = drive.getReadReg().RO.calMainEncoderMinE;
-	float maxE = drive.getReadReg().RO.calMainEncoderMaxE;
-	vout << "- main encoder last check error stddev: " << (stddevE < mainEncoderStdDevMax ? std::to_string(stddevE) : YELLOW_(std::to_string(stddevE))) << " rad" << std::endl;
-	vout << "- main encoder last check min error " << (minE > -mainEncoderMaxError ? std::to_string(minE) : YELLOW_(std::to_string(minE))) << " rad" << std::endl;
-	vout << "- main encoder last check max error: " << (maxE < mainEncoderMaxError ? std::to_string(maxE) : YELLOW_(std::to_string(maxE))) << " rad" << std::endl;
+	if (printAll)
+	{
+		float stddevE = drive.getReadReg().RO.calMainEncoderStdDev;
+		float minE = drive.getReadReg().RO.calMainEncoderMinE;
+		float maxE = drive.getReadReg().RO.calMainEncoderMaxE;
+		vout << "- main encoder last check error stddev: " << (stddevE < mainEncoderStdDevMax ? std::to_string(stddevE) : YELLOW_(std::to_string(stddevE))) << " rad" << std::endl;
+		vout << "- main encoder last check min error " << (minE > -mainEncoderMaxError ? std::to_string(minE) : YELLOW_(std::to_string(minE))) << " rad" << std::endl;
+		vout << "- main encoder last check max error: " << (maxE < mainEncoderMaxError ? std::to_string(maxE) : YELLOW_(std::to_string(maxE))) << " rad" << std::endl;
+	}
 
 	vout << "- output encoder: " << (drive.getReadReg().RW.outputEncoder ? encoderTypes[drive.getReadReg().RW.outputEncoder] : "no") << std::endl;
 
 	if (drive.getReadReg().RW.outputEncoder != 0)
 	{
-		float stddevE = drive.getReadReg().RO.calOutputEncoderStdDev;
-		float minE = drive.getReadReg().RO.calOutputEncoderMinE;
-		float maxE = drive.getReadReg().RO.calOutputEncoderMaxE;
 		vout << "- output encoder mode: " << encoderModes[drive.getReadReg().RW.outputEncoderMode] << std::endl;
 		vout << "- output encoder calibration mode: " << encoderCalibrationModes[drive.getReadReg().RW.outputEncoderCalibrationMode] << std::endl;
 		vout << "- output encoder position: " << drive.getReadReg().RO.outputEncoderPosition << " rad" << std::endl;
 		vout << "- output encoder velocity: " << drive.getReadReg().RO.outputEncoderVelocity << " rad/s" << std::endl;
-		vout << "- output encoder last check error stddev: " << (stddevE < outputEncoderStdDevMax ? std::to_string(stddevE) : YELLOW_(std::to_string(stddevE))) << " rad" << std::endl;
-		vout << "- output encoder last check min error " << (minE > -outputEncoderMaxError ? std::to_string(minE) : YELLOW_(std::to_string(minE))) << " rad" << std::endl;
-		vout << "- output encoder last check max error: " << (maxE < outputEncoderMaxError ? std::to_string(maxE) : YELLOW_(std::to_string(maxE))) << " rad" << std::endl;
+
+		if (printAll)
+		{
+			float stddevE = drive.getReadReg().RO.calOutputEncoderStdDev;
+			float minE = drive.getReadReg().RO.calOutputEncoderMinE;
+			float maxE = drive.getReadReg().RO.calOutputEncoderMaxE;
+			vout << "- output encoder last check error stddev: " << (stddevE < outputEncoderStdDevMax ? std::to_string(stddevE) : YELLOW_(std::to_string(stddevE))) << " rad" << std::endl;
+			vout << "- output encoder last check min error " << (minE > -outputEncoderMaxError ? std::to_string(minE) : YELLOW_(std::to_string(minE))) << " rad" << std::endl;
+			vout << "- output encoder last check max error: " << (maxE < outputEncoderMaxError ? std::to_string(maxE) : YELLOW_(std::to_string(maxE))) << " rad" << std::endl;
+		}
 	}
 	vout << "- position: " << std::setprecision(2) << drive.getPosition() << " rad" << std::endl;
 	vout << "- velocity: " << std::setprecision(2) << drive.getVelocity() << " rad/s" << std::endl;

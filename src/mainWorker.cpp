@@ -544,10 +544,17 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 
 void MainWorker::setupInfo(std::vector<std::string>& args)
 {
-	if (args.size() != 4)
+	bool printAll = false;
+
+	if (args.size() < 4)
 	{
 		ui::printTooFewArgsNoHelp();
 		return;
+	}
+	if (args.size() == 5)
+	{
+		if (args[4] == "all")
+			printAll = true;
 	}
 	int id = atoi(args[3].c_str());
 	checkSpeedForId(id);
@@ -555,7 +562,7 @@ void MainWorker::setupInfo(std::vector<std::string>& args)
 		return;
 
 	candle->setupMd80DiagnosticExtended(id);
-	ui::printDriveInfoExtended(candle->getMd80FromList(id));
+	ui::printDriveInfoExtended(candle->getMd80FromList(id), printAll);
 }
 
 void MainWorker::testMove(std::vector<std::string>& args)
