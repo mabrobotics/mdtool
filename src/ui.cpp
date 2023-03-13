@@ -345,7 +345,7 @@ void printAllErrors(mab::Md80& drive)
 	printErrorDetails(drive.getReadReg().RO.communicationErrors, communicationErrorList);
 }
 
-void printErrorDetails(uint16_t error, const std::vector<std::string>& errorList)
+void printErrorDetails(uint32_t error, const std::vector<std::string>& errorList)
 {
 	vout << "	(";
 	if (error == 0)
