@@ -36,7 +36,7 @@ void printHelpTest();
 void printLatencyTestResult(uint8_t actuatorCount, float average, float stdev, std::string bus);
 
 bool getCalibrationConfirmation();
-bool getCalibrationAuxConfirmation();
+bool getCalibrationOutputConfirmation();
 void printPosition(int id, float pos);
 void printPositionAndVelocity(int id, float pos, float velocity);
 void printDriveInfo(int id, float pos, float vel, float torque, float temperature, uint16_t error, mab::CANdleBaudrate_E baud);

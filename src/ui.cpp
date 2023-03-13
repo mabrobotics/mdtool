@@ -156,7 +156,7 @@ bool getCalibrationConfirmation()
 	return true;
 }
 
-bool getCalibrationAuxConfirmation()
+bool getCalibrationOutputConfirmation()
 {
 	vout << "This step will start output encoder calibration." << std::endl;
 	vout << "The process takes around 40-50 seconds, and should not be cancelled or stopped." << std::endl;
@@ -331,8 +331,8 @@ void printAllErrors(mab::Md80& drive)
 
 	if (drive.getReadReg().RW.outputEncoder != 0)
 	{
-		vout << "- output encoder error: 0x" << std::hex << (unsigned short)drive.getReadReg().RO.auxEncoderErrors << std::dec;
-		printErrorDetails(drive.getReadReg().RO.auxEncoderErrors, encoderErrorList);
+		vout << "- output encoder error: 0x" << std::hex << (unsigned short)drive.getReadReg().RO.outputEncoderErrors << std::dec;
+		printErrorDetails(drive.getReadReg().RO.outputEncoderErrors, encoderErrorList);
 	}
 
 	vout << "- calibration error: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.calibrationErrors << std::dec;

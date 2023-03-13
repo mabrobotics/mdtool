@@ -39,7 +39,7 @@ enum class toolsOptions_E
 	INFO,
 	MOVE,
 	LATENCY,
-	CALIBRATIONOUT,
+	CALIBRATION_OUTPUT,
 	ENCODER,
 	MAIN,
 	OUTPUT,
@@ -59,7 +59,7 @@ toolsOptions_E str2option(std::string& opt)
 	if (opt == "calibration")
 		return toolsOptions_E::CALIBRATION;
 	if (opt == "calibration_out")
-		return toolsOptions_E::CALIBRATIONOUT;
+		return toolsOptions_E::CALIBRATION_OUTPUT;
 	if (opt == "diagnostic")
 		return toolsOptions_E::DIAGNOSTIC;
 	if (opt == "motor")
@@ -220,8 +220,8 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 		{
 			if (option == toolsOptions_E::CALIBRATION)
 				setupCalibration(args);
-			else if (option == toolsOptions_E::CALIBRATIONOUT)
-				setupCalibrationOut(args);
+			else if (option == toolsOptions_E::CALIBRATION_OUTPUT)
+				setupCalibrationOutput(args);
 			else if (option == toolsOptions_E::DIAGNOSTIC)
 				setupDiagnostic(args);
 			else if (option == toolsOptions_E::MOTOR)
@@ -393,7 +393,7 @@ void MainWorker::setupCalibration(std::vector<std::string>& args)
 	candle->setupMd80Calibration(id);
 }
 
-void MainWorker::setupCalibrationOut(std::vector<std::string>& args)
+void MainWorker::setupCalibrationOutput(std::vector<std::string>& args)
 {
 	if (args.size() != 4)
 	{
@@ -401,14 +401,14 @@ void MainWorker::setupCalibrationOut(std::vector<std::string>& args)
 		return;
 	}
 
-	if (!ui::getCalibrationAuxConfirmation())
+	if (!ui::getCalibrationOutputConfirmation())
 		return;
 	int id = atoi(args[3].c_str());
 	checkSpeedForId(id);
 	if (!candle->addMd80(id))
 		return;
 
-	candle->setupMd80CalibrationAux(id);
+	candle->setupMd80CalibrationOutput(id);
 }
 void MainWorker::setupDiagnostic(std::vector<std::string>& args)
 {
@@ -816,7 +816,7 @@ bool MainWorker::checkErrors(uint16_t canId)
 	candle->setupMd80DiagnosticExtended(canId);
 
 	if (candle->getMd80FromList(canId).getReadReg().RO.mainEncoderErrors ||
-		candle->getMd80FromList(canId).getReadReg().RO.auxEncoderErrors ||
+		candle->getMd80FromList(canId).getReadReg().RO.outputEncoderErrors ||
 		candle->getMd80FromList(canId).getReadReg().RO.calibrationErrors ||
 		candle->getMd80FromList(canId).getReadReg().RO.hardwareErrors ||
 		candle->getMd80FromList(canId).getReadReg().RO.bridgeErrors ||

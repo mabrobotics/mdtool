@@ -36,7 +36,7 @@ class MainWorker
 	void configBandwidth(std::vector<std::string>& args);
 
 	void setupCalibration(std::vector<std::string>& args);
-	void setupCalibrationOut(std::vector<std::string>& args);
+	void setupCalibrationOutput(std::vector<std::string>& args);
 	void setupDiagnostic(std::vector<std::string>& args);
 	void setupMotor(std::vector<std::string>& args);
 	void setupInfo(std::vector<std::string>& args);
