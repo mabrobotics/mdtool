@@ -1,6 +1,6 @@
 [submodule "candle"]
 	path = candle
-	url = git@gitlab.com:MAB_Robotics/md80_usbcan.git
+	url = git@github.com:mabrobotics/candle.git
 [submodule "3rd_party/mINI"]
 	path = 3rd_party/mINI
 	url = https://github.com/mabrobotics/mINI.git
