@@ -1,6 +1,3 @@
-[submodule "candle"]
-	path = candle
-	url = git@github.com:mabrobotics/candle.git
 [submodule "3rd_party/mINI"]
 	path = 3rd_party/mINI
 	url = https://github.com/mabrobotics/mINI.git
