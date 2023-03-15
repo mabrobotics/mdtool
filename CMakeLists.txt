@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
+set(CMAKE_CXX_STANDARD 14)
 
-set(MDTOOL_VERSION 1.2.1)
+set(MDTOOL_VERSION 1.2.3)
 
 if(NOT DEFINED ARCH)
     set(ARCH "native")
@@ -22,7 +23,6 @@ endif()
 
 project(mdtool-${ARCH} VERSION ${MDTOOL_VERSION})
 
-set(CMAKE_CXX_STANDARD 11)
 add_compile_options(-Wall -Wextra -Wpedantic)
 
 file(GLOB SRC "src/*.cpp")

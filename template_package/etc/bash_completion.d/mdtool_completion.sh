@@ -4,7 +4,7 @@ _have mdtool &&
 
 _mdtool_complete()
 {
-	local cur prev prev2
+	local cur prev
 	local MEMO_DIR=$HOME/.config/mdtool/mdtool_motors
 	
 	COMPREPLY=()
@@ -26,14 +26,20 @@ _mdtool_complete()
 			COMPREPLY=( $(compgen -W "zero can save current bandwidth" -- $cur) )
 			;; 
 			"setup")
-			COMPREPLY=( $(compgen -W "calibration diagnostic motor info" -- $cur) )
+			COMPREPLY=( $(compgen -W "calibration calibration_out motor info" -- $cur) )
 			;;
 			"test")
-			COMPREPLY=( $(compgen -W "move latency" -- $cur) )
+			COMPREPLY=( $(compgen -W "move latency encoder" -- $cur) )
 			;;
 			*)
 			;;
 		esac
+	elif [ $COMP_CWORD -eq 3 ]; then
+		if [[ "$prev" == "encoder" ]]; then
+			COMPREPLY=( $(compgen -W "main output" -- $cur) )
+
+		fi
+
 	elif [ $COMP_CWORD -eq 4 ]; then
 		if [[ "$prev2" == "motor" ]]; then
 
