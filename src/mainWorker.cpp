@@ -10,7 +10,7 @@
 /* TODO move to a class during refactor */
 const uint8_t VMAJOR = 1;
 const uint8_t VMINOR = 2;
-const uint8_t VREVISION = 3;
+const uint8_t VREVISION = 4;
 const char VTAG = 'd';
 const mab::version_ut mdtoolVersion = {{VTAG, VREVISION, VMINOR, VMAJOR}};
 
@@ -622,6 +622,11 @@ void MainWorker::testMove(std::vector<std::string>& args)
 
 void MainWorker::testLatency(std::vector<std::string>& args)
 {
+	struct sched_param sp;
+	memset(&sp, 0, sizeof(sp));
+	sp.sched_priority = 99;
+	sched_setscheduler(0, SCHED_FIFO, &sp);
+
 	if (args.size() != 4)
 	{
 		ui::printTooFewArgsNoHelp();
@@ -636,7 +641,10 @@ void MainWorker::testLatency(std::vector<std::string>& args)
 	checkSpeedForId(ids[0]);
 
 	for (auto& id : ids)
+	{
 		candle->addMd80(id);
+		candle->controlMd80Mode(id, mab::Md80Mode_E::IMPEDANCE);
+	}
 
 	candle->begin();
 

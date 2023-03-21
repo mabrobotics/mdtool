@@ -126,11 +126,10 @@ void printLatencyTestResult(uint8_t actuatorCount, float average, float stdev, s
 	vout << std::fixed;
 	vout << "******************************************************************************************************************************" << std::endl;
 	vout << std::endl;
-	vout << "Communication speed results during 10s test for " << unsigned(actuatorCount) << " actuators and " << bus << " bus" << std::endl;
+	vout << "Communication speed results during 10s test for " << (uint8_t)actuatorCount << " actuators and " << bus << " bus" << std::endl;
 	vout << "Average speed: " << std::setprecision(2) << average << "Hz" << std::endl;
 	vout << "Standard deviation: " << std::setprecision(2) << stdev << "Hz" << std::endl;
 	vout << std::endl;
-	vout << "Please note: the result is highly dependent on your PC hardware and reflects the PC <> CANdle rather than PC <> MD80 communication speed." << std::endl;
 	vout << "For more information on this test please refer to the manual: " << GREEN("https://mabrobotics.pl/servos/manual") << std::endl;
 	vout << std::endl;
 	vout << "******************************************************************************************************************************" << std::endl;
