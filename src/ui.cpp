@@ -371,7 +371,7 @@ void printErrorDetails(uint32_t error, const std::vector<std::string>& errorList
 	vout << std::endl;
 }
 
-void printErrorDetails(uint32_t error, const std::map<uint8_t, std::string>& errorMap)
+void printErrorDetails(uint32_t error, const std::map<std::string, uint8_t>& errorMap)
 {
 	vout << "	(";
 	if (error == 0)
@@ -382,10 +382,10 @@ void printErrorDetails(uint32_t error, const std::map<uint8_t, std::string>& err
 
 	for (auto& entry : errorMap)
 	{
-		if (error & (1 << entry.first) && entry.second[0] == 'E')
-			vout << RED_(entry.second) << ", ";
-		else if (error & (1 << entry.first) && entry.second[0] == 'W')
-			vout << YELLOW_(entry.second) << ", ";
+		if (error & (1 << entry.second) && entry.first[0] == 'E')
+			vout << RED_(entry.first) << ", ";
+		else if (error & (1 << entry.second) && entry.first[0] == 'W')
+			vout << YELLOW_(entry.first) << ", ";
 	}
 
 	vout << ")";

@@ -46,8 +46,7 @@ void printFoundDrives(std::vector<uint16_t> ids);
 void printUnableToFindCfgFile(std::string path);
 void printDriveInfoExtended(mab::Md80& drive, bool printAll);
 void printAllErrors(mab::Md80& drive);
-void printErrorDetails(uint32_t error, const std::vector<std::string>& errorList);
-void printErrorDetails(uint32_t error, const std::map<uint8_t, std::string>& errorMap);
+void printErrorDetails(uint32_t error, const std::map<std::string, uint8_t>& errorMap);
 void printParameterOutOfBounds(std::string category, std::string field);
 void printFailedToSetupMotor(mab::Md80Reg_E regId);
 
@@ -79,33 +78,33 @@ const std::vector<std::string> errorVectorList = {"ERROR_BRIDGE_OCP",
 												  "CAN_WD_TRIGGERED",
 												  "ERROR_LOOPBACK"};
 
-const std::map<uint8_t, std::string> encoderErrorList = {{0, "ERROR_COMMUNICATION"},
-														 {1, "ERROR_WRONG_DIRECTION"},
-														 {2, "ERROR_EMPTY_LUT"},
-														 {3, "ERROR_FAULTY_LUT"},
-														 {4, "ERROR_CALIBRATION_FAILED"},
-														 {5, "ERROR_POSITON_INVALID"},
-														 {6, "ERROR_INIT"},
-														 {30, "WARNING_LOW_ACCURACY"}};
+const std::map<std::string, uint8_t> encoderErrorList = {{"ERROR_COMMUNICATION", 0},
+														 {"ERROR_WRONG_DIRECTION", 1},
+														 {"ERROR_EMPTY_LUT", 2},
+														 {"ERROR_FAULTY_LUT", 3},
+														 {"ERROR_CALIBRATION_FAILED", 4},
+														 {"ERROR_POSITON_INVALID", 5},
+														 {"ERROR_INIT", 6},
+														 {"WARNING_LOW_ACCURACY", 30}};
 
-const std::map<uint8_t, std::string> calibrationErrorList = {{0, "ERROR_OFFSET_CAL"},
-															 {1, "ERROR_RESISTANCE_IDENT"},
-															 {2, "ERROR_INDUCTANCE_IDENT"},
-															 {3, "ERROR_POLE_PAIR_CAL"},
-															 {4, "ERROR_SETUP"}};
+const std::map<std::string, uint8_t> calibrationErrorList = {{"ERROR_OFFSET_CAL", 0},
+															 {"ERROR_RESISTANCE_IDENT", 1},
+															 {"ERROR_INDUCTANCE_IDENT", 2},
+															 {"ERROR_POLE_PAIR_CAL", 3},
+															 {"ERROR_SETUP", 4}};
 
-const std::map<uint8_t, std::string> bridgeErrorList = {{0, "ERROR_BRIDGE_COM"},
-														{1, "ERROR_BRIDGE_OC"},
-														{2, "ERROR_BRIDGE_GENERAL_FAULT"}};
+const std::map<std::string, uint8_t> bridgeErrorList = {{"ERROR_BRIDGE_COM", 0},
+														{"ERROR_BRIDGE_OC", 1},
+														{"ERROR_BRIDGE_GENERAL_FAULT", 2}};
 
-const std::map<uint8_t, std::string> hardwareErrorList = {{0, "ERROR_OVER_CURRENT"},
-														  {1, "ERROR_OVER_VOLTAGE"},
-														  {2, "ERROR_UNDER_VOLTAGE"},
-														  {3, "ERROR_MOTOR_TEMP"},
-														  {4, "ERROR_MOSFET_TEMP"},
-														  {5, "ERROR_ADC_CURRENT_OFFSETS"}};
+const std::map<std::string, uint8_t> hardwareErrorList = {{"ERROR_OVER_CURRENT", 0},
+														  {"ERROR_OVER_VOLTAGE", 1},
+														  {"ERROR_UNDER_VOLTAGE", 2},
+														  {"ERROR_MOTOR_TEMP", 3},
+														  {"ERROR_MOSFET_TEMP", 4},
+														  {"ERROR_ADC_CURRENT_OFFSETS", 5}};
 
-const std::map<uint8_t, std::string> communicationErrorList = {{30, "WARNING_CAN_WD"}};
+const std::map<std::string, uint8_t> communicationErrorList = {{"WARNING_CAN_WD", 30}};
 
 template <class T>
 bool checkParamLimit(T value, T min, T max)

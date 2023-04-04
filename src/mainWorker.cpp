@@ -390,6 +390,13 @@ void MainWorker::setupCalibration(std::vector<std::string>& args)
 	if (!candle->addMd80(id))
 		return;
 
+	candle->setupMd80DiagnosticExtended(id);
+	if (candle->getMd80FromList(id).getReadReg().RO.calibrationErrors & (1 << ui::calibrationErrorList.at(std::string("ERROR_SETUP"))))
+	{
+		std::cout << "[MDTOOL] Could not proceed due to " << RED("ERROR_SETUP") << ". Please call mdtool setup motor <ID> <cfg> first." << std::endl;
+		return;
+	}
+
 	candle->setupMd80Calibration(id);
 }
 
