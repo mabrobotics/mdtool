@@ -10,7 +10,7 @@
 /* TODO move to a class during refactor */
 const uint8_t VMAJOR = 1;
 const uint8_t VMINOR = 2;
-const uint8_t VREVISION = 4;
+const uint8_t VREVISION = 5;
 const char VTAG = 'd';
 const mab::version_ut mdtoolVersion = {{VTAG, VREVISION, VMINOR, VMAJOR}};
 
@@ -389,6 +389,13 @@ void MainWorker::setupCalibration(std::vector<std::string>& args)
 	checkSpeedForId(id);
 	if (!candle->addMd80(id))
 		return;
+
+	candle->setupMd80DiagnosticExtended(id);
+	if (candle->getMd80FromList(id).getReadReg().RO.calibrationErrors & (1 << ui::calibrationErrorList.at(std::string("ERROR_SETUP"))))
+	{
+		std::cout << "[MDTOOL] Could not proceed due to " << RED("ERROR_SETUP") << ". Please call mdtool setup motor <ID> <cfg> first." << std::endl;
+		return;
+	}
 
 	candle->setupMd80Calibration(id);
 }

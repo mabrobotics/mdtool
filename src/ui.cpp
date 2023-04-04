@@ -126,7 +126,7 @@ void printLatencyTestResult(uint8_t actuatorCount, float average, float stdev, s
 	vout << std::fixed;
 	vout << "******************************************************************************************************************************" << std::endl;
 	vout << std::endl;
-	vout << "Communication speed results during 10s test for " << (uint8_t)actuatorCount << " actuators and " << bus << " bus" << std::endl;
+	vout << "Communication speed results during 10s test for " << (int)actuatorCount << " actuators and " << bus << " bus" << std::endl;
 	vout << "Average speed: " << std::setprecision(2) << average << "Hz" << std::endl;
 	vout << "Standard deviation: " << std::setprecision(2) << stdev << "Hz" << std::endl;
 	vout << std::endl;
@@ -256,7 +256,16 @@ void printDriveInfoExtended(mab::Md80& drive, bool printAll)
 		}
 	};
 
-	vout << std::fixed;
+	auto getListElement = [](std::vector<std::string> vec, uint32_t idx)
+	{
+		if (idx < vec.size())
+			return vec[idx];
+		else
+			return std::string("UNKNOWN (") + std::to_string(idx) + std::string(")");
+	};
+
+	vout
+		<< std::fixed;
 	vout << "Drive " << drive.getId() << ":" << std::endl;
 	vout << "- actuator name: " << drive.getReadReg().RW.motorName << std::endl;
 	vout << "- CAN speed: " << drive.getReadReg().RW.canBaudrate / 1000000 << " M" << std::endl;
@@ -293,12 +302,12 @@ void printDriveInfoExtended(mab::Md80& drive, bool printAll)
 		vout << "- main encoder last check max error: " << (maxE < mainEncoderMaxError ? std::to_string(maxE) : YELLOW_(std::to_string(maxE))) << " rad" << std::endl;
 	}
 
-	vout << "- output encoder: " << (drive.getReadReg().RW.outputEncoder ? encoderTypes[drive.getReadReg().RW.outputEncoder] : "no") << std::endl;
+	vout << "- output encoder: " << (drive.getReadReg().RW.outputEncoder ? getListElement(encoderTypes, drive.getReadReg().RW.outputEncoder) : "no") << std::endl;
 
 	if (drive.getReadReg().RW.outputEncoder != 0)
 	{
-		vout << "- output encoder mode: " << encoderModes[drive.getReadReg().RW.outputEncoderMode] << std::endl;
-		vout << "- output encoder calibration mode: " << encoderCalibrationModes[drive.getReadReg().RW.outputEncoderCalibrationMode] << std::endl;
+		vout << "- output encoder mode: " << getListElement(encoderModes, drive.getReadReg().RW.outputEncoderMode) << std::endl;
+		vout << "- output encoder calibration mode: " << getListElement(encoderCalibrationModes, drive.getReadReg().RW.outputEncoderCalibrationMode) << std::endl;
 		vout << "- output encoder position: " << drive.getReadReg().RO.outputEncoderPosition << " rad" << std::endl;
 		vout << "- output encoder velocity: " << drive.getReadReg().RO.outputEncoderVelocity << " rad/s" << std::endl;
 
@@ -358,6 +367,27 @@ void printErrorDetails(uint32_t error, const std::vector<std::string>& errorList
 		if (error & (1 << i))
 			vout << RED_(errorList[i]) << ", ";
 	}
+	vout << ")";
+	vout << std::endl;
+}
+
+void printErrorDetails(uint32_t error, const std::map<std::string, uint8_t>& errorMap)
+{
+	vout << "	(";
+	if (error == 0)
+	{
+		vout << GREEN("ALL OK") << ")" << std::endl;
+		return;
+	}
+
+	for (auto& entry : errorMap)
+	{
+		if (error & (1 << entry.second) && entry.first[0] == 'E')
+			vout << RED_(entry.first) << ", ";
+		else if (error & (1 << entry.second) && entry.first[0] == 'W')
+			vout << YELLOW_(entry.first) << ", ";
+	}
+
 	vout << ")";
 	vout << std::endl;
 }
