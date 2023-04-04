@@ -10,7 +10,7 @@
 /* TODO move to a class during refactor */
 const uint8_t VMAJOR = 1;
 const uint8_t VMINOR = 2;
-const uint8_t VREVISION = 4;
+const uint8_t VREVISION = 5;
 const char VTAG = 'd';
 const mab::version_ut mdtoolVersion = {{VTAG, VREVISION, VMINOR, VMAJOR}};
 
