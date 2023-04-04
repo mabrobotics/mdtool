@@ -126,7 +126,7 @@ void printLatencyTestResult(uint8_t actuatorCount, float average, float stdev, s
 	vout << std::fixed;
 	vout << "******************************************************************************************************************************" << std::endl;
 	vout << std::endl;
-	vout << "Communication speed results during 10s test for " << (uint8_t)actuatorCount << " actuators and " << bus << " bus" << std::endl;
+	vout << "Communication speed results during 10s test for " << (int)actuatorCount << " actuators and " << bus << " bus" << std::endl;
 	vout << "Average speed: " << std::setprecision(2) << average << "Hz" << std::endl;
 	vout << "Standard deviation: " << std::setprecision(2) << stdev << "Hz" << std::endl;
 	vout << std::endl;
