@@ -4,12 +4,11 @@
 #include "candle.hpp"
 #include "mini/ini.h"
 
-const std::string version = "1.2.1";
-
 class MainWorker
 {
    public:
 	MainWorker(std::vector<std::string>& args);
+	static std::string getVersion();
 
    private:
 	const std::string mdtoolHomeConfigDirName = ".config";
@@ -37,18 +36,25 @@ class MainWorker
 	void configBandwidth(std::vector<std::string>& args);
 
 	void setupCalibration(std::vector<std::string>& args);
+	void setupCalibrationOutput(std::vector<std::string>& args);
 	void setupDiagnostic(std::vector<std::string>& args);
 	void setupMotor(std::vector<std::string>& args);
 	void setupInfo(std::vector<std::string>& args);
 
 	void testMove(std::vector<std::string>& args);
 	void testLatency(std::vector<std::string>& args);
+	void testEncoderOutput(std::vector<std::string>& args);
+	void testEncoderMain(std::vector<std::string>& args);
 	void blink(std::vector<std::string>& args);
 	void encoder(std::vector<std::string>& args);
 	void bus(std::vector<std::string>& args);
 
 	void changeDefaultConfig(std::string bus, std::string device);
 	mab::CANdleBaudrate_E checkSpeedForId(uint16_t id);
+
+	uint8_t getNumericParamFromList(std::string& param, const std::vector<std::string>& list);
+
+	bool checkErrors(uint16_t canId);
 
 	template <class T>
 	bool getField(mINI::INIStructure& cfg, mINI::INIStructure& ini, std::string category, std::string field, T& value);

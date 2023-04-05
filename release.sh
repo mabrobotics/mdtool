@@ -4,10 +4,6 @@ rm -rf build
 mkdir -p build
 cd build
 
-apt install gcc-arm-linux-gnueabi g++-arm-linux-gnueabi
-apt install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
-apt install g++-aarch64-linux-gnu
-
 mkdir packages
 
 for TARGET in ${TARGETS}
