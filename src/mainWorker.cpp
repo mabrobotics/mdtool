@@ -7,11 +7,10 @@
 
 #include "ui.hpp"
 
-/* TODO move to a class during refactor */
-const uint8_t VMAJOR = 1;
-const uint8_t VMINOR = 2;
-const uint8_t VREVISION = 5;
-const char VTAG = 'd';
+const uint8_t VMAJOR = MDTOOL_VERSION_MAJOR;
+const uint8_t VMINOR = MDTOOL_VERSION_MINOR;
+const uint8_t VREVISION = MDTOOL_VERSION_REVISION;
+const char VTAG = 'r';
 const mab::version_ut mdtoolVersion = {{VTAG, VREVISION, VMINOR, VMAJOR}};
 
 enum class toolsCmd_E
