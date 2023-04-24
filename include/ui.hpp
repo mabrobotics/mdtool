@@ -61,6 +61,7 @@ const std::vector<std::string> encoderTypes = {"NONE", "AS5047_CENTER", "AS5047_
 const std::vector<std::string> encoderModes = {"NONE", "STARTUP", "MOTION", "REPORT"};
 const std::vector<std::string> encoderCalibrationModes = {"FULL", "DIRONLY"};
 const std::vector<std::string> motorCalibrationModes = {"FULL", "NOPPDET"};
+const std::vector<std::string> homingModes = {"OFF", "SENSORLESS"};
 const std::vector<std::string> errorVectorList = {"ERROR_BRIDGE_OCP",
 												  "ERROR_BRIDGE_FAULT",
 												  "ERROR_OUT_ENCODER_E",
@@ -104,7 +105,14 @@ const std::map<std::string, uint8_t> hardwareErrorList = {{"ERROR_OVER_CURRENT",
 														  {"ERROR_MOSFET_TEMP", 4},
 														  {"ERROR_ADC_CURRENT_OFFSETS", 5}};
 
-const std::map<std::string, uint8_t> communicationErrorList = {{"WARNING_CAN_WD", 30}};
+const std::map<std::string, uint8_t> communicationErrorList = {{"WARNING_POSITION_CLIPPED", 29},
+															   {"WARNING_CAN_WD", 30}};
+
+const std::map<std::string, uint8_t> homingErrorList = {{"ERROR_HOMING_LIMIT_REACHED", 0},
+														{"ERROR_HOMING_SEQUENCE", 1},
+														{"ERROR_HOMING_REQUIRED", 2},
+														{"ERROR_HOMING_SETUP", 3},
+														{"ERROR_HOMING_ABORTED", 4}};
 
 template <class T>
 bool checkParamLimit(T value, T min, T max)

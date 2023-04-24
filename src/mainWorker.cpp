@@ -42,6 +42,7 @@ enum class toolsOptions_E
 	ENCODER,
 	MAIN,
 	OUTPUT,
+	HOMING,
 };
 toolsOptions_E str2option(std::string& opt)
 {
@@ -75,6 +76,8 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::MAIN;
 	if (opt == "output")
 		return toolsOptions_E::OUTPUT;
+	if (opt == "homing")
+		return toolsOptions_E::HOMING;
 
 	return toolsOptions_E::NONE;
 }
@@ -245,6 +248,10 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 					testEncoderOutput(args);
 				else
 					ui::printHelpTest();
+			}
+			else if (option == toolsOptions_E::HOMING)
+			{
+				testHoming(args);
 			}
 			else
 				ui::printHelpTest();
@@ -491,6 +498,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	regW.RW.outputEncoder = getNumericParamFromList(cfg["output encoder"]["output encoder"], ui::encoderTypes);
 	regW.RW.outputEncoderMode = getNumericParamFromList(cfg["output encoder"]["output encoder mode"], ui::encoderModes);
 	regW.RW.outputEncoderCalibrationMode = getNumericParamFromList(cfg["output encoder"]["output encoder calibration mode"], ui::encoderCalibrationModes);
+	regW.RW.homingMode = getNumericParamFromList(cfg["homing"]["mode"], ui::homingModes);
 
 	/* motor base config */
 	if (!candle->writeMd80Register(id,
@@ -548,6 +556,14 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 		if (!candle->writeMd80Register(id, mab::Md80Reg_E::shuntResistance, regR.RO.shuntResistance))
 			ui::printFailedToSetupMotor(mab::Md80Reg_E::shuntResistance);
 	}
+
+	if (!candle->writeMd80Register(id,
+								   mab::Md80Reg_E::homingMode, regW.RW.homingMode,
+								   mab::Md80Reg_E::homingMaxTravel, (float)atof(cfg["homing"]["max travel"].c_str()),
+								   mab::Md80Reg_E::homingTorque, (float)atof(cfg["homing"]["max torque"].c_str()),
+								   mab::Md80Reg_E::homingVelocity, (float)atof(cfg["homing"]["max velocity"].c_str()),
+								   mab::Md80Reg_E::homingPositionDeviationTrigger, (float)atof(cfg["homing"]["position deviation trigger"].c_str())))
+		ui::printFailedToSetupMotor(mab::Md80Reg_E::homingMode);
 
 	candle->configMd80Save(id);
 
@@ -731,6 +747,25 @@ void MainWorker::testEncoderMain(std::vector<std::string>& args)
 	candle->setupMd80TestMainEncoder(id);
 }
 
+void MainWorker::testHoming(std::vector<std::string>& args)
+{
+	if (args.size() != 4)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+
+	int id = atoi(args[3].c_str());
+	checkSpeedForId(id);
+
+	if (!candle->addMd80(id))
+		return;
+
+	/* TODO check critical errors, but not the homing required error since we want to clear it with homing */
+
+	candle->setupMd80PerformHoming(id);
+}
+
 void MainWorker::blink(std::vector<std::string>& args)
 {
 	if (args.size() != 3)
@@ -829,12 +864,12 @@ bool MainWorker::checkErrors(uint16_t canId)
 {
 	candle->setupMd80DiagnosticExtended(canId);
 
-	if (candle->getMd80FromList(canId).getReadReg().RO.mainEncoderErrors ||
-		candle->getMd80FromList(canId).getReadReg().RO.outputEncoderErrors ||
-		candle->getMd80FromList(canId).getReadReg().RO.calibrationErrors ||
-		candle->getMd80FromList(canId).getReadReg().RO.hardwareErrors ||
-		candle->getMd80FromList(canId).getReadReg().RO.bridgeErrors ||
-		candle->getMd80FromList(canId).getReadReg().RO.communicationErrors)
+	if (candle->getMd80FromList(canId).getReadReg().RO.mainEncoderErrors & 0x0000ffff ||
+		candle->getMd80FromList(canId).getReadReg().RO.outputEncoderErrors & 0x0000ffff ||
+		candle->getMd80FromList(canId).getReadReg().RO.calibrationErrors & 0x0000ffff ||
+		candle->getMd80FromList(canId).getReadReg().RO.hardwareErrors & 0x0000ffff ||
+		candle->getMd80FromList(canId).getReadReg().RO.bridgeErrors & 0x0000ffff ||
+		candle->getMd80FromList(canId).getReadReg().RO.communicationErrors & 0x0000ffff)
 		return true;
 
 	return false;

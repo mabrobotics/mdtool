@@ -306,21 +306,32 @@ void printDriveInfoExtended(mab::Md80& drive, bool printAll)
 
 	if (drive.getReadReg().RW.outputEncoder != 0)
 	{
-		vout << "- output encoder mode: " << getListElement(encoderModes, drive.getReadReg().RW.outputEncoderMode) << std::endl;
-		vout << "- output encoder calibration mode: " << getListElement(encoderCalibrationModes, drive.getReadReg().RW.outputEncoderCalibrationMode) << std::endl;
-		vout << "- output encoder position: " << drive.getReadReg().RO.outputEncoderPosition << " rad" << std::endl;
-		vout << "- output encoder velocity: " << drive.getReadReg().RO.outputEncoderVelocity << " rad/s" << std::endl;
+		vout << "   - output encoder mode: " << getListElement(encoderModes, drive.getReadReg().RW.outputEncoderMode) << std::endl;
+		vout << "   - output encoder calibration mode: " << getListElement(encoderCalibrationModes, drive.getReadReg().RW.outputEncoderCalibrationMode) << std::endl;
+		vout << "   - output encoder position: " << drive.getReadReg().RO.outputEncoderPosition << " rad" << std::endl;
+		vout << "   - output encoder velocity: " << drive.getReadReg().RO.outputEncoderVelocity << " rad/s" << std::endl;
 
 		if (printAll)
 		{
 			float stddevE = drive.getReadReg().RO.calOutputEncoderStdDev;
 			float minE = drive.getReadReg().RO.calOutputEncoderMinE;
 			float maxE = drive.getReadReg().RO.calOutputEncoderMaxE;
-			vout << "- output encoder last check error stddev: " << (stddevE < outputEncoderStdDevMax ? std::to_string(stddevE) : YELLOW_(std::to_string(stddevE))) << " rad" << std::endl;
-			vout << "- output encoder last check min error " << (minE > -outputEncoderMaxError ? std::to_string(minE) : YELLOW_(std::to_string(minE))) << " rad" << std::endl;
-			vout << "- output encoder last check max error: " << (maxE < outputEncoderMaxError ? std::to_string(maxE) : YELLOW_(std::to_string(maxE))) << " rad" << std::endl;
+			vout << "   - output encoder last check error stddev: " << (stddevE < outputEncoderStdDevMax ? std::to_string(stddevE) : YELLOW_(std::to_string(stddevE))) << " rad" << std::endl;
+			vout << "   - output encoder last check min error " << (minE > -outputEncoderMaxError ? std::to_string(minE) : YELLOW_(std::to_string(minE))) << " rad" << std::endl;
+			vout << "   - output encoder last check max error: " << (maxE < outputEncoderMaxError ? std::to_string(maxE) : YELLOW_(std::to_string(maxE))) << " rad" << std::endl;
 		}
 	}
+
+	vout << "- homing: " << (drive.getReadReg().RW.homingMode ? getListElement(homingModes, drive.getReadReg().RW.homingMode) : "off") << std::endl;
+
+	if (drive.getReadReg().RW.homingMode != 0)
+	{
+		vout << "   - homing max travel: " << std::setprecision(2) << drive.getReadReg().RW.homingMaxTravel << " rad" << std::endl;
+		vout << "   - homing max torque: " << std::setprecision(2) << drive.getReadReg().RW.homingTorque << " Nm" << std::endl;
+		vout << "   - homing max velocity: " << std::setprecision(2) << drive.getReadReg().RW.homingVelocity << " rad/s" << std::endl;
+		vout << "   - homing position deviation trigger: " << std::setprecision(2) << drive.getReadReg().RW.homingPositionDeviationTrigger << " rad" << std::endl;
+	}
+
 	vout << "- position: " << std::setprecision(2) << drive.getPosition() << " rad" << std::endl;
 	vout << "- velocity: " << std::setprecision(2) << drive.getVelocity() << " rad/s" << std::endl;
 	vout << "- torque: " << std::setprecision(2) << drive.getTorque() << " Nm" << std::endl;
@@ -351,6 +362,12 @@ void printAllErrors(mab::Md80& drive)
 	printErrorDetails(drive.getReadReg().RO.hardwareErrors, hardwareErrorList);
 	vout << "- communication error: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.communicationErrors << std::dec;
 	printErrorDetails(drive.getReadReg().RO.communicationErrors, communicationErrorList);
+
+	if (drive.getReadReg().RW.homingMode != 0)
+	{
+		vout << "- homing error: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.homingErrors << std::dec;
+		printErrorDetails(drive.getReadReg().RO.homingErrors, homingErrorList);
+	}
 }
 
 void printErrorDetails(uint32_t error, const std::vector<std::string>& errorList)

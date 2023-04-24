@@ -45,6 +45,7 @@ class MainWorker
 	void testLatency(std::vector<std::string>& args);
 	void testEncoderOutput(std::vector<std::string>& args);
 	void testEncoderMain(std::vector<std::string>& args);
+	void testHoming(std::vector<std::string>& args);
 	void blink(std::vector<std::string>& args);
 	void encoder(std::vector<std::string>& args);
 	void bus(std::vector<std::string>& args);
