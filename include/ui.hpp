@@ -105,7 +105,8 @@ const std::map<std::string, uint8_t> hardwareErrorList = {{"ERROR_OVER_CURRENT",
 														  {"ERROR_MOSFET_TEMP", 4},
 														  {"ERROR_ADC_CURRENT_OFFSETS", 5}};
 
-const std::map<std::string, uint8_t> communicationErrorList = {{"WARNING_POSITION_CLIPPED", 29},
+const std::map<std::string, uint8_t> communicationErrorList = {{"WARNING_START_OUTSIDE_LIMITS", 28},
+															   {"WARNING_POSITION_CLIPPED", 29},
 															   {"WARNING_CAN_WD", 30}};
 
 const std::map<std::string, uint8_t> homingErrorList = {{"ERROR_HOMING_LIMIT_REACHED", 0},

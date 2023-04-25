@@ -500,6 +500,11 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	regW.RW.outputEncoderCalibrationMode = getNumericParamFromList(cfg["output encoder"]["output encoder calibration mode"], ui::encoderCalibrationModes);
 	regW.RW.homingMode = getNumericParamFromList(cfg["homing"]["mode"], ui::homingModes);
 
+	auto floatFromField = [&](const char* category, const char* field) -> float
+	{
+		return atof(cfg[category][field].c_str());
+	};
+
 	/* motor base config */
 	if (!candle->writeMd80Register(id,
 								   mab::Md80Reg_E::motorName, regW.RW.motorName,
@@ -525,23 +530,23 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 
 	/* motor motion config - Position and velocity PID*/
 	if (!candle->writeMd80Register(id,
-								   mab::Md80Reg_E::motorPosPidKp, (float)atof(cfg["position PID"]["kp"].c_str()),
-								   mab::Md80Reg_E::motorPosPidKi, (float)atof(cfg["position PID"]["ki"].c_str()),
-								   mab::Md80Reg_E::motorPosPidKd, (float)atof(cfg["position PID"]["kd"].c_str()),
-								   mab::Md80Reg_E::motorPosPidOutMax, (float)atof(cfg["position PID"]["max out"].c_str()),
-								   mab::Md80Reg_E::motorPosPidWindup, (float)atof(cfg["position PID"]["windup"].c_str()),
-								   mab::Md80Reg_E::motorVelPidKp, (float)atof(cfg["velocity PID"]["kp"].c_str()),
-								   mab::Md80Reg_E::motorVelPidKi, (float)atof(cfg["velocity PID"]["ki"].c_str()),
-								   mab::Md80Reg_E::motorVelPidKd, (float)atof(cfg["velocity PID"]["kd"].c_str()),
-								   mab::Md80Reg_E::motorVelPidOutMax, (float)atof(cfg["velocity PID"]["max out"].c_str()),
-								   mab::Md80Reg_E::motorVelPidWindup, (float)atof(cfg["velocity PID"]["windup"].c_str())))
+								   mab::Md80Reg_E::motorPosPidKp, floatFromField("position PID", "kp"),
+								   mab::Md80Reg_E::motorPosPidKi, floatFromField("position PID", "ki"),
+								   mab::Md80Reg_E::motorPosPidKd, floatFromField("position PID", "kd"),
+								   mab::Md80Reg_E::motorPosPidOutMax, floatFromField("position PID", "max out"),
+								   mab::Md80Reg_E::motorPosPidWindup, floatFromField("position PID", "windup"),
+								   mab::Md80Reg_E::motorVelPidKp, floatFromField("velocity PID", "kp"),
+								   mab::Md80Reg_E::motorVelPidKi, floatFromField("velocity PID", "ki"),
+								   mab::Md80Reg_E::motorVelPidKd, floatFromField("velocity PID", "kd"),
+								   mab::Md80Reg_E::motorVelPidOutMax, floatFromField("velocity PID", "max out"),
+								   mab::Md80Reg_E::motorVelPidWindup, floatFromField("velocity PID", "windup")))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorVelPidWindup);
 
 	/* motor motion config - Impedance PD*/
 	if (!candle->writeMd80Register(id,
-								   mab::Md80Reg_E::motorImpPidKp, (float)atof(cfg["impedance PD"]["kp"].c_str()),
-								   mab::Md80Reg_E::motorImpPidKd, (float)atof(cfg["impedance PD"]["kd"].c_str()),
-								   mab::Md80Reg_E::motorImpPidOutMax, (float)atof(cfg["impedance PD"]["max out"].c_str()),
+								   mab::Md80Reg_E::motorImpPidKp, floatFromField("impedance PD", "kp"),
+								   mab::Md80Reg_E::motorImpPidKd, floatFromField("impedance PD", "kd"),
+								   mab::Md80Reg_E::motorImpPidOutMax, floatFromField("impedance PD", "max out"),
 								   mab::Md80Reg_E::motorShutdownTemp, regW.RW.motorShutdownTemp))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorShutdownTemp);
 
@@ -559,11 +564,16 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 
 	if (!candle->writeMd80Register(id,
 								   mab::Md80Reg_E::homingMode, regW.RW.homingMode,
-								   mab::Md80Reg_E::homingMaxTravel, (float)atof(cfg["homing"]["max travel"].c_str()),
-								   mab::Md80Reg_E::homingTorque, (float)atof(cfg["homing"]["max torque"].c_str()),
-								   mab::Md80Reg_E::homingVelocity, (float)atof(cfg["homing"]["max velocity"].c_str()),
-								   mab::Md80Reg_E::homingPositionDeviationTrigger, (float)atof(cfg["homing"]["position deviation trigger"].c_str())))
+								   mab::Md80Reg_E::homingMaxTravel, floatFromField("homing", "max travel"),
+								   mab::Md80Reg_E::homingTorque, floatFromField("homing", "max torque"),
+								   mab::Md80Reg_E::homingVelocity, floatFromField("homing", "max velocity"),
+								   mab::Md80Reg_E::homingPositionDeviationTrigger, floatFromField("homing", "position deviation trigger")))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::homingMode);
+
+	if (!candle->writeMd80Register(id,
+								   mab::Md80Reg_E::positionLimitMin, floatFromField("motor", "position limit min"),
+								   mab::Md80Reg_E::positionLimitMax, floatFromField("motor", "position limit max")))
+		ui::printFailedToSetupMotor(mab::Md80Reg_E::positionLimitMin);
 
 	candle->configMd80Save(id);
 

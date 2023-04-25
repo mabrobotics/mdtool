@@ -331,7 +331,8 @@ void printDriveInfoExtended(mab::Md80& drive, bool printAll)
 		vout << "   - homing max velocity: " << std::setprecision(2) << drive.getReadReg().RW.homingVelocity << " rad/s" << std::endl;
 		vout << "   - homing position deviation trigger: " << std::setprecision(2) << drive.getReadReg().RW.homingPositionDeviationTrigger << " rad" << std::endl;
 	}
-
+	vout << "- position limit min: " << std::setprecision(2) << drive.getReadReg().RW.positionLimitMin << " rad" << std::endl;
+	vout << "- position limit max: " << std::setprecision(2) << drive.getReadReg().RW.positionLimitMax << " rad" << std::endl;
 	vout << "- position: " << std::setprecision(2) << drive.getPosition() << " rad" << std::endl;
 	vout << "- velocity: " << std::setprecision(2) << drive.getVelocity() << " rad/s" << std::endl;
 	vout << "- torque: " << std::setprecision(2) << drive.getTorque() << " Nm" << std::endl;
