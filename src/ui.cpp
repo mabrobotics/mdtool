@@ -116,6 +116,7 @@ void printHelpTest()
 	vout << "\t move [id] [position] \t\t\tsimple test movement from current location to [position]. [position] should be <-10, 10> rad." << std::endl;
 	vout << "\t latency  [baudrate] \t\t\ttests the overall TX message frequency. [baudrate] should be the baudrate of actuators on the CAN bus." << std::endl;
 	vout << "\t encoder  [type] [id] \t\t\ttests the encoder [type] (main/output)" << std::endl;
+	vout << "\t homing   [id]        \t\t\tstarts the homing routine" << std::endl;
 	vout << std::endl;
 	vout << "For more information please refer to the manual:" << GREEN("https://mabrobotics.pl/servos/manual") << std::endl;
 	vout << std::endl;

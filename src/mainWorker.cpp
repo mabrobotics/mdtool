@@ -10,7 +10,7 @@
 const uint8_t VMAJOR = MDTOOL_VERSION_MAJOR;
 const uint8_t VMINOR = MDTOOL_VERSION_MINOR;
 const uint8_t VREVISION = MDTOOL_VERSION_REVISION;
-const char VTAG = 'r';
+const char VTAG = 'd';
 const mab::version_ut mdtoolVersion = {{VTAG, VREVISION, VMINOR, VMAJOR}};
 
 enum class toolsCmd_E

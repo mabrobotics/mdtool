@@ -29,7 +29,7 @@ _mdtool_complete()
 			COMPREPLY=( $(compgen -W "calibration calibration_out motor info" -- $cur) )
 			;;
 			"test")
-			COMPREPLY=( $(compgen -W "move latency encoder" -- $cur) )
+			COMPREPLY=( $(compgen -W "move latency encoder homing" -- $cur) )
 			;;
 			*)
 			;;
