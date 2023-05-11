@@ -575,6 +575,11 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 								   mab::Md80Reg_E::positionLimitMax, floatFromField("motor", "position limit max")))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::positionLimitMin);
 
+	if (!candle->writeMd80Register(id,
+									mab::Md80Reg_E::maxAcceleration, floatFromField("trajectory control", "max acceleration"),
+									mab::Md80Reg_E::maxDeceleration, floatFromField("trajectory control", "max deceleration")))
+		ui::printFailedToSetupMotor(mab::Md80Reg_E::maxAcceleration);
+
 	candle->configMd80Save(id);
 
 	/* wait for a full reboot */
