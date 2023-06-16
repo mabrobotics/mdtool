@@ -43,6 +43,7 @@ enum class toolsOptions_E
 	MAIN,
 	OUTPUT,
 	HOMING,
+	ABSOLUTE,
 };
 toolsOptions_E str2option(std::string& opt)
 {
@@ -78,6 +79,8 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::OUTPUT;
 	if (opt == "homing")
 		return toolsOptions_E::HOMING;
+	if (opt == "absolute")
+		return toolsOptions_E::ABSOLUTE;
 
 	return toolsOptions_E::NONE;
 }
@@ -180,9 +183,9 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 	try
 	{
 		if (device != "" && busType != mab::BusType_E::USB)
-			candle = new mab::Candle(baud, printVerbose, busType, device);
+			candle = std::make_unique<mab::Candle>(baud, printVerbose, busType, device);
 		else
-			candle = new mab::Candle(baud, printVerbose, busType);
+			candle = std::make_unique<mab::Candle>(baud, printVerbose, busType);
 	}
 	catch (const char* e)
 	{
@@ -239,7 +242,12 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 			if (option == toolsOptions_E::LATENCY)
 				testLatency(args);
 			else if (option == toolsOptions_E::MOVE)
-				testMove(args);
+			{
+				if (option2 == toolsOptions_E::ABSOLUTE)
+					testMoveAbs(args);
+				else
+					testMove(args);
+			}
 			else if (option == toolsOptions_E::ENCODER)
 			{
 				if (option2 == toolsOptions_E::MAIN)
@@ -299,7 +307,7 @@ void MainWorker::ping(std::vector<std::string>& args)
 	if (performScan)
 	{
 		candle->setVebose(false);
-		ui::printScanOutput(candle);
+		ui::printScanOutput(candle.get());
 	}
 	else
 	{
@@ -533,12 +541,10 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 								   mab::Md80Reg_E::motorPosPidKp, floatFromField("position PID", "kp"),
 								   mab::Md80Reg_E::motorPosPidKi, floatFromField("position PID", "ki"),
 								   mab::Md80Reg_E::motorPosPidKd, floatFromField("position PID", "kd"),
-								   mab::Md80Reg_E::motorPosPidOutMax, floatFromField("position PID", "max out"),
 								   mab::Md80Reg_E::motorPosPidWindup, floatFromField("position PID", "windup"),
 								   mab::Md80Reg_E::motorVelPidKp, floatFromField("velocity PID", "kp"),
 								   mab::Md80Reg_E::motorVelPidKi, floatFromField("velocity PID", "ki"),
 								   mab::Md80Reg_E::motorVelPidKd, floatFromField("velocity PID", "kd"),
-								   mab::Md80Reg_E::motorVelPidOutMax, floatFromField("velocity PID", "max out"),
 								   mab::Md80Reg_E::motorVelPidWindup, floatFromField("velocity PID", "windup")))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorVelPidWindup);
 
@@ -566,13 +572,21 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 								   mab::Md80Reg_E::homingMode, regW.RW.homingMode,
 								   mab::Md80Reg_E::homingMaxTravel, floatFromField("homing", "max travel"),
 								   mab::Md80Reg_E::homingTorque, floatFromField("homing", "max torque"),
-								   mab::Md80Reg_E::homingVelocity, floatFromField("homing", "max velocity"),
-								   mab::Md80Reg_E::homingPositionDeviationTrigger, floatFromField("homing", "position deviation trigger")))
+								   mab::Md80Reg_E::homingVelocity, floatFromField("homing", "max velocity")))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::homingMode);
 
 	if (!candle->writeMd80Register(id,
-								   mab::Md80Reg_E::positionLimitMin, floatFromField("motor", "position limit min"),
-								   mab::Md80Reg_E::positionLimitMax, floatFromField("motor", "position limit max")))
+								   mab::Md80Reg_E::maxTorque, floatFromField("limits", "max torque"),
+								   mab::Md80Reg_E::maxAcceleration, floatFromField("limits", "max acceleration"),
+								   mab::Md80Reg_E::maxVelocity, floatFromField("limits", "max velocity"),
+								   mab::Md80Reg_E::positionLimitMin, floatFromField("limits", "min position"),
+								   mab::Md80Reg_E::positionLimitMax, floatFromField("limits", "max position")))
+		ui::printFailedToSetupMotor(mab::Md80Reg_E::positionLimitMin);
+
+	if (!candle->writeMd80Register(id,
+								   mab::Md80Reg_E::profileAcceleration, floatFromField("profile", "acceleration"),
+								   mab::Md80Reg_E::profileDeceleration, floatFromField("profile", "deceleration"),
+								   mab::Md80Reg_E::profileVelocity, floatFromField("profile", "velocity")))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::positionLimitMin);
 
 	candle->configMd80Save(id);
@@ -647,6 +661,51 @@ void MainWorker::testMove(std::vector<std::string>& args)
 		ui::printPositionAndVelocity(id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity());
 	}
 	std::cout << std::endl;
+
+	candle->end();
+	candle->controlMd80Enable(id, false);
+}
+
+void MainWorker::testMoveAbs(std::vector<std::string>& args)
+{
+	if (args.size() != 9)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+
+	int id = atoi(args[4].c_str());
+	checkSpeedForId(id);
+	if (!candle->addMd80(id))
+		return;
+
+	float targetPos = std::stof(args[5].c_str());
+
+	/* check if no critical errors are present */
+	if (checkErrors(id))
+	{
+		std::cout << "[MDTOOL] Could not proceed due to errors: " << std::endl;
+		ui::printAllErrors(candle->md80s[0]);
+		return;
+	}
+
+	if (args.size() > 6)
+		candle->writeMd80Register(id, mab::Md80Reg_E::profileVelocity, std::stof(args[6].c_str()));
+	if (args.size() > 7)
+		candle->writeMd80Register(id, mab::Md80Reg_E::profileAcceleration, std::stof(args[7].c_str()));
+	if (args.size() > 8)
+		candle->writeMd80Register(id, mab::Md80Reg_E::profileDeceleration, std::stof(args[8].c_str()));
+
+	candle->controlMd80Mode(id, mab::Md80Mode_E::POSITION_PROFILE);
+	candle->controlMd80Enable(id, true);
+	candle->begin();
+
+	candle->md80s[0].setTargetPosition(targetPos);
+	while (!candle->md80s[0].isTargetPositionReached())
+	{
+		sleep(1);
+	};
+	std::cout << "TARGET REACHED!" << std::endl;
 
 	candle->end();
 	candle->controlMd80Enable(id, false);

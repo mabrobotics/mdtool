@@ -21,7 +21,7 @@ class MainWorker
 	std::string mdtoolBaseDir;
 	std::string mdtoolIniFilePath;
 
-	mab::Candle* candle;
+	std::unique_ptr<mab::Candle> candle;
 
 	std::string busString;
 
@@ -42,6 +42,7 @@ class MainWorker
 	void setupInfo(std::vector<std::string>& args);
 
 	void testMove(std::vector<std::string>& args);
+	void testMoveAbs(std::vector<std::string>& args);
 	void testLatency(std::vector<std::string>& args);
 	void testEncoderOutput(std::vector<std::string>& args);
 	void testEncoderMain(std::vector<std::string>& args);
