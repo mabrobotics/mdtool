@@ -351,22 +351,24 @@ void printAllErrors(mab::Md80& drive)
 
 	if (drive.getReadReg().RW.outputEncoder != 0)
 	{
-		vout << "- output encoder error: 0x" << std::hex << (unsigned short)drive.getReadReg().RO.outputEncoderErrors << std::dec;
+		vout << "- output encoder status: 0x" << std::hex << (unsigned short)drive.getReadReg().RO.outputEncoderErrors << std::dec;
 		printErrorDetails(drive.getReadReg().RO.outputEncoderErrors, encoderErrorList);
 	}
 
-	vout << "- calibration error: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.calibrationErrors << std::dec;
+	vout << "- calibration status: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.calibrationErrors << std::dec;
 	printErrorDetails(drive.getReadReg().RO.calibrationErrors, calibrationErrorList);
-	vout << "- bridge error: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.bridgeErrors << std::dec;
+	vout << "- bridge status: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.bridgeErrors << std::dec;
 	printErrorDetails(drive.getReadReg().RO.bridgeErrors, bridgeErrorList);
-	vout << "- hardware error: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.hardwareErrors << std::dec;
+	vout << "- hardware status: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.hardwareErrors << std::dec;
 	printErrorDetails(drive.getReadReg().RO.hardwareErrors, hardwareErrorList);
-	vout << "- communication error: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.communicationErrors << std::dec;
+	vout << "- communication status: 0x" << std::hex << (unsigned short)drive.getReadReg().RO.communicationErrors << std::dec;
 	printErrorDetails(drive.getReadReg().RO.communicationErrors, communicationErrorList);
+	vout << "- motion status: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.motionErrors << std::dec;
+	printErrorDetails(drive.getReadReg().RO.motionErrors, motionErrorList);
 
 	if (drive.getReadReg().RW.homingMode != 0)
 	{
-		vout << "- homing error: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.homingErrors << std::dec;
+		vout << "- homing status: 	0x" << std::hex << (unsigned short)drive.getReadReg().RO.homingErrors << std::dec;
 		printErrorDetails(drive.getReadReg().RO.homingErrors, homingErrorList);
 	}
 }

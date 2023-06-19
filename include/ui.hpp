@@ -105,15 +105,18 @@ const std::map<std::string, uint8_t> hardwareErrorList = {{"ERROR_OVER_CURRENT",
 														  {"ERROR_MOSFET_TEMP", 4},
 														  {"ERROR_ADC_CURRENT_OFFSETS", 5}};
 
-const std::map<std::string, uint8_t> communicationErrorList = {{"WARNING_START_OUTSIDE_LIMITS", 28},
-															   {"WARNING_POSITION_CLIPPED", 29},
-															   {"WARNING_CAN_WD", 30}};
+const std::map<std::string, uint8_t> communicationErrorList = {{"WARNING_CAN_WD", 30}};
 
 const std::map<std::string, uint8_t> homingErrorList = {{"ERROR_HOMING_LIMIT_REACHED", 0},
 														{"ERROR_HOMING_SEQUENCE", 1},
 														{"ERROR_HOMING_REQUIRED", 2},
 														{"ERROR_HOMING_SETUP", 3},
 														{"ERROR_HOMING_ABORTED", 4}};
+
+const std::map<std::string, uint8_t> motionErrorList = {{"WARNING_TORQUE_CLIPPED", 25},
+														{"WARNING_VELOCITY_CLIPPED", 26},
+														{"WARNING_POSITION_CLIPPED", 27},
+														{"WARNING_START_OUTSIDE_LIMITS", 28}};
 
 template <class T>
 bool checkParamLimit(T value, T min, T max)
