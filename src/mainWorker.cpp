@@ -668,7 +668,7 @@ void MainWorker::testMove(std::vector<std::string>& args)
 
 void MainWorker::testMoveAbs(std::vector<std::string>& args)
 {
-	if (args.size() != 9)
+	if (args.size() < 6)
 	{
 		ui::printTooFewArgsNoHelp();
 		return;
