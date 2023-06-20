@@ -47,6 +47,8 @@ class MainWorker
 	void testEncoderOutput(std::vector<std::string>& args);
 	void testEncoderMain(std::vector<std::string>& args);
 	void testHoming(std::vector<std::string>& args);
+	void registerWrite(std::vector<std::string>& args);
+	void registerRead(std::vector<std::string>& args);
 	void blink(std::vector<std::string>& args);
 	void encoder(std::vector<std::string>& args);
 	void bus(std::vector<std::string>& args);
@@ -60,4 +62,13 @@ class MainWorker
 
 	template <class T>
 	bool getField(mINI::INIStructure& cfg, mINI::INIStructure& ini, std::string category, std::string field, T& value);
+
+	template <typename T>
+	bool readRegisterToString(uint16_t id, mab::Md80Reg_E regId, std::string& str)
+	{
+		T value = 0;
+		bool status = candle->readMd80Register(id, regId, value);
+		str = std::to_string(value);
+		return status;
+	}
 };

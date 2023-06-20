@@ -22,7 +22,8 @@ enum class toolsCmd_E
 	TEST,
 	BLINK,
 	ENCODER,
-	BUS
+	BUS,
+	REGISTER,
 };
 enum class toolsOptions_E
 {
@@ -44,6 +45,8 @@ enum class toolsOptions_E
 	OUTPUT,
 	HOMING,
 	ABSOLUTE,
+	READ,
+	WRITE,
 };
 toolsOptions_E str2option(std::string& opt)
 {
@@ -81,6 +84,10 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::HOMING;
 	if (opt == "absolute")
 		return toolsOptions_E::ABSOLUTE;
+	if (opt == "read")
+		return toolsOptions_E::READ;
+	if (opt == "write")
+		return toolsOptions_E::WRITE;
 
 	return toolsOptions_E::NONE;
 }
@@ -100,6 +107,8 @@ toolsCmd_E str2cmd(std::string& cmd)
 		return toolsCmd_E::ENCODER;
 	if (cmd == "bus")
 		return toolsCmd_E::BUS;
+	if (cmd == "register")
+		return toolsCmd_E::REGISTER;
 	return toolsCmd_E::NONE;
 }
 
@@ -274,6 +283,15 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 		{
 			encoder(args);
 			break;
+		}
+		case toolsCmd_E::REGISTER:
+		{
+			if (option == toolsOptions_E::WRITE)
+				registerWrite(args);
+			else if (option == toolsOptions_E::READ)
+				registerRead(args);
+			else
+				ui::printHelpTest();
 		}
 		default:
 			return;
@@ -833,6 +851,100 @@ void MainWorker::testHoming(std::vector<std::string>& args)
 	/* TODO check critical errors, but not the homing required error since we want to clear it with homing */
 
 	candle->setupMd80PerformHoming(id);
+}
+
+void MainWorker::registerWrite(std::vector<std::string>& args)
+{
+	if (args.size() != 6)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+
+	int id = atoi(args[3].c_str());
+	checkSpeedForId(id);
+
+	mab::Md80Reg_E regId = static_cast<mab::Md80Reg_E>(std::strtol(args[4].c_str(), nullptr, 16));
+	uint32_t regValue = atoi(args[5].c_str());
+
+	bool success = false;
+
+	switch (mab::Register::getType(regId))
+	{
+		case mab::Register::type::U8:
+			success = candle->writeMd80Register(id, regId, static_cast<uint8_t>(regValue));
+			break;
+		case mab::Register::type::I8:
+			success = candle->writeMd80Register(id, regId, static_cast<int8_t>(regValue));
+			break;
+		case mab::Register::type::U16:
+			success = candle->writeMd80Register(id, regId, static_cast<uint16_t>(regValue));
+			break;
+		case mab::Register::type::I16:
+			success = candle->writeMd80Register(id, regId, static_cast<int16_t>(regValue));
+			break;
+		case mab::Register::type::U32:
+			success = candle->writeMd80Register(id, regId, static_cast<uint32_t>(regValue));
+			break;
+		case mab::Register::type::I32:
+			success = candle->writeMd80Register(id, regId, static_cast<int32_t>(regValue));
+			break;
+		case mab::Register::type::F32:
+			success = candle->writeMd80Register(id, regId, static_cast<float>(std::atof(args[5].c_str())));
+			break;
+		case mab::Register::type::UNKNOWN:
+			std::cout << "Unknown register! Please check the ID and try again" << std::endl;
+	}
+	if (success)
+		std::cout << "Writing register successful!" << std::endl;
+	else
+		std::cout << "Writing register failed!" << std::endl;
+}
+
+void MainWorker::registerRead(std::vector<std::string>& args)
+{
+	if (args.size() != 5)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+
+	uint16_t id = atoi(args[3].c_str());
+	checkSpeedForId(id);
+
+	mab::Md80Reg_E regId = static_cast<mab::Md80Reg_E>(std::strtol(args[4].c_str(), nullptr, 16));
+
+	std::string value = "";
+
+	switch (mab::Register::getType(regId))
+	{
+		case mab::Register::type::U8:
+			readRegisterToString<uint8_t>(id, regId, value);
+			break;
+		case mab::Register::type::I8:
+			readRegisterToString<int8_t>(id, regId, value);
+			break;
+		case mab::Register::type::U16:
+			readRegisterToString<uint16_t>(id, regId, value);
+			break;
+		case mab::Register::type::I16:
+			readRegisterToString<int16_t>(id, regId, value);
+			break;
+		case mab::Register::type::U32:
+			readRegisterToString<uint32_t>(id, regId, value);
+			break;
+		case mab::Register::type::I32:
+			readRegisterToString<int32_t>(id, regId, value);
+			break;
+		case mab::Register::type::F32:
+			readRegisterToString<float>(id, regId, value);
+			break;
+		case mab::Register::type::UNKNOWN:
+			std::cout << "Unknown register! Please check the ID and try again" << std::endl;
+			break;
+	}
+
+	std::cout << "Register value: " << value << std::endl;
 }
 
 void MainWorker::blink(std::vector<std::string>& args)
