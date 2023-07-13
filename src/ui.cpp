@@ -49,6 +49,7 @@ void printHelp()
 	vout << "\t blink [id] \t\t\t blink LEDs on driver board." << std::endl;
 	vout << "\t encoder [id] \t\t\t prints current position and velocity in a loop." << std::endl;
 	vout << "\t bus [type] [device]\t\t changes default CANdle CAN bus [type] (SPI/USB/UART) and optionally [device] if default is not suitable (applies to UART and SPI)." << std::endl;
+	vout << "\t clear [error / warning]\t clears errors or warnings" << std::endl;
 	vout << std::endl;
 	vout << std::endl;
 	vout << "For more information please refer to the manual:" << GREEN(" https://mabrobotics.pl/servos/manual");
@@ -108,12 +109,15 @@ void printHelpTest()
 	vout << std::endl;
 	vout << "Example: " << std::endl;
 	vout << "\tmdtool test move 100 5" << std::endl;
+	vout << "\tmdtool test move absolute 100 10" << std::endl;
+	vout << "\tmdtool test move absolute 100 10 20 10 10" << std::endl;
 	vout << "\tmdtool test latency 1M" << std::endl;
 	vout << "\tmdtool test encoder main 100" << std::endl;
 	vout << "\tmdtool test encoder output 100" << std::endl;
 	vout << std::endl;
 	vout << "Supported options: " << std::endl;
 	vout << "\t move [id] [position] \t\t\tsimple test movement from current location to [position]. [position] should be <-10, 10> rad." << std::endl;
+	vout << "\t move absolute [id] [position] [profile velocity] [profile acceleration] [profile deceleration] position PID absolute movement. " << std::endl;
 	vout << "\t latency  [baudrate] \t\t\ttests the overall TX message frequency. [baudrate] should be the baudrate of actuators on the CAN bus." << std::endl;
 	vout << "\t encoder  [type] [id] \t\t\ttests the encoder [type] (main/output)" << std::endl;
 	vout << "\t homing   [id]        \t\t\tstarts the homing routine" << std::endl;

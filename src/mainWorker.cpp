@@ -24,6 +24,7 @@ enum class toolsCmd_E
 	ENCODER,
 	BUS,
 	REGISTER,
+	CLEAR,
 };
 enum class toolsOptions_E
 {
@@ -47,6 +48,8 @@ enum class toolsOptions_E
 	ABSOLUTE,
 	READ,
 	WRITE,
+	ERROR,
+	WARNING,
 };
 toolsOptions_E str2option(std::string& opt)
 {
@@ -88,6 +91,10 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::READ;
 	if (opt == "write")
 		return toolsOptions_E::WRITE;
+	if (opt == "error")
+		return toolsOptions_E::ERROR;
+	if (opt == "warning")
+		return toolsOptions_E::WARNING;
 
 	return toolsOptions_E::NONE;
 }
@@ -109,6 +116,8 @@ toolsCmd_E str2cmd(std::string& cmd)
 		return toolsCmd_E::BUS;
 	if (cmd == "register")
 		return toolsCmd_E::REGISTER;
+	if (cmd == "clear")
+		return toolsCmd_E::CLEAR;
 	return toolsCmd_E::NONE;
 }
 
@@ -253,7 +262,7 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 			else if (option == toolsOptions_E::MOVE)
 			{
 				if (option2 == toolsOptions_E::ABSOLUTE)
-					testMoveAbs(args);
+					testMoveAbsolute(args);
 				else
 					testMove(args);
 			}
@@ -292,6 +301,17 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 				registerRead(args);
 			else
 				ui::printHelpTest();
+			break;
+		}
+		case toolsCmd_E::CLEAR:
+		{
+			if (option == toolsOptions_E::ERROR)
+				clearErrors(args);
+			else if (option == toolsOptions_E::WARNING)
+				clearWarnings(args);
+			else
+				ui::printHelpTest();
+			break;
 		}
 		default:
 			return;
@@ -684,7 +704,7 @@ void MainWorker::testMove(std::vector<std::string>& args)
 	candle->controlMd80Enable(id, false);
 }
 
-void MainWorker::testMoveAbs(std::vector<std::string>& args)
+void MainWorker::testMoveAbsolute(std::vector<std::string>& args)
 {
 	if (args.size() < 6)
 	{
@@ -1013,6 +1033,43 @@ void MainWorker::changeDefaultConfig(std::string bus, std::string device)
 	else
 		ini["communication"]["device"] = "";
 	file.write(ini);
+}
+
+void MainWorker::clearErrors(std::vector<std::string>& args)
+{
+	if (args.size() != 4)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+
+	int id = atoi(args[3].c_str());
+	checkSpeedForId(id);
+
+	if (!candle->addMd80(id))
+		return;
+
+	/* TODO check critical errors, but not the homing required error since we want to clear it with homing */
+
+	candle->setupMd80ClearErrors(id);
+}
+void MainWorker::clearWarnings(std::vector<std::string>& args)
+{
+	if (args.size() != 4)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+
+	int id = atoi(args[3].c_str());
+	checkSpeedForId(id);
+
+	if (!candle->addMd80(id))
+		return;
+
+	/* TODO check critical errors, but not the homing required error since we want to clear it with homing */
+
+	candle->setupMd80ClearWarnings(id);
 }
 
 mab::CANdleBaudrate_E MainWorker::checkSpeedForId(uint16_t id)

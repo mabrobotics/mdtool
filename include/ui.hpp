@@ -113,10 +113,11 @@ const std::map<std::string, uint8_t> homingErrorList = {{"ERROR_HOMING_LIMIT_REA
 														{"ERROR_HOMING_SETUP", 3},
 														{"ERROR_HOMING_ABORTED", 4}};
 
-const std::map<std::string, uint8_t> motionErrorList = {{"WARNING_TORQUE_CLIPPED", 25},
+const std::map<std::string, uint8_t> motionErrorList = {{"ERROR_POSITION_OUTSIDE_LIMITS", 0},
+														{"WARNING_ACCELERATION_CLIPPED", 24},
+														{"WARNING_TORQUE_CLIPPED", 25},
 														{"WARNING_VELOCITY_CLIPPED", 26},
-														{"WARNING_POSITION_CLIPPED", 27},
-														{"WARNING_START_OUTSIDE_LIMITS", 28}};
+														{"WARNING_POSITION_CLIPPED", 27}};
 
 template <class T>
 bool checkParamLimit(T value, T min, T max)
