@@ -13,7 +13,7 @@ _mdtool_complete()
 	prev2=${COMP_WORDS[COMP_CWORD-2]}
 	
 	if [ $COMP_CWORD -eq 1 ]; then
-		COMPREPLY=( $(compgen -W "bus ping config setup test blink encoder" -- $cur) )
+		COMPREPLY=( $(compgen -W "bus ping config setup test blink encoder register clear" -- $cur) )
 	elif [ $COMP_CWORD -eq 2 ]; then
 		case "$prev" in
 			"bus")
@@ -31,12 +31,22 @@ _mdtool_complete()
 			"test")
 			COMPREPLY=( $(compgen -W "move latency encoder homing" -- $cur) )
 			;;
+			"register")
+			COMPREPLY=( $(compgen -W "read write" -- $cur) )
+			;;
+			"clear")
+			COMPREPLY=( $(compgen -W "error warning" -- $cur) )
+			;;
 			*)
 			;;
 		esac
 	elif [ $COMP_CWORD -eq 3 ]; then
 		if [[ "$prev" == "encoder" ]]; then
 			COMPREPLY=( $(compgen -W "main output" -- $cur) )
+
+		fi
+		if [[ "$prev" == "move" ]]; then
+			COMPREPLY=( $(compgen -W "absolute" -- $cur) )
 
 		fi
 
