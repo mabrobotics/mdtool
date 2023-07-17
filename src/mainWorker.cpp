@@ -747,7 +747,7 @@ void MainWorker::testMoveAbsolute(std::vector<std::string>& args)
 	{
 		sleep(1);
 	};
-	std::cout << "TARGET REACHED!" << std::endl;
+	std::cout << "[MDTOOL] TARGET REACHED!" << std::endl;
 
 	candle->end();
 	candle->controlMd80Enable(id, false);
