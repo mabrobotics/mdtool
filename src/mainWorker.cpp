@@ -25,6 +25,7 @@ enum class toolsCmd_E
 	BUS,
 	REGISTER,
 	CLEAR,
+	RESET,
 };
 enum class toolsOptions_E
 {
@@ -118,6 +119,8 @@ toolsCmd_E str2cmd(std::string& cmd)
 		return toolsCmd_E::REGISTER;
 	if (cmd == "clear")
 		return toolsCmd_E::CLEAR;
+	if (cmd == "reset")
+		return toolsCmd_E::RESET;
 	return toolsCmd_E::NONE;
 }
 
@@ -311,6 +314,11 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 				clearWarnings(args);
 			else
 				ui::printHelpTest();
+			break;
+		}
+		case toolsCmd_E::RESET:
+		{
+			reset(args);
 			break;
 		}
 		default:
@@ -1057,6 +1065,7 @@ void MainWorker::clearErrors(std::vector<std::string>& args)
 
 	candle->setupMd80ClearErrors(id);
 }
+
 void MainWorker::clearWarnings(std::vector<std::string>& args)
 {
 	if (args.size() != 4)
@@ -1071,9 +1080,24 @@ void MainWorker::clearWarnings(std::vector<std::string>& args)
 	if (!candle->addMd80(id))
 		return;
 
-	/* TODO check critical errors, but not the homing required error since we want to clear it with homing */
-
 	candle->setupMd80ClearWarnings(id);
+}
+
+void MainWorker::reset(std::vector<std::string>& args)
+{
+	if (args.size() != 3)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+
+	int id = atoi(args[2].c_str());
+	checkSpeedForId(id);
+
+	if (!candle->addMd80(id))
+		return;
+
+	candle->setupMd80PerformReset(id);
 }
 
 mab::CANdleBaudrate_E MainWorker::checkSpeedForId(uint16_t id)

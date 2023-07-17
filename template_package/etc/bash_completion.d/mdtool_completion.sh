@@ -13,7 +13,7 @@ _mdtool_complete()
 	prev2=${COMP_WORDS[COMP_CWORD-2]}
 	
 	if [ $COMP_CWORD -eq 1 ]; then
-		COMPREPLY=( $(compgen -W "bus ping config setup test blink encoder register clear" -- $cur) )
+		COMPREPLY=( $(compgen -W "bus ping config setup test blink encoder register clear reset" -- $cur) )
 	elif [ $COMP_CWORD -eq 2 ]; then
 		case "$prev" in
 			"bus")

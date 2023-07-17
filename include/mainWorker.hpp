@@ -55,6 +55,7 @@ class MainWorker
 
 	void clearErrors(std::vector<std::string>& args);
 	void clearWarnings(std::vector<std::string>& args);
+	void reset(std::vector<std::string>& args);
 
 	void changeDefaultConfig(std::string bus, std::string device);
 	mab::CANdleBaudrate_E checkSpeedForId(uint16_t id);
