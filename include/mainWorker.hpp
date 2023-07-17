@@ -37,7 +37,6 @@ class MainWorker
 
 	void setupCalibration(std::vector<std::string>& args);
 	void setupCalibrationOutput(std::vector<std::string>& args);
-	void setupDiagnostic(std::vector<std::string>& args);
 	void setupMotor(std::vector<std::string>& args);
 	void setupInfo(std::vector<std::string>& args);
 
@@ -75,4 +74,8 @@ class MainWorker
 		str = std::to_string(value);
 		return status;
 	}
+
+	bool checkArgs(std::vector<std::string>& args, uint32_t size);
+	bool tryAddMD80(uint16_t id);
+	int checkArgsAndGetId(std::vector<std::string>& args, uint32_t size, uint32_t idPos);
 };

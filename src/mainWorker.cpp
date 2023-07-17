@@ -248,8 +248,6 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 				setupCalibration(args);
 			else if (option == toolsOptions_E::CALIBRATION_OUTPUT)
 				setupCalibrationOutput(args);
-			else if (option == toolsOptions_E::DIAGNOSTIC)
-				setupDiagnostic(args);
 			else if (option == toolsOptions_E::MOTOR)
 				setupMotor(args);
 			else if (option == toolsOptions_E::INFO)
@@ -365,12 +363,7 @@ void MainWorker::ping(std::vector<std::string>& args)
 
 void MainWorker::configCan(std::vector<std::string>& args)
 {
-	if (args.size() < 7)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
+	checkArgs(args, 7);
 	int id = atoi(args[3].c_str());
 	checkSpeedForId(id);
 	int new_id = atoi(args[4].c_str());
@@ -382,72 +375,36 @@ void MainWorker::configCan(std::vector<std::string>& args)
 }
 void MainWorker::configSave(std::vector<std::string>& args)
 {
-	if (args.size() != 4)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1) return;
 	candle->configMd80Save(id);
 }
 void MainWorker::configZero(std::vector<std::string>& args)
 {
-	if (args.size() != 4)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1) return;
 	candle->controlMd80SetEncoderZero(id);
 }
 void MainWorker::configCurrent(std::vector<std::string>& args)
 {
-	if (args.size() != 5)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
+	int32_t id = checkArgsAndGetId(args, 5, 3);
+	if (id == -1) return;
 	candle->configMd80SetCurrentLimit(id, atof(args[4].c_str()));
 }
 
 void MainWorker::configBandwidth(std::vector<std::string>& args)
 {
-	if (args.size() != 5)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
-
+	int32_t id = checkArgsAndGetId(args, 5, 3);
+	if (id == -1) return;
 	candle->configMd80TorqueBandwidth(id, atof(args[4].c_str()));
 }
 
 void MainWorker::setupCalibration(std::vector<std::string>& args)
 {
-	if (args.size() != 4)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1) return;
 
 	if (!ui::getCalibrationConfirmation())
-		return;
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
 		return;
 
 	candle->setupMd80DiagnosticExtended(id);
@@ -462,48 +419,19 @@ void MainWorker::setupCalibration(std::vector<std::string>& args)
 
 void MainWorker::setupCalibrationOutput(std::vector<std::string>& args)
 {
-	if (args.size() != 4)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1) return;
 
 	if (!ui::getCalibrationOutputConfirmation())
-		return;
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
 		return;
 
 	candle->setupMd80CalibrationOutput(id);
 }
-void MainWorker::setupDiagnostic(std::vector<std::string>& args)
-{
-	if (args.size() != 4)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
-	candle->setupMd80Diagnostic(id);
-	ui::printDriveInfo(id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity(), candle->md80s[0].getTorque(), candle->md80s[0].getTemperature(), candle->md80s[0].getErrorVector(), candle->getCurrentBaudrate());
-}
 
 void MainWorker::setupMotor(std::vector<std::string>& args)
 {
-	if (args.size() != 5)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
+	int32_t id = checkArgsAndGetId(args, 5, 3);
+	if (id == -1) return;
 
 	std::string path = (mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" + args[4].c_str());
 
@@ -670,22 +598,14 @@ void MainWorker::setupInfo(std::vector<std::string>& args)
 
 void MainWorker::testMove(std::vector<std::string>& args)
 {
-	if (args.size() != 5)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
+	int32_t id = checkArgsAndGetId(args, 5, 3);
+	if (id == -1) return;
 
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
 	float targetPos = atof(args[4].c_str());
 	if (targetPos > 10.0f)
 		targetPos = 10.0f;
 	if (targetPos < -10.0f)
 		targetPos = -10.0f;
-
-	if (!candle->addMd80(id))
-		return;
 
 	/* check if no critical errors are present */
 	if (checkErrors(id))
@@ -718,16 +638,8 @@ void MainWorker::testMove(std::vector<std::string>& args)
 
 void MainWorker::testMoveAbsolute(std::vector<std::string>& args)
 {
-	if (args.size() < 6)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	int id = atoi(args[4].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
+	int32_t id = checkArgsAndGetId(args, 6, 3);
+	if (id == -1) return;
 
 	float targetPos = std::stof(args[5].c_str());
 
@@ -818,18 +730,8 @@ void MainWorker::testLatency(std::vector<std::string>& args)
 
 void MainWorker::testEncoderOutput(std::vector<std::string>& args)
 {
-	if (args.size() != 5)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	int id = atoi(args[4].c_str());
-	checkSpeedForId(id);
-
-	if (!candle->addMd80(id))
-		return;
-
+	int32_t id = checkArgsAndGetId(args, 5, 4);
+	if (id == -1) return;
 	/* check if no critical errors are present */
 	if (checkErrors(id))
 	{
@@ -843,17 +745,8 @@ void MainWorker::testEncoderOutput(std::vector<std::string>& args)
 
 void MainWorker::testEncoderMain(std::vector<std::string>& args)
 {
-	if (args.size() != 5)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	int id = atoi(args[4].c_str());
-	checkSpeedForId(id);
-
-	if (!candle->addMd80(id))
-		return;
+	int32_t id = checkArgsAndGetId(args, 5, 4);
+	if (id == -1) return;
 
 	/* check if no critical errors are present */
 	if (checkErrors(id))
@@ -868,33 +761,15 @@ void MainWorker::testEncoderMain(std::vector<std::string>& args)
 
 void MainWorker::testHoming(std::vector<std::string>& args)
 {
-	if (args.size() != 4)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-
-	if (!candle->addMd80(id))
-		return;
-
-	/* TODO check critical errors, but not the homing required error since we want to clear it with homing */
-
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1) return;
 	candle->setupMd80PerformHoming(id);
 }
 
 void MainWorker::registerWrite(std::vector<std::string>& args)
 {
-	if (args.size() != 6)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
+	int32_t id = checkArgsAndGetId(args, 6, 3);
+	if (id == -1) return;
 
 	mab::Md80Reg_E regId = static_cast<mab::Md80Reg_E>(std::strtol(args[4].c_str(), nullptr, 16));
 	uint32_t regValue = atoi(args[5].c_str());
@@ -935,14 +810,8 @@ void MainWorker::registerWrite(std::vector<std::string>& args)
 
 void MainWorker::registerRead(std::vector<std::string>& args)
 {
-	if (args.size() != 5)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	uint16_t id = atoi(args[3].c_str());
-	checkSpeedForId(id);
+	int32_t id = checkArgsAndGetId(args, 5, 3);
+	if (id == -1) return;
 
 	mab::Md80Reg_E regId = static_cast<mab::Md80Reg_E>(std::strtol(args[4].c_str(), nullptr, 16));
 
@@ -981,30 +850,14 @@ void MainWorker::registerRead(std::vector<std::string>& args)
 
 void MainWorker::blink(std::vector<std::string>& args)
 {
-	if (args.size() != 3)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	int id = atoi(args[2].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
+	int32_t id = checkArgsAndGetId(args, 3, 2);
+	if (id == -1) return;
 	candle->configMd80Blink(id);
 }
 void MainWorker::encoder(std::vector<std::string>& args)
 {
-	if (args.size() != 3)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	int id = atoi(args[2].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
+	int32_t id = checkArgsAndGetId(args, 3, 2);
+	if (id == -1) return;
 	candle->controlMd80Mode(id, mab::Md80Mode_E::IDLE);
 	candle->controlMd80Enable(id, true);
 	candle->begin();
@@ -1049,54 +902,22 @@ void MainWorker::changeDefaultConfig(std::string bus, std::string device)
 
 void MainWorker::clearErrors(std::vector<std::string>& args)
 {
-	if (args.size() != 4)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-
-	if (!candle->addMd80(id))
-		return;
-
-	/* TODO check critical errors, but not the homing required error since we want to clear it with homing */
-
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1) return;
 	candle->setupMd80ClearErrors(id);
 }
 
 void MainWorker::clearWarnings(std::vector<std::string>& args)
 {
-	if (args.size() != 4)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-
-	if (!candle->addMd80(id))
-		return;
-
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1) return;
 	candle->setupMd80ClearWarnings(id);
 }
 
 void MainWorker::reset(std::vector<std::string>& args)
 {
-	if (args.size() != 3)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	int id = atoi(args[2].c_str());
-	checkSpeedForId(id);
-
-	if (!candle->addMd80(id))
-		return;
-
+	int32_t id = checkArgsAndGetId(args, 3, 2);
+	if (id == -1) return;
 	candle->setupMd80PerformReset(id);
 }
 
@@ -1168,4 +989,35 @@ bool MainWorker::getField(mINI::INIStructure& cfg, mINI::INIStructure& ini, std:
 		ui::printParameterOutOfBounds(category, field);
 		return false;
 	}
+}
+
+bool MainWorker::checkArgs(std::vector<std::string>& args, uint32_t size)
+{
+	if (args.size() != size)
+	{
+		ui::printTooFewArgsNoHelp();
+		return false;
+	}
+	return true;
+}
+
+bool MainWorker::tryAddMD80(uint16_t id)
+{
+	checkSpeedForId(id);
+
+	if (!candle->addMd80(id))
+		return false;
+	return true;
+}
+
+int MainWorker::checkArgsAndGetId(std::vector<std::string>& args, uint32_t size, uint32_t idPos)
+{
+	if (!checkArgs(args, size))
+		return -1;
+
+	int id = atoi(args[idPos].c_str());
+	if (!tryAddMD80(id))
+		return -1;
+
+	return id;
 }
