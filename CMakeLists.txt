@@ -34,6 +34,8 @@ set(CANDLE_BUILD_STATIC ON)
 set(CANDLE_OMIT_EXAMPLES ON)
 add_subdirectory(candle)
 
+set(CMAKE_BUILD_TYPE Release)
+
 add_executable(${PROJECT_NAME} ${SRC})
 target_link_libraries(${PROJECT_NAME} candle)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/candle/include ${CMAKE_SOURCE_DIR}/3rd_party/mINI/src)

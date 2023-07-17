@@ -638,8 +638,15 @@ void MainWorker::testMove(std::vector<std::string>& args)
 
 void MainWorker::testMoveAbsolute(std::vector<std::string>& args)
 {
-	int32_t id = checkArgsAndGetId(args, 6, 3);
-	if (id == -1) return;
+	if (args.size() < 6)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+	uint16_t id = atoi(args[4].c_str());
+
+	if (!tryAddMD80(id))
+		return;
 
 	float targetPos = std::stof(args[5].c_str());
 
