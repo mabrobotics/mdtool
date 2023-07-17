@@ -49,7 +49,7 @@ void printHelp()
 	vout << "\t blink [id] \t\t\t blink LEDs on driver board." << std::endl;
 	vout << "\t encoder [id] \t\t\t prints current position and velocity in a loop." << std::endl;
 	vout << "\t bus [type] [device]\t\t changes default CANdle CAN bus [type] (SPI/USB/UART) and optionally [device] if default is not suitable (applies to UART and SPI)." << std::endl;
-	vout << "\t clear [error / warning]\t clears errors or warnings" << std::endl;
+	vout << "\t clear [error / warning]\t\t clears errors or warnings" << std::endl;
 	vout << std::endl;
 	vout << std::endl;
 	vout << "For more information please refer to the manual:" << GREEN(" https://mabrobotics.pl/servos/manual");
@@ -290,8 +290,6 @@ void printDriveInfoExtended(mab::Md80& drive, bool printAll)
 	vout << "- motor shutdown temperature: " << std::to_string(drive.getReadReg().RW.motorShutdownTemp) << " *C" << std::endl;
 	vout << "- motor calibration mode: " << motorCalibrationModes[drive.getReadReg().RW.motorCalibrationMode] << std::endl;
 	vout << "- motor torque constant: " << std::setprecision(4) << drive.getReadReg().RW.motorKt << " Nm/A" << std::endl;
-	vout << "- motor stiction: " << std::setprecision(3) << drive.getReadReg().RW.stiction << " Nm" << std::endl;
-	vout << "- motor friction: " << std::setprecision(3) << drive.getReadReg().RW.friction << " Nm" << std::endl;
 	vout << "- d-axis resistance: " << std::setprecision(3) << drive.getReadReg().RO.resistance << " Ohm" << std::endl;
 	vout << "- d-axis inductance: " << std::setprecision(6) << drive.getReadReg().RO.inductance << " H" << std::endl;
 	vout << "- torque bandwidth: " << drive.getReadReg().RW.torqueBandwidth << " Hz" << std::endl;
@@ -335,8 +333,14 @@ void printDriveInfoExtended(mab::Md80& drive, bool printAll)
 		vout << "   - homing max torque: " << std::setprecision(2) << drive.getReadReg().RW.homingTorque << " Nm" << std::endl;
 		vout << "   - homing max velocity: " << std::setprecision(2) << drive.getReadReg().RW.homingVelocity << " rad/s" << std::endl;
 	}
-	vout << "- position limit min: " << std::setprecision(2) << drive.getReadReg().RW.positionLimitMin << " rad" << std::endl;
-	vout << "- position limit max: " << std::setprecision(2) << drive.getReadReg().RW.positionLimitMax << " rad" << std::endl;
+	vout << "- motion limits: " << std::endl;
+	vout << "   - max torque: " << std::setprecision(2) << drive.getReadReg().RW.maxTorque << " Nm" << std::endl;
+	vout << "   - max acceleration: " << std::setprecision(2) << drive.getReadReg().RW.maxAcceleration << " rad/s^2" << std::endl;
+	vout << "   - max deceleration: " << std::setprecision(2) << drive.getReadReg().RW.maxDeceleration << " rad/s^2" << std::endl;
+	vout << "   - max velocity: " << std::setprecision(2) << drive.getReadReg().RW.maxVelocity << " rad/s" << std::endl;
+	vout << "   - position limit min: " << std::setprecision(2) << drive.getReadReg().RW.positionLimitMin << " rad" << std::endl;
+	vout << "   - position limit max: " << std::setprecision(2) << drive.getReadReg().RW.positionLimitMax << " rad" << std::endl;
+
 	vout << "- position: " << std::setprecision(2) << drive.getPosition() << " rad" << std::endl;
 	vout << "- velocity: " << std::setprecision(2) << drive.getVelocity() << " rad/s" << std::endl;
 	vout << "- torque: " << std::setprecision(2) << drive.getTorque() << " Nm" << std::endl;
