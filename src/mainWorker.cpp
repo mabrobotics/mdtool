@@ -529,6 +529,9 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!getField(cfg, ini, "motor", "dynamic friction", regW.RW.friction)) return;
 	if (!getField(cfg, ini, "motor", "static friction", regW.RW.stiction)) return;
 	if (!getField(cfg, ini, "motor", "shutdown temp", regW.RW.motorShutdownTemp)) return;
+	if (!getField(cfg, ini, "limits", "max velocity", regW.RW.maxVelocity)) return;
+	if (!getField(cfg, ini, "limits", "max acceleration", regW.RW.maxAcceleration)) return;
+	if (!getField(cfg, ini, "limits", "max deceleration", regW.RW.maxDeceleration)) return;
 
 	if (cfg["hardware"]["shunt resistance"] != "")
 	{
@@ -615,8 +618,9 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 
 	if (!candle->writeMd80Register(id,
 								   mab::Md80Reg_E::maxTorque, floatFromField("limits", "max torque"),
-								   mab::Md80Reg_E::maxAcceleration, floatFromField("limits", "max acceleration"),
-								   mab::Md80Reg_E::maxVelocity, floatFromField("limits", "max velocity"),
+								   mab::Md80Reg_E::maxAcceleration, regW.RW.maxAcceleration,
+								   mab::Md80Reg_E::maxDeceleration, regW.RW.maxDeceleration,
+								   mab::Md80Reg_E::maxVelocity, regW.RW.maxVelocity,
 								   mab::Md80Reg_E::positionLimitMin, floatFromField("limits", "min position"),
 								   mab::Md80Reg_E::positionLimitMax, floatFromField("limits", "max position")))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::positionLimitMin);
