@@ -114,6 +114,7 @@ const std::map<std::string, uint8_t> homingErrorList = {{"ERROR_HOMING_LIMIT_REA
 														{"ERROR_HOMING_ABORTED", 4}};
 
 const std::map<std::string, uint8_t> motionErrorList = {{"ERROR_POSITION_OUTSIDE_LIMITS", 0},
+														{"ERROR_VELOCITY_OUTSIDE_LIMITS", 1},
 														{"WARNING_ACCELERATION_CLIPPED", 24},
 														{"WARNING_TORQUE_CLIPPED", 25},
 														{"WARNING_VELOCITY_CLIPPED", 26},
