@@ -469,13 +469,27 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!getField(cfg, ini, "limits", "max acceleration", regW.RW.maxAcceleration)) return;
 	if (!getField(cfg, ini, "limits", "max deceleration", regW.RW.maxDeceleration)) return;
 
-	if (cfg["hardware"]["shunt resistance"] != "")
+	auto checkFieldWriteIfPopulated = [&](const char* category, const char* field, auto& fieldVar, mab::Md80Reg_E reg) -> bool
 	{
-		if (!getField(cfg, ini, "hardware", "shunt resistance", regR.RO.shuntResistance))
-			return;
-	}
-	else
-		regR.RO.shuntResistance = 0;
+		if (cfg[category][field] == "")
+			return true;
+
+		if (!getField(cfg, ini, category, field, fieldVar))
+			return false;
+
+		if (!candle->writeMd80Register(id, reg, fieldVar))
+		{
+			ui::printFailedToSetupMotor(reg);
+			return false;
+		}
+		return true;
+	};
+
+	if (!checkFieldWriteIfPopulated("hardware", "shunt resistance", regR.RO.shuntResistance, mab::Md80Reg_E::shuntResistance))
+		return;
+
+	if (!checkFieldWriteIfPopulated("motor", "reverse direction", regR.RW.reverseDirection, mab::Md80Reg_E::reverseDirection))
+		return;
 
 	regW.RW.motorCalibrationMode = getNumericParamFromList(cfg["motor"]["calibration mode"], ui::motorCalibrationModes);
 
@@ -538,12 +552,6 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 
 	if (!candle->writeMd80Register(id, mab::Md80Reg_E::motorCalibrationMode, regW.RW.motorCalibrationMode))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorCalibrationMode);
-
-	if (regR.RO.shuntResistance != 0)
-	{
-		if (!candle->writeMd80Register(id, mab::Md80Reg_E::shuntResistance, regR.RO.shuntResistance))
-			ui::printFailedToSetupMotor(mab::Md80Reg_E::shuntResistance);
-	}
 
 	if (!candle->writeMd80Register(id,
 								   mab::Md80Reg_E::homingMode, regW.RW.homingMode,
