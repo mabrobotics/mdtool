@@ -68,8 +68,6 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::CALIBRATION;
 	if (opt == "calibration_out")
 		return toolsOptions_E::CALIBRATION_OUTPUT;
-	if (opt == "diagnostic")
-		return toolsOptions_E::DIAGNOSTIC;
 	if (opt == "motor")
 		return toolsOptions_E::MOTOR;
 	if (opt == "info")
@@ -404,15 +402,8 @@ void MainWorker::setupCalibration(std::vector<std::string>& args)
 	int32_t id = checkArgsAndGetId(args, 4, 3);
 	if (id == -1) return;
 
-	if (!ui::getCalibrationConfirmation())
+	if (!ui::getCalibrationConfirmation() || checkSetupError(id))
 		return;
-
-	candle->setupMd80DiagnosticExtended(id);
-	if (candle->getMd80FromList(id).getReadReg().RO.calibrationErrors & (1 << ui::calibrationErrorList.at(std::string("ERROR_SETUP"))))
-	{
-		std::cout << "[MDTOOL] Could not proceed due to " << RED("ERROR_SETUP") << ". Please call mdtool setup motor <ID> <cfg> first." << std::endl;
-		return;
-	}
 
 	candle->setupMd80Calibration(id);
 }
@@ -422,8 +413,17 @@ void MainWorker::setupCalibrationOutput(std::vector<std::string>& args)
 	int32_t id = checkArgsAndGetId(args, 4, 3);
 	if (id == -1) return;
 
-	if (!ui::getCalibrationOutputConfirmation())
+	if (!ui::getCalibrationOutputConfirmation() || checkSetupError(id))
 		return;
+
+	uint16_t outputEncoder = 0;
+	candle->readMd80Register(id, mab::Md80Reg_E::outputEncoder, outputEncoder);
+
+	if (!outputEncoder)
+	{
+		std::cout << "[MDTOOL] No output encoder is configured! " << RED("[FAILED]") << std::endl;
+		return;
+	}
 
 	candle->setupMd80CalibrationOutput(id);
 }
@@ -756,6 +756,15 @@ void MainWorker::testEncoderOutput(std::vector<std::string>& args)
 		return;
 	}
 
+	uint16_t outputEncoder = 0;
+	candle->readMd80Register(id, mab::Md80Reg_E::outputEncoder, outputEncoder);
+
+	if (!outputEncoder)
+	{
+		std::cout << "[MDTOOL] No output encoder is configured! " << RED("[FAILED]") << std::endl;
+		return;
+	}
+
 	candle->setupMd80TestOutputEncoder(id);
 }
 
@@ -1036,4 +1045,18 @@ int MainWorker::checkArgsAndGetId(std::vector<std::string>& args, uint32_t size,
 		return -1;
 
 	return id;
+}
+
+bool MainWorker::checkSetupError(uint16_t id)
+{
+	uint32_t calibrationStatus;
+	candle->readMd80Register(id, mab::Md80Reg_E::calibrationErrors, calibrationStatus);
+
+	if (calibrationStatus & (1 << ui::calibrationErrorList.at(std::string("ERROR_SETUP"))))
+	{
+		std::cout << "[MDTOOL] Could not proceed due to " << RED("ERROR_SETUP") << ". Please call mdtool setup motor <ID> <cfg> first." << std::endl;
+		return true;
+	}
+
+	return false;
 }
