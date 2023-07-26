@@ -572,6 +572,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!candle->writeMd80Register(id,
 								   mab::Md80Reg_E::profileAcceleration, floatFromField("profile", "acceleration"),
 								   mab::Md80Reg_E::profileDeceleration, floatFromField("profile", "deceleration"),
+								   mab::Md80Reg_E::quickStopDeceleration, floatFromField("profile", "quick stop deceleration"),
 								   mab::Md80Reg_E::profileVelocity, floatFromField("profile", "velocity")))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::positionLimitMin);
 
