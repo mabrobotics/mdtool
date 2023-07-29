@@ -7,12 +7,6 @@
 
 #include "ui.hpp"
 
-const uint8_t VMAJOR = MDTOOL_VERSION_MAJOR;
-const uint8_t VMINOR = MDTOOL_VERSION_MINOR;
-const uint8_t VREVISION = MDTOOL_VERSION_REVISION;
-const char VTAG = 'd';
-const mab::version_ut mdtoolVersion = {{VTAG, VREVISION, VMINOR, VMAJOR}};
-
 enum class toolsCmd_E
 {
 	NONE,
@@ -150,11 +144,11 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 		mINI::INIStructure ini;
 		file.read(ini);
 
-		if (ini["general"]["version"] != getVersionString(&mdtoolVersion))
+		if (ini["general"]["version"] != getVersion())
 		{
 			system(("cp " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolIniFileName + " " + mdtoolBaseDir + "/").c_str());
 			file.read(ini);
-			ini["general"]["version"] = getVersionString(&mdtoolVersion);
+			ini["general"]["version"] = getVersion();
 			file.write(ini);
 		}
 
@@ -324,7 +318,7 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 
 std::string MainWorker::getVersion()
 {
-	return mab::getVersionString(&mdtoolVersion);
+	return mab::getVersionString({'d', MDTOOL_VERSION_REVISION, MDTOOL_VERSION_MINOR, MDTOOL_VERSION_MAJOR});
 }
 
 void MainWorker::ping(std::vector<std::string>& args)

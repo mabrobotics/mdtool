@@ -268,7 +268,7 @@ void printDriveInfoExtended(mab::Md80& drive, bool printAll)
 	vout << "- gear ratio: " << std::setprecision(3) << drive.getReadReg().RW.gearRatio << std::endl;
 	mab::version_ut firmwareVersion = {{0, 0, 0, 0}};
 	firmwareVersion.i = drive.getReadReg().RO.firmwareVersion;
-	vout << "- firmware version: v" << mab::getVersionString(&firmwareVersion) << std::endl;
+	vout << "- firmware version: v" << mab::getVersionString(firmwareVersion) << std::endl;
 	vout << "- hardware version: " << getHardwareVersion(drive.getReadReg().RO.hardwareVersion) << std::endl;
 	vout << "- build date: " << getStringBuildDate(drive.getReadReg().RO.buildDate) << std::endl;
 	vout << "- commit hash: " << drive.getReadReg().RO.commitHash << std::endl;
