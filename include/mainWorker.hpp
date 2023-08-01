@@ -25,7 +25,6 @@ class MainWorker
 
 	std::string busString;
 
-	mab::CANdleBaudrate_E CurrentBaudrate;
 	bool printVerbose = false;
 
 	void ping(std::vector<std::string>& args);

@@ -537,7 +537,6 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!candle->writeMd80Register(id,
 								   mab::Md80Reg_E::motorImpPidKp, floatFromField("impedance PD", "kp"),
 								   mab::Md80Reg_E::motorImpPidKd, floatFromField("impedance PD", "kd"),
-								   mab::Md80Reg_E::motorImpPidOutMax, floatFromField("impedance PD", "max out"),
 								   mab::Md80Reg_E::motorShutdownTemp, regW.RW.motorShutdownTemp))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorShutdownTemp);
 
