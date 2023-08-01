@@ -355,7 +355,8 @@ void MainWorker::ping(std::vector<std::string>& args)
 
 void MainWorker::configCan(std::vector<std::string>& args)
 {
-	checkArgs(args, 7);
+	if (!checkArgs(args, 7))
+		return;
 	int id = atoi(args[3].c_str());
 	checkSpeedForId(id);
 	int new_id = atoi(args[4].c_str());
