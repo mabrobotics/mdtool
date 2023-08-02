@@ -33,6 +33,7 @@ class MainWorker
 	void configZero(std::vector<std::string>& args);
 	void configCurrent(std::vector<std::string>& args);
 	void configBandwidth(std::vector<std::string>& args);
+	void configClear(std::vector<std::string>& args);
 
 	void setupCalibration(std::vector<std::string>& args);
 	void setupCalibrationOutput(std::vector<std::string>& args);

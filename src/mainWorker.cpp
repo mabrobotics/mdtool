@@ -45,6 +45,7 @@ enum class toolsOptions_E
 	WRITE,
 	ERROR,
 	WARNING,
+	CLEAR,
 };
 toolsOptions_E str2option(std::string& opt)
 {
@@ -88,6 +89,8 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::ERROR;
 	if (opt == "warning")
 		return toolsOptions_E::WARNING;
+	if (opt == "clear")
+		return toolsOptions_E::CLEAR;
 
 	return toolsOptions_E::NONE;
 }
@@ -136,8 +139,10 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 
 	/* copy motors configs directory - not the best practice to use system() but std::filesystem is not available until C++17 */
 	struct stat info;
+	int result = 0;
+
 	if (stat(mdtoolBaseDir.c_str(), &info) != 0)
-		system(("cp -r " + mdtoolConfigPath + mdtoolDirName + " " + mdtoolBaseDir).c_str());
+		result = system(("cp -r " + mdtoolConfigPath + mdtoolDirName + " " + mdtoolBaseDir).c_str());
 	else /* if the directory is not empty we should only copy the ini file (only if the version is newer) and all default config files */
 	{
 		mINI::INIFile file(mdtoolIniFilePath);
@@ -146,13 +151,13 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 
 		if (ini["general"]["version"] != getVersion())
 		{
-			system(("cp " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolIniFileName + " " + mdtoolBaseDir + "/").c_str());
+			result = system(("cp " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolIniFileName + " " + mdtoolBaseDir + "/").c_str());
 			file.read(ini);
 			ini["general"]["version"] = getVersion();
 			file.write(ini);
 		}
 
-		system(("cp -a " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName + "/." + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/").c_str());
+		result = system(("cp -a " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName + "/." + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/").c_str());
 	}
 
 	/* defaults */
@@ -230,6 +235,8 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 				configCurrent(args);
 			else if (option == toolsOptions_E::BANDWIDTH)
 				configBandwidth(args);
+			else if (option == toolsOptions_E::CLEAR)
+				configClear(args);
 			else
 				ui::printHelpConfig();
 			break;
@@ -390,6 +397,17 @@ void MainWorker::configBandwidth(std::vector<std::string>& args)
 	int32_t id = checkArgsAndGetId(args, 5, 3);
 	if (id == -1) return;
 	candle->configMd80TorqueBandwidth(id, atof(args[4].c_str()));
+}
+
+void MainWorker::configClear(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1) return;
+
+	if (candle->writeMd80Register(id, mab::Md80Reg_E::runRestoreFactoryConfig, true))
+		std::cout << "[MDTOOL] Config reverted to factory state!" << std::endl;
+	else
+		std::cout << "[MDTOOL] Error reverting config to factory state!" << std::endl;
 }
 
 void MainWorker::setupCalibration(std::vector<std::string>& args)
@@ -818,13 +836,20 @@ void MainWorker::registerWrite(std::vector<std::string>& args)
 		case mab::Register::type::F32:
 			success = candle->writeMd80Register(id, regId, static_cast<float>(std::atof(args[5].c_str())));
 			break;
+		case mab::Register::type::STR:
+		{
+			char str[24]{};
+			memcpy(str, args[5].c_str(), sizeof(str));
+			success = candle->writeMd80Register(id, regId, str);
+			break;
+		}
 		case mab::Register::type::UNKNOWN:
-			std::cout << "Unknown register! Please check the ID and try again" << std::endl;
+			std::cout << "[MDTOOL] Unknown register! Please check the ID and try again" << std::endl;
 	}
 	if (success)
-		std::cout << "Writing register successful!" << std::endl;
+		std::cout << "[MDTOOL] Writing register successful!" << std::endl;
 	else
-		std::cout << "Writing register failed!" << std::endl;
+		std::cout << "[MDTOOL] Writing register failed!" << std::endl;
 }
 
 void MainWorker::registerRead(std::vector<std::string>& args)
@@ -859,12 +884,19 @@ void MainWorker::registerRead(std::vector<std::string>& args)
 		case mab::Register::type::F32:
 			readRegisterToString<float>(id, regId, value);
 			break;
+		case mab::Register::type::STR:
+		{
+			char str[24]{};
+			candle->readMd80Register(id, regId, str);
+			value = std::string(str);
+			break;
+		}
 		case mab::Register::type::UNKNOWN:
-			std::cout << "Unknown register! Please check the ID and try again" << std::endl;
+			std::cout << "[MDTOOL] Unknown register! Please check the ID and try again" << std::endl;
 			break;
 	}
 
-	std::cout << "Register value: " << value << std::endl;
+	std::cout << "[MDTOOL] Register value: " << value << std::endl;
 }
 
 void MainWorker::blink(std::vector<std::string>& args)
