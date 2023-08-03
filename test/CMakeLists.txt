@@ -8,10 +8,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 add_library(GTest::GTest INTERFACE IMPORTED)
 
+file (GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS "*.cpp")
+
 include_directories(mdtool_test ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/candle/include ${CMAKE_SOURCE_DIR}/3rd_party/mINI/src)
 target_link_libraries(GTest::GTest INTERFACE gtest_main)
 
-add_executable(mdtool_test test.cpp ${CMAKE_SOURCE_DIR}/src/ui.cpp)
+add_executable(mdtool_test ${CMAKE_SOURCE_DIR}/src/ui.cpp ${TEST_SOURCES} ${CMAKE_SOURCE_DIR}/src/ConfigManager.cpp)
 
 target_link_libraries(mdtool_test
     PRIVATE

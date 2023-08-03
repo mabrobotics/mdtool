@@ -6,6 +6,7 @@
 #include <numeric>
 
 #include "ui.hpp"
+#include "ConfigManager.hpp"
 
 enum class toolsCmd_E
 {
@@ -136,6 +137,26 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 {
 	mdtoolBaseDir = std::string(getenv("HOME")) + "/" + mdtoolHomeConfigDirName + "/" + mdtoolDirName;
 	mdtoolIniFilePath = mdtoolBaseDir + "/" + mdtoolIniFileName;
+
+	ConfigManager configManager(mdtoolConfigPath + "/" + mdtoolDirName + "/" + mdtoolMotorCfgDirName ,mdtoolBaseDir + "/" + mdtoolMotorCfgDirName);
+
+	std::cout << "Original path: " << mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName << std::endl;
+	std::cout << "User path: " << mdtoolBaseDir + "/" + mdtoolMotorCfgDirName << std::endl;
+
+	auto identicalFiles = configManager.getIdenticalFilePaths();
+	std::cout << "IDENTICAL FILES: " << std::endl << "================" << std::endl;
+	for (auto& file : identicalFiles)
+	{
+		std::cout << file << std::endl;
+	}
+	auto differentFiles = configManager.getDifferentFilePaths();
+	std::cout << std::endl << std::endl;
+	std::cout << "DIFFERENT FILES: " << std::endl << "================" << std::endl;
+	for (auto& file : differentFiles)
+	{
+		std::cout << file << std::endl;
+	}
+
 
 	/* copy motors configs directory - not the best practice to use system() but std::filesystem is not available until C++17 */
 	struct stat info;

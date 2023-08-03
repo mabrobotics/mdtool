@@ -48,7 +48,7 @@ target_compile_definitions(${PROJECT_NAME}
     PRIVATE MDTOOL_VERSION_REVISION=${CMAKE_MATCH_3}
 )
 
-if(MAKE_TESTS)
+if(MAKE_TESTS_MDTOOL)
     add_subdirectory(test)
 endif()
 
