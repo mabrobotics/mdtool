@@ -251,6 +251,8 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 				setupMotor(args);
 			else if (option == toolsOptions_E::INFO)
 				setupInfo(args);
+			else if (option == toolsOptions_E::HOMING)
+				setupHoming(args);
 			else
 				ui::printHelpSetup();
 			break;
@@ -274,10 +276,6 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 					testEncoderOutput(args);
 				else
 					ui::printHelpTest();
-			}
-			else if (option == toolsOptions_E::HOMING)
-			{
-				testHoming(args);
 			}
 			else
 				ui::printHelpTest();
@@ -796,7 +794,7 @@ void MainWorker::testEncoderMain(std::vector<std::string>& args)
 	candle->setupMd80TestMainEncoder(id);
 }
 
-void MainWorker::testHoming(std::vector<std::string>& args)
+void MainWorker::setupHoming(std::vector<std::string>& args)
 {
 	int32_t id = checkArgsAndGetId(args, 4, 3);
 	if (id == -1) return;

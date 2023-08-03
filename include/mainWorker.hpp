@@ -39,13 +39,13 @@ class MainWorker
 	void setupCalibrationOutput(std::vector<std::string>& args);
 	void setupMotor(std::vector<std::string>& args);
 	void setupInfo(std::vector<std::string>& args);
+	void setupHoming(std::vector<std::string>& args);
 
 	void testMove(std::vector<std::string>& args);
 	void testMoveAbsolute(std::vector<std::string>& args);
 	void testLatency(std::vector<std::string>& args);
 	void testEncoderOutput(std::vector<std::string>& args);
 	void testEncoderMain(std::vector<std::string>& args);
-	void testHoming(std::vector<std::string>& args);
 	void registerWrite(std::vector<std::string>& args);
 	void registerRead(std::vector<std::string>& args);
 	void blink(std::vector<std::string>& args);

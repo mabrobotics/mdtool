@@ -91,12 +91,14 @@ void printHelpSetup()
 	vout << "\tmdtool setup calibration_out 100" << std::endl;
 	vout << "\tmdtool setup motor 100 AK80-9.cfg" << std::endl;
 	vout << "\tmdtool setup info 100" << std::endl;
+	vout << "\tmdtool setup info 100" << std::endl;
 	vout << std::endl;
 	vout << "Supported options: " << std::endl;
 	vout << "\t calibration [id] \t\t\tstarts motor calibration procedure." << std::endl;
 	vout << "\t calibration_out [id] \t\t\tstarts output encoder calibration procedure." << std::endl;
 	vout << "\t motor [id] [*.cfg] \t\t\tloads selected motor config." << std::endl;
 	vout << "\t info  [id] \t\t\t\tprints detailed info about controller." << std::endl;
+	vout << "\t homing   [id]        \t\t\tstarts the homing routine" << std::endl;
 	vout << std::endl;
 	vout << "For more information please refer to the manual:" << GREEN(" https://mabrobotics.pl/servos/manual") << std::endl;
 	vout << std::endl;
@@ -120,7 +122,6 @@ void printHelpTest()
 	vout << "\t move absolute [id] [position] [profile velocity] [profile acceleration] [profile deceleration] position PID absolute movement. " << std::endl;
 	vout << "\t latency  [baudrate] \t\t\ttests the overall TX message frequency. [baudrate] should be the baudrate of actuators on the CAN bus." << std::endl;
 	vout << "\t encoder  [type] [id] \t\t\ttests the encoder [type] (main/output)" << std::endl;
-	vout << "\t homing   [id]        \t\t\tstarts the homing routine" << std::endl;
 	vout << std::endl;
 	vout << "For more information please refer to the manual:" << GREEN("https://mabrobotics.pl/servos/manual") << std::endl;
 	vout << std::endl;
