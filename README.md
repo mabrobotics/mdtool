@@ -1,4 +1,6 @@
 # MDtool
+![example workflow](https://github.com/mabrobotics/mdtool/actions/workflows/build.yaml/badge.svg)
+
 MDtool is a console application for configuring and performing basic diagnostics on MD80-based drives via CANdle. For more information please refer to [MD80 x CANdle Manual](https://www.mabrobotics.pl/servos/#comp-l6v4io99).
 
 # Installing
