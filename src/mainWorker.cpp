@@ -7,12 +7,6 @@
 
 #include "ui.hpp"
 
-const uint8_t VMAJOR = MDTOOL_VERSION_MAJOR;
-const uint8_t VMINOR = MDTOOL_VERSION_MINOR;
-const uint8_t VREVISION = MDTOOL_VERSION_REVISION;
-const char VTAG = 'r';
-const mab::version_ut mdtoolVersion = {{VTAG, VREVISION, VMINOR, VMAJOR}};
-
 enum class toolsCmd_E
 {
 	NONE,
@@ -22,7 +16,10 @@ enum class toolsCmd_E
 	TEST,
 	BLINK,
 	ENCODER,
-	BUS
+	BUS,
+	REGISTER,
+	CLEAR,
+	RESET,
 };
 enum class toolsOptions_E
 {
@@ -42,6 +39,13 @@ enum class toolsOptions_E
 	ENCODER,
 	MAIN,
 	OUTPUT,
+	HOMING,
+	ABSOLUTE,
+	READ,
+	WRITE,
+	ERROR,
+	WARNING,
+	CLEAR,
 };
 toolsOptions_E str2option(std::string& opt)
 {
@@ -59,8 +63,6 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::CALIBRATION;
 	if (opt == "calibration_out")
 		return toolsOptions_E::CALIBRATION_OUTPUT;
-	if (opt == "diagnostic")
-		return toolsOptions_E::DIAGNOSTIC;
 	if (opt == "motor")
 		return toolsOptions_E::MOTOR;
 	if (opt == "info")
@@ -75,6 +77,20 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::MAIN;
 	if (opt == "output")
 		return toolsOptions_E::OUTPUT;
+	if (opt == "homing")
+		return toolsOptions_E::HOMING;
+	if (opt == "absolute")
+		return toolsOptions_E::ABSOLUTE;
+	if (opt == "read")
+		return toolsOptions_E::READ;
+	if (opt == "write")
+		return toolsOptions_E::WRITE;
+	if (opt == "error")
+		return toolsOptions_E::ERROR;
+	if (opt == "warning")
+		return toolsOptions_E::WARNING;
+	if (opt == "clear")
+		return toolsOptions_E::CLEAR;
 
 	return toolsOptions_E::NONE;
 }
@@ -94,6 +110,12 @@ toolsCmd_E str2cmd(std::string& cmd)
 		return toolsCmd_E::ENCODER;
 	if (cmd == "bus")
 		return toolsCmd_E::BUS;
+	if (cmd == "register")
+		return toolsCmd_E::REGISTER;
+	if (cmd == "clear")
+		return toolsCmd_E::CLEAR;
+	if (cmd == "reset")
+		return toolsCmd_E::RESET;
 	return toolsCmd_E::NONE;
 }
 
@@ -117,23 +139,25 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 
 	/* copy motors configs directory - not the best practice to use system() but std::filesystem is not available until C++17 */
 	struct stat info;
+	int result = 0;
+
 	if (stat(mdtoolBaseDir.c_str(), &info) != 0)
-		system(("cp -r " + mdtoolConfigPath + mdtoolDirName + " " + mdtoolBaseDir).c_str());
+		result = system(("cp -r " + mdtoolConfigPath + mdtoolDirName + " " + mdtoolBaseDir).c_str());
 	else /* if the directory is not empty we should only copy the ini file (only if the version is newer) and all default config files */
 	{
 		mINI::INIFile file(mdtoolIniFilePath);
 		mINI::INIStructure ini;
 		file.read(ini);
 
-		if (ini["general"]["version"] != getVersionString(&mdtoolVersion))
+		if (ini["general"]["version"] != getVersion())
 		{
-			system(("cp " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolIniFileName + " " + mdtoolBaseDir + "/").c_str());
+			result = system(("cp " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolIniFileName + " " + mdtoolBaseDir + "/").c_str());
 			file.read(ini);
-			ini["general"]["version"] = getVersionString(&mdtoolVersion);
+			ini["general"]["version"] = getVersion();
 			file.write(ini);
 		}
 
-		system(("cp -a " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName + "/." + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/").c_str());
+		result = system(("cp -a " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName + "/." + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/").c_str());
 	}
 
 	/* defaults */
@@ -177,9 +201,9 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 	try
 	{
 		if (device != "" && busType != mab::BusType_E::USB)
-			candle = new mab::Candle(baud, printVerbose, busType, device);
+			candle = std::make_unique<mab::Candle>(baud, printVerbose, busType, device);
 		else
-			candle = new mab::Candle(baud, printVerbose, busType);
+			candle = std::make_unique<mab::Candle>(baud, printVerbose, busType);
 	}
 	catch (const char* e)
 	{
@@ -211,6 +235,8 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 				configCurrent(args);
 			else if (option == toolsOptions_E::BANDWIDTH)
 				configBandwidth(args);
+			else if (option == toolsOptions_E::CLEAR)
+				configClear(args);
 			else
 				ui::printHelpConfig();
 			break;
@@ -221,12 +247,12 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 				setupCalibration(args);
 			else if (option == toolsOptions_E::CALIBRATION_OUTPUT)
 				setupCalibrationOutput(args);
-			else if (option == toolsOptions_E::DIAGNOSTIC)
-				setupDiagnostic(args);
 			else if (option == toolsOptions_E::MOTOR)
 				setupMotor(args);
 			else if (option == toolsOptions_E::INFO)
 				setupInfo(args);
+			else if (option == toolsOptions_E::HOMING)
+				setupHoming(args);
 			else
 				ui::printHelpSetup();
 			break;
@@ -236,7 +262,12 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 			if (option == toolsOptions_E::LATENCY)
 				testLatency(args);
 			else if (option == toolsOptions_E::MOVE)
-				testMove(args);
+			{
+				if (option2 == toolsOptions_E::ABSOLUTE)
+					testMoveAbsolute(args);
+				else
+					testMove(args);
+			}
 			else if (option == toolsOptions_E::ENCODER)
 			{
 				if (option2 == toolsOptions_E::MAIN)
@@ -260,6 +291,31 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 			encoder(args);
 			break;
 		}
+		case toolsCmd_E::REGISTER:
+		{
+			if (option == toolsOptions_E::WRITE)
+				registerWrite(args);
+			else if (option == toolsOptions_E::READ)
+				registerRead(args);
+			else
+				ui::printHelpTest();
+			break;
+		}
+		case toolsCmd_E::CLEAR:
+		{
+			if (option == toolsOptions_E::ERROR)
+				clearErrors(args);
+			else if (option == toolsOptions_E::WARNING)
+				clearWarnings(args);
+			else
+				ui::printHelpTest();
+			break;
+		}
+		case toolsCmd_E::RESET:
+		{
+			reset(args);
+			break;
+		}
 		default:
 			return;
 	}
@@ -267,7 +323,7 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 
 std::string MainWorker::getVersion()
 {
-	return mab::getVersionString(&mdtoolVersion);
+	return mab::getVersionString({MDTOOL_VTAG, MDTOOL_VREVISION, MDTOOL_VMINOR, MDTOOL_VMAJOR});
 }
 
 void MainWorker::ping(std::vector<std::string>& args)
@@ -292,7 +348,7 @@ void MainWorker::ping(std::vector<std::string>& args)
 	if (performScan)
 	{
 		candle->setVebose(false);
-		ui::printScanOutput(candle);
+		ui::printScanOutput(candle.get());
 	}
 	else
 	{
@@ -304,12 +360,8 @@ void MainWorker::ping(std::vector<std::string>& args)
 
 void MainWorker::configCan(std::vector<std::string>& args)
 {
-	if (args.size() < 7)
-	{
-		ui::printTooFewArgsNoHelp();
+	if (!checkArgs(args, 7))
 		return;
-	}
-
 	int id = atoi(args[3].c_str());
 	checkSpeedForId(id);
 	int new_id = atoi(args[4].c_str());
@@ -321,128 +373,76 @@ void MainWorker::configCan(std::vector<std::string>& args)
 }
 void MainWorker::configSave(std::vector<std::string>& args)
 {
-	if (args.size() != 4)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1) return;
 	candle->configMd80Save(id);
 }
 void MainWorker::configZero(std::vector<std::string>& args)
 {
-	if (args.size() != 4)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1) return;
 	candle->controlMd80SetEncoderZero(id);
 }
 void MainWorker::configCurrent(std::vector<std::string>& args)
 {
-	if (args.size() != 5)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
+	int32_t id = checkArgsAndGetId(args, 5, 3);
+	if (id == -1) return;
 	candle->configMd80SetCurrentLimit(id, atof(args[4].c_str()));
 }
 
 void MainWorker::configBandwidth(std::vector<std::string>& args)
 {
-	if (args.size() != 5)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
-
+	int32_t id = checkArgsAndGetId(args, 5, 3);
+	if (id == -1) return;
 	candle->configMd80TorqueBandwidth(id, atof(args[4].c_str()));
+}
+
+void MainWorker::configClear(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1) return;
+
+	if (candle->writeMd80Register(id, mab::Md80Reg_E::runRestoreFactoryConfig, true))
+		std::cout << "[MDTOOL] Config reverted to factory state!" << std::endl;
+	else
+		std::cout << "[MDTOOL] Error reverting config to factory state!" << std::endl;
 }
 
 void MainWorker::setupCalibration(std::vector<std::string>& args)
 {
-	if (args.size() != 4)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1) return;
 
-	if (!ui::getCalibrationConfirmation())
+	if (!ui::getCalibrationConfirmation() || checkSetupError(id))
 		return;
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
-
-	candle->setupMd80DiagnosticExtended(id);
-	if (candle->getMd80FromList(id).getReadReg().RO.calibrationErrors & (1 << ui::calibrationErrorList.at(std::string("ERROR_SETUP"))))
-	{
-		std::cout << "[MDTOOL] Could not proceed due to " << RED("ERROR_SETUP") << ". Please call mdtool setup motor <ID> <cfg> first." << std::endl;
-		return;
-	}
 
 	candle->setupMd80Calibration(id);
 }
 
 void MainWorker::setupCalibrationOutput(std::vector<std::string>& args)
 {
-	if (args.size() != 4)
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1) return;
+
+	if (!ui::getCalibrationOutputConfirmation() || checkSetupError(id))
+		return;
+
+	uint16_t outputEncoder = 0;
+	candle->readMd80Register(id, mab::Md80Reg_E::outputEncoder, outputEncoder);
+
+	if (!outputEncoder)
 	{
-		ui::printTooFewArgsNoHelp();
+		std::cout << "[MDTOOL] No output encoder is configured! " << RED("[FAILED]") << std::endl;
 		return;
 	}
-
-	if (!ui::getCalibrationOutputConfirmation())
-		return;
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
 
 	candle->setupMd80CalibrationOutput(id);
-}
-void MainWorker::setupDiagnostic(std::vector<std::string>& args)
-{
-	if (args.size() != 4)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
-	candle->setupMd80Diagnostic(id);
-	ui::printDriveInfo(id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity(), candle->md80s[0].getTorque(), candle->md80s[0].getTemperature(), candle->md80s[0].getErrorVector(), candle->getCurrentBaudrate());
 }
 
 void MainWorker::setupMotor(std::vector<std::string>& args)
 {
-	if (args.size() != 5)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
+	int32_t id = checkArgsAndGetId(args, 5, 3);
+	if (id == -1) return;
 
 	std::string path = (mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" + args[4].c_str());
 
@@ -476,14 +476,31 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!getField(cfg, ini, "motor", "dynamic friction", regW.RW.friction)) return;
 	if (!getField(cfg, ini, "motor", "static friction", regW.RW.stiction)) return;
 	if (!getField(cfg, ini, "motor", "shutdown temp", regW.RW.motorShutdownTemp)) return;
+	if (!getField(cfg, ini, "limits", "max velocity", regW.RW.maxVelocity)) return;
+	if (!getField(cfg, ini, "limits", "max acceleration", regW.RW.maxAcceleration)) return;
+	if (!getField(cfg, ini, "limits", "max deceleration", regW.RW.maxDeceleration)) return;
 
-	if (cfg["hardware"]["shunt resistance"] != "")
+	auto checkFieldWriteIfPopulated = [&](const char* category, const char* field, auto& fieldVar, mab::Md80Reg_E reg) -> bool
 	{
-		if (!getField(cfg, ini, "hardware", "shunt resistance", regR.RO.shuntResistance))
-			return;
-	}
-	else
-		regR.RO.shuntResistance = 0;
+		if (cfg[category][field] == "")
+			return true;
+
+		if (!getField(cfg, ini, category, field, fieldVar))
+			return false;
+
+		if (!candle->writeMd80Register(id, reg, fieldVar))
+		{
+			ui::printFailedToSetupMotor(reg);
+			return false;
+		}
+		return true;
+	};
+
+	if (!checkFieldWriteIfPopulated("hardware", "shunt resistance", regR.RO.shuntResistance, mab::Md80Reg_E::shuntResistance))
+		return;
+
+	if (!checkFieldWriteIfPopulated("motor", "reverse direction", regR.RW.reverseDirection, mab::Md80Reg_E::reverseDirection))
+		return;
 
 	regW.RW.motorCalibrationMode = getNumericParamFromList(cfg["motor"]["calibration mode"], ui::motorCalibrationModes);
 
@@ -491,6 +508,12 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	regW.RW.outputEncoder = getNumericParamFromList(cfg["output encoder"]["output encoder"], ui::encoderTypes);
 	regW.RW.outputEncoderMode = getNumericParamFromList(cfg["output encoder"]["output encoder mode"], ui::encoderModes);
 	regW.RW.outputEncoderCalibrationMode = getNumericParamFromList(cfg["output encoder"]["output encoder calibration mode"], ui::encoderCalibrationModes);
+	regW.RW.homingMode = getNumericParamFromList(cfg["homing"]["mode"], ui::homingModes);
+
+	auto floatFromField = [&](const char* category, const char* field) -> float
+	{
+		return atof(cfg[category][field].c_str());
+	};
 
 	/* motor base config */
 	if (!candle->writeMd80Register(id,
@@ -517,23 +540,20 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 
 	/* motor motion config - Position and velocity PID*/
 	if (!candle->writeMd80Register(id,
-								   mab::Md80Reg_E::motorPosPidKp, (float)atof(cfg["position PID"]["kp"].c_str()),
-								   mab::Md80Reg_E::motorPosPidKi, (float)atof(cfg["position PID"]["ki"].c_str()),
-								   mab::Md80Reg_E::motorPosPidKd, (float)atof(cfg["position PID"]["kd"].c_str()),
-								   mab::Md80Reg_E::motorPosPidOutMax, (float)atof(cfg["position PID"]["max out"].c_str()),
-								   mab::Md80Reg_E::motorPosPidWindup, (float)atof(cfg["position PID"]["windup"].c_str()),
-								   mab::Md80Reg_E::motorVelPidKp, (float)atof(cfg["velocity PID"]["kp"].c_str()),
-								   mab::Md80Reg_E::motorVelPidKi, (float)atof(cfg["velocity PID"]["ki"].c_str()),
-								   mab::Md80Reg_E::motorVelPidKd, (float)atof(cfg["velocity PID"]["kd"].c_str()),
-								   mab::Md80Reg_E::motorVelPidOutMax, (float)atof(cfg["velocity PID"]["max out"].c_str()),
-								   mab::Md80Reg_E::motorVelPidWindup, (float)atof(cfg["velocity PID"]["windup"].c_str())))
+								   mab::Md80Reg_E::motorPosPidKp, floatFromField("position PID", "kp"),
+								   mab::Md80Reg_E::motorPosPidKi, floatFromField("position PID", "ki"),
+								   mab::Md80Reg_E::motorPosPidKd, floatFromField("position PID", "kd"),
+								   mab::Md80Reg_E::motorPosPidWindup, floatFromField("position PID", "windup"),
+								   mab::Md80Reg_E::motorVelPidKp, floatFromField("velocity PID", "kp"),
+								   mab::Md80Reg_E::motorVelPidKi, floatFromField("velocity PID", "ki"),
+								   mab::Md80Reg_E::motorVelPidKd, floatFromField("velocity PID", "kd"),
+								   mab::Md80Reg_E::motorVelPidWindup, floatFromField("velocity PID", "windup")))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorVelPidWindup);
 
 	/* motor motion config - Impedance PD*/
 	if (!candle->writeMd80Register(id,
-								   mab::Md80Reg_E::motorImpPidKp, (float)atof(cfg["impedance PD"]["kp"].c_str()),
-								   mab::Md80Reg_E::motorImpPidKd, (float)atof(cfg["impedance PD"]["kd"].c_str()),
-								   mab::Md80Reg_E::motorImpPidOutMax, (float)atof(cfg["impedance PD"]["max out"].c_str()),
+								   mab::Md80Reg_E::motorImpPidKp, floatFromField("impedance PD", "kp"),
+								   mab::Md80Reg_E::motorImpPidKd, floatFromField("impedance PD", "kd"),
 								   mab::Md80Reg_E::motorShutdownTemp, regW.RW.motorShutdownTemp))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorShutdownTemp);
 
@@ -543,11 +563,28 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!candle->writeMd80Register(id, mab::Md80Reg_E::motorCalibrationMode, regW.RW.motorCalibrationMode))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorCalibrationMode);
 
-	if (regR.RO.shuntResistance != 0)
-	{
-		if (!candle->writeMd80Register(id, mab::Md80Reg_E::shuntResistance, regR.RO.shuntResistance))
-			ui::printFailedToSetupMotor(mab::Md80Reg_E::shuntResistance);
-	}
+	if (!candle->writeMd80Register(id,
+								   mab::Md80Reg_E::homingMode, regW.RW.homingMode,
+								   mab::Md80Reg_E::homingMaxTravel, floatFromField("homing", "max travel"),
+								   mab::Md80Reg_E::homingTorque, floatFromField("homing", "max torque"),
+								   mab::Md80Reg_E::homingVelocity, floatFromField("homing", "max velocity")))
+		ui::printFailedToSetupMotor(mab::Md80Reg_E::homingMode);
+
+	if (!candle->writeMd80Register(id,
+								   mab::Md80Reg_E::maxTorque, floatFromField("limits", "max torque"),
+								   mab::Md80Reg_E::maxAcceleration, regW.RW.maxAcceleration,
+								   mab::Md80Reg_E::maxDeceleration, regW.RW.maxDeceleration,
+								   mab::Md80Reg_E::maxVelocity, regW.RW.maxVelocity,
+								   mab::Md80Reg_E::positionLimitMin, floatFromField("limits", "min position"),
+								   mab::Md80Reg_E::positionLimitMax, floatFromField("limits", "max position")))
+		ui::printFailedToSetupMotor(mab::Md80Reg_E::positionLimitMin);
+
+	if (!candle->writeMd80Register(id,
+								   mab::Md80Reg_E::profileAcceleration, floatFromField("profile", "acceleration"),
+								   mab::Md80Reg_E::profileDeceleration, floatFromField("profile", "deceleration"),
+								   mab::Md80Reg_E::quickStopDeceleration, floatFromField("profile", "quick stop deceleration"),
+								   mab::Md80Reg_E::profileVelocity, floatFromField("profile", "velocity")))
+		ui::printFailedToSetupMotor(mab::Md80Reg_E::positionLimitMin);
 
 	candle->configMd80Save(id);
 
@@ -580,22 +617,14 @@ void MainWorker::setupInfo(std::vector<std::string>& args)
 
 void MainWorker::testMove(std::vector<std::string>& args)
 {
-	if (args.size() != 5)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
+	int32_t id = checkArgsAndGetId(args, 5, 3);
+	if (id == -1) return;
 
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
 	float targetPos = atof(args[4].c_str());
 	if (targetPos > 10.0f)
 		targetPos = 10.0f;
 	if (targetPos < -10.0f)
 		targetPos = -10.0f;
-
-	if (!candle->addMd80(id))
-		return;
 
 	/* check if no critical errors are present */
 	if (checkErrors(id))
@@ -621,6 +650,50 @@ void MainWorker::testMove(std::vector<std::string>& args)
 		ui::printPositionAndVelocity(id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity());
 	}
 	std::cout << std::endl;
+
+	candle->end();
+	candle->controlMd80Enable(id, false);
+}
+
+void MainWorker::testMoveAbsolute(std::vector<std::string>& args)
+{
+	if (args.size() < 6)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+	uint16_t id = atoi(args[4].c_str());
+
+	if (!tryAddMD80(id))
+		return;
+
+	float targetPos = std::stof(args[5].c_str());
+
+	/* check if no critical errors are present */
+	if (checkErrors(id))
+	{
+		std::cout << "[MDTOOL] Could not proceed due to errors: " << std::endl;
+		ui::printAllErrors(candle->md80s[0]);
+		return;
+	}
+
+	if (args.size() > 6)
+		candle->writeMd80Register(id, mab::Md80Reg_E::profileVelocity, std::stof(args[6].c_str()));
+	if (args.size() > 7)
+		candle->writeMd80Register(id, mab::Md80Reg_E::profileAcceleration, std::stof(args[7].c_str()));
+	if (args.size() > 8)
+		candle->writeMd80Register(id, mab::Md80Reg_E::profileDeceleration, std::stof(args[8].c_str()));
+
+	candle->controlMd80Mode(id, mab::Md80Mode_E::POSITION_PROFILE);
+	candle->controlMd80Enable(id, true);
+	candle->begin();
+
+	candle->md80s[0].setTargetPosition(targetPos);
+	while (!candle->md80s[0].isTargetPositionReached())
+	{
+		sleep(1);
+	};
+	std::cout << "[MDTOOL] TARGET REACHED!" << std::endl;
 
 	candle->end();
 	candle->controlMd80Enable(id, false);
@@ -683,18 +756,8 @@ void MainWorker::testLatency(std::vector<std::string>& args)
 
 void MainWorker::testEncoderOutput(std::vector<std::string>& args)
 {
-	if (args.size() != 5)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	int id = atoi(args[4].c_str());
-	checkSpeedForId(id);
-
-	if (!candle->addMd80(id))
-		return;
-
+	int32_t id = checkArgsAndGetId(args, 5, 4);
+	if (id == -1) return;
 	/* check if no critical errors are present */
 	if (checkErrors(id))
 	{
@@ -703,22 +766,22 @@ void MainWorker::testEncoderOutput(std::vector<std::string>& args)
 		return;
 	}
 
+	uint16_t outputEncoder = 0;
+	candle->readMd80Register(id, mab::Md80Reg_E::outputEncoder, outputEncoder);
+
+	if (!outputEncoder)
+	{
+		std::cout << "[MDTOOL] No output encoder is configured! " << RED("[FAILED]") << std::endl;
+		return;
+	}
+
 	candle->setupMd80TestOutputEncoder(id);
 }
 
 void MainWorker::testEncoderMain(std::vector<std::string>& args)
 {
-	if (args.size() != 5)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	int id = atoi(args[4].c_str());
-	checkSpeedForId(id);
-
-	if (!candle->addMd80(id))
-		return;
+	int32_t id = checkArgsAndGetId(args, 5, 4);
+	if (id == -1) return;
 
 	/* check if no critical errors are present */
 	if (checkErrors(id))
@@ -731,32 +794,119 @@ void MainWorker::testEncoderMain(std::vector<std::string>& args)
 	candle->setupMd80TestMainEncoder(id);
 }
 
-void MainWorker::blink(std::vector<std::string>& args)
+void MainWorker::setupHoming(std::vector<std::string>& args)
 {
-	if (args.size() != 3)
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1) return;
+	candle->setupMd80PerformHoming(id);
+}
+
+void MainWorker::registerWrite(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 6, 3);
+	if (id == -1) return;
+
+	mab::Md80Reg_E regId = static_cast<mab::Md80Reg_E>(std::strtol(args[4].c_str(), nullptr, 16));
+	uint32_t regValue = atoi(args[5].c_str());
+
+	bool success = false;
+
+	switch (mab::Register::getType(regId))
 	{
-		ui::printTooFewArgsNoHelp();
-		return;
+		case mab::Register::type::U8:
+			success = candle->writeMd80Register(id, regId, static_cast<uint8_t>(regValue));
+			break;
+		case mab::Register::type::I8:
+			success = candle->writeMd80Register(id, regId, static_cast<int8_t>(regValue));
+			break;
+		case mab::Register::type::U16:
+			success = candle->writeMd80Register(id, regId, static_cast<uint16_t>(regValue));
+			break;
+		case mab::Register::type::I16:
+			success = candle->writeMd80Register(id, regId, static_cast<int16_t>(regValue));
+			break;
+		case mab::Register::type::U32:
+			success = candle->writeMd80Register(id, regId, static_cast<uint32_t>(regValue));
+			break;
+		case mab::Register::type::I32:
+			success = candle->writeMd80Register(id, regId, static_cast<int32_t>(regValue));
+			break;
+		case mab::Register::type::F32:
+			success = candle->writeMd80Register(id, regId, static_cast<float>(std::atof(args[5].c_str())));
+			break;
+		case mab::Register::type::STR:
+		{
+			char str[24]{};
+			memcpy(str, args[5].c_str(), sizeof(str));
+			success = candle->writeMd80Register(id, regId, str);
+			break;
+		}
+		case mab::Register::type::UNKNOWN:
+			std::cout << "[MDTOOL] Unknown register! Please check the ID and try again" << std::endl;
+	}
+	if (success)
+		std::cout << "[MDTOOL] Writing register successful!" << std::endl;
+	else
+		std::cout << "[MDTOOL] Writing register failed!" << std::endl;
+}
+
+void MainWorker::registerRead(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 5, 3);
+	if (id == -1) return;
+
+	mab::Md80Reg_E regId = static_cast<mab::Md80Reg_E>(std::strtol(args[4].c_str(), nullptr, 16));
+
+	std::string value = "";
+
+	switch (mab::Register::getType(regId))
+	{
+		case mab::Register::type::U8:
+			readRegisterToString<uint8_t>(id, regId, value);
+			break;
+		case mab::Register::type::I8:
+			readRegisterToString<int8_t>(id, regId, value);
+			break;
+		case mab::Register::type::U16:
+			readRegisterToString<uint16_t>(id, regId, value);
+			break;
+		case mab::Register::type::I16:
+			readRegisterToString<int16_t>(id, regId, value);
+			break;
+		case mab::Register::type::U32:
+			readRegisterToString<uint32_t>(id, regId, value);
+			break;
+		case mab::Register::type::I32:
+			readRegisterToString<int32_t>(id, regId, value);
+			break;
+		case mab::Register::type::F32:
+			readRegisterToString<float>(id, regId, value);
+			break;
+		case mab::Register::type::STR:
+		{
+			char str[24]{};
+			candle->readMd80Register(id, regId, str);
+			value = std::string(str);
+			break;
+		}
+		case mab::Register::type::UNKNOWN:
+			std::cout << "[MDTOOL] Unknown register! Please check the ID and try again" << std::endl;
+			break;
 	}
 
-	int id = atoi(args[2].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
+	std::cout << "[MDTOOL] Register value: " << value << std::endl;
+}
+
+void MainWorker::blink(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 3, 2);
+	if (id == -1) return;
 	candle->configMd80Blink(id);
 }
 void MainWorker::encoder(std::vector<std::string>& args)
 {
-	if (args.size() != 3)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	int id = atoi(args[2].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
+	int32_t id = checkArgsAndGetId(args, 3, 2);
+	if (id == -1) return;
 	candle->controlMd80Mode(id, mab::Md80Mode_E::IDLE);
 	candle->controlMd80Enable(id, true);
 	candle->begin();
@@ -799,6 +949,27 @@ void MainWorker::changeDefaultConfig(std::string bus, std::string device)
 	file.write(ini);
 }
 
+void MainWorker::clearErrors(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1) return;
+	candle->setupMd80ClearErrors(id);
+}
+
+void MainWorker::clearWarnings(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1) return;
+	candle->setupMd80ClearWarnings(id);
+}
+
+void MainWorker::reset(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 3, 2);
+	if (id == -1) return;
+	candle->setupMd80PerformReset(id);
+}
+
 mab::CANdleBaudrate_E MainWorker::checkSpeedForId(uint16_t id)
 {
 	std::initializer_list<mab::CANdleBaudrate_E> bauds = {mab::CANdleBaudrate_E::CAN_BAUD_1M, mab::CANdleBaudrate_E::CAN_BAUD_2M, mab::CANdleBaudrate_E::CAN_BAUD_5M, mab::CANdleBaudrate_E::CAN_BAUD_8M};
@@ -829,12 +1000,12 @@ bool MainWorker::checkErrors(uint16_t canId)
 {
 	candle->setupMd80DiagnosticExtended(canId);
 
-	if (candle->getMd80FromList(canId).getReadReg().RO.mainEncoderErrors ||
-		candle->getMd80FromList(canId).getReadReg().RO.outputEncoderErrors ||
-		candle->getMd80FromList(canId).getReadReg().RO.calibrationErrors ||
-		candle->getMd80FromList(canId).getReadReg().RO.hardwareErrors ||
-		candle->getMd80FromList(canId).getReadReg().RO.bridgeErrors ||
-		candle->getMd80FromList(canId).getReadReg().RO.communicationErrors)
+	if (candle->getMd80FromList(canId).getReadReg().RO.mainEncoderErrors & 0x0000ffff ||
+		candle->getMd80FromList(canId).getReadReg().RO.outputEncoderErrors & 0x0000ffff ||
+		candle->getMd80FromList(canId).getReadReg().RO.calibrationErrors & 0x0000ffff ||
+		candle->getMd80FromList(canId).getReadReg().RO.hardwareErrors & 0x0000ffff ||
+		candle->getMd80FromList(canId).getReadReg().RO.bridgeErrors & 0x0000ffff ||
+		candle->getMd80FromList(canId).getReadReg().RO.communicationErrors & 0x0000ffff)
 		return true;
 
 	return false;
@@ -867,4 +1038,49 @@ bool MainWorker::getField(mINI::INIStructure& cfg, mINI::INIStructure& ini, std:
 		ui::printParameterOutOfBounds(category, field);
 		return false;
 	}
+}
+
+bool MainWorker::checkArgs(std::vector<std::string>& args, uint32_t size)
+{
+	if (args.size() != size)
+	{
+		ui::printTooFewArgsNoHelp();
+		return false;
+	}
+	return true;
+}
+
+bool MainWorker::tryAddMD80(uint16_t id)
+{
+	checkSpeedForId(id);
+
+	if (!candle->addMd80(id))
+		return false;
+	return true;
+}
+
+int MainWorker::checkArgsAndGetId(std::vector<std::string>& args, uint32_t size, uint32_t idPos)
+{
+	if (!checkArgs(args, size))
+		return -1;
+
+	int id = atoi(args[idPos].c_str());
+	if (!tryAddMD80(id))
+		return -1;
+
+	return id;
+}
+
+bool MainWorker::checkSetupError(uint16_t id)
+{
+	uint32_t calibrationStatus;
+	candle->readMd80Register(id, mab::Md80Reg_E::calibrationErrors, calibrationStatus);
+
+	if (calibrationStatus & (1 << ui::calibrationErrorList.at(std::string("ERROR_SETUP"))))
+	{
+		std::cout << "[MDTOOL] Could not proceed due to " << RED("ERROR_SETUP") << ". Please call mdtool setup motor <ID> <cfg> first." << std::endl;
+		return true;
+	}
+
+	return false;
 }

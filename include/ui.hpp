@@ -58,9 +58,10 @@ constexpr float mainEncoderStdDevMax = 0.012f;
 constexpr float mainEncoderMaxError = 0.05f;
 
 const std::vector<std::string> encoderTypes = {"NONE", "AS5047_CENTER", "AS5047_OFFAXIS", "MB053SFA17BENT00"};
-const std::vector<std::string> encoderModes = {"NONE", "STARTUP", "MOTION", "REPORT"};
+const std::vector<std::string> encoderModes = {"NONE", "STARTUP", "MOTION", "REPORT", "MAIN"};
 const std::vector<std::string> encoderCalibrationModes = {"FULL", "DIRONLY"};
 const std::vector<std::string> motorCalibrationModes = {"FULL", "NOPPDET"};
+const std::vector<std::string> homingModes = {"OFF", "SENSORLESS"};
 const std::vector<std::string> errorVectorList = {"ERROR_BRIDGE_OCP",
 												  "ERROR_BRIDGE_FAULT",
 												  "ERROR_OUT_ENCODER_E",
@@ -105,6 +106,19 @@ const std::map<std::string, uint8_t> hardwareErrorList = {{"ERROR_OVER_CURRENT",
 														  {"ERROR_ADC_CURRENT_OFFSETS", 5}};
 
 const std::map<std::string, uint8_t> communicationErrorList = {{"WARNING_CAN_WD", 30}};
+
+const std::map<std::string, uint8_t> homingErrorList = {{"ERROR_HOMING_LIMIT_REACHED", 0},
+														{"ERROR_HOMING_SEQUENCE", 1},
+														{"ERROR_HOMING_REQUIRED", 2},
+														{"ERROR_HOMING_SETUP", 3},
+														{"ERROR_HOMING_ABORTED", 4}};
+
+const std::map<std::string, uint8_t> motionErrorList = {{"ERROR_POSITION_OUTSIDE_LIMITS", 0},
+														{"ERROR_VELOCITY_OUTSIDE_LIMITS", 1},
+														{"WARNING_ACCELERATION_CLIPPED", 24},
+														{"WARNING_TORQUE_CLIPPED", 25},
+														{"WARNING_VELOCITY_CLIPPED", 26},
+														{"WARNING_POSITION_CLIPPED", 27}};
 
 template <class T>
 bool checkParamLimit(T value, T min, T max)

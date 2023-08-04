@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CXX_STANDARD 14)
 
-set(MDTOOL_VERSION 1.3.0)
+set(MDTOOL_VERSION 1.3.1)
+set(MDTOOL_VERSION_TAG 'd')
 
 if(NOT DEFINED ARCH)
     set(ARCH "native")
@@ -34,6 +35,8 @@ set(CANDLE_BUILD_STATIC ON)
 set(CANDLE_OMIT_EXAMPLES ON)
 add_subdirectory(candle)
 
+set(CMAKE_BUILD_TYPE Release)
+
 add_executable(${PROJECT_NAME} ${SRC})
 target_link_libraries(${PROJECT_NAME} candle)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/candle/include ${CMAKE_SOURCE_DIR}/3rd_party/mINI/src)
@@ -41,9 +44,10 @@ set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "mdtool")
 
 string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+)" _ "${MDTOOL_VERSION}")
 target_compile_definitions(${PROJECT_NAME}
-    PRIVATE MDTOOL_VERSION_MAJOR=${CMAKE_MATCH_1}
-    PRIVATE MDTOOL_VERSION_MINOR=${CMAKE_MATCH_2}
-    PRIVATE MDTOOL_VERSION_REVISION=${CMAKE_MATCH_3}
+    PRIVATE MDTOOL_VMAJOR=${CMAKE_MATCH_1}
+    PRIVATE MDTOOL_VMINOR=${CMAKE_MATCH_2}
+    PRIVATE MDTOOL_VREVISION=${CMAKE_MATCH_3}
+    PRIVATE MDTOOL_VTAG=${MDTOOL_VERSION_TAG}
 )
 
 if(MAKE_TESTS)
