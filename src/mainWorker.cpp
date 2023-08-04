@@ -323,7 +323,7 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 
 std::string MainWorker::getVersion()
 {
-	return mab::getVersionString({'d', MDTOOL_VERSION_REVISION, MDTOOL_VERSION_MINOR, MDTOOL_VERSION_MAJOR});
+	return mab::getVersionString({MDTOOL_VTAG, MDTOOL_VREVISION, MDTOOL_VMINOR, MDTOOL_VMAJOR});
 }
 
 void MainWorker::ping(std::vector<std::string>& args)
