@@ -46,8 +46,8 @@ void ConfigManager::update()
 	// Compare the files
 	for (auto& filename : defaultFilenames)
 	{
-		std::string originalFile = originalConfigPath + filename;
-		std::string userFile = userConfigPath + filename;
+		std::string originalFile = originalConfigPath + "/" + filename;
+		std::string userFile = userConfigPath + "/" + filename;
 
 		if (compareFiles(originalFile, userFile))
 		{
@@ -111,4 +111,21 @@ bool ConfigManager::performUpdate()
 {
     this->update();
     return true;
+}
+
+bool ConfigManager::isConfigDefault(std::string configName)
+{
+    return defaultFilenames.find(configName) != defaultFilenames.end();
+}
+
+bool ConfigManager::isConifgDiffrent(std::string configName)
+{
+    if (!isConfigDefault(configName))
+    {
+        return false;
+    }
+    else 
+    {
+        return differentFilePaths.find(configName) != differentFilePaths.end();
+    }
 }

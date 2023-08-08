@@ -50,6 +50,8 @@ void printErrorDetails(uint32_t error, const std::map<std::string, uint8_t>& err
 void printParameterOutOfBounds(std::string category, std::string field);
 void printFailedToSetupMotor(mab::Md80Reg_E regId);
 
+bool getDiffrentConfigsConfirmation(std::string configName);
+
 /* these are only used to light up the values in */
 constexpr float outputEncoderStdDevMax = 0.05f;
 constexpr float outputEncoderMaxError = 0.18f;

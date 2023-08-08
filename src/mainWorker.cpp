@@ -138,25 +138,6 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 	mdtoolBaseDir = std::string(getenv("HOME")) + "/" + mdtoolHomeConfigDirName + "/" + mdtoolDirName;
 	mdtoolIniFilePath = mdtoolBaseDir + "/" + mdtoolIniFileName;
 
-	ConfigManager configManager(mdtoolConfigPath + "/" + mdtoolDirName + "/" + mdtoolMotorCfgDirName ,mdtoolBaseDir + "/" + mdtoolMotorCfgDirName);
-
-	std::cout << "Original path: " << mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName << std::endl;
-	std::cout << "User path: " << mdtoolBaseDir + "/" + mdtoolMotorCfgDirName << std::endl;
-
-	auto identicalFiles = configManager.getIdenticalFilePaths();
-	std::cout << "IDENTICAL FILES: " << std::endl << "================" << std::endl;
-	for (auto& file : identicalFiles)
-	{
-		std::cout << file << std::endl;
-	}
-	auto differentFiles = configManager.getDifferentFilePaths();
-	std::cout << std::endl << std::endl;
-	std::cout << "DIFFERENT FILES: " << std::endl << "================" << std::endl;
-	for (auto& file : differentFiles)
-	{
-		std::cout << file << std::endl;
-	}
-
 
 	/* copy motors configs directory - not the best practice to use system() but std::filesystem is not available until C++17 */
 	struct stat info;
@@ -177,8 +158,8 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 			ini["general"]["version"] = getVersion();
 			file.write(ini);
 		}
-
-		result = system(("cp -a " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName + "/." + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/").c_str());
+		//deprecated becouse it always ovewrtitten the config files
+		//result = system(("cp -a " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName + "/." + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/").c_str());
 	}
 
 	/* defaults */
@@ -466,6 +447,19 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (id == -1) return;
 
 	std::string path = (mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" + args[4].c_str());
+
+	std::string filename = args[4].c_str();
+
+	ConfigManager configManager(mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName, mdtoolBaseDir + "/" + mdtoolMotorCfgDirName);
+
+	if(configManager.isConfigDefault(filename) && configManager.isConifgDiffrent(filename))
+	{
+		if (ui::getDiffrentConfigsConfirmation(filename))
+		{
+			system(("cp " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName + "/" + filename + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" + filename).c_str());
+		}
+			
+	}
 
 	mINI::INIFile motorCfg(path);
 	mINI::INIStructure cfg;

@@ -79,10 +79,25 @@ TEST_F(ConfigManagerTest, CompareOnlyOriginalFilesInDirectory)
     configManager.performUpdate();
     ASSERT_EQ(configManager.getIdenticalFilePaths().size(), 1);
     ASSERT_EQ(configManager.getDifferentFilePaths().size(), 1);
-    ASSERT_EQ(configManager.getDifferentFilePaths().find(tempUserDirectory + tempfile1Path) != configManager.getDifferentFilePaths().end(), true);
+    ASSERT_EQ(configManager.getDifferentFilePaths().find(tempfile1Path) != configManager.getDifferentFilePaths().end(), true);
     
     //revert file to original
     file1.open(tempUserDirectory + tempfile1Path);
     file1 << "This is a test file";
     file1.close();
+}
+
+TEST_F(ConfigManagerTest, IsConfigValidAndDiffrent)
+{
+    //change file
+    std::ofstream file1(tempUserDirectory + tempfile1Path);
+    file1 << "This is again a test file but diffrent";
+    file1.close();
+
+    ConfigManager configManager(tempOriginalDirectory, tempUserDirectory);
+    ASSERT_EQ(configManager.isConfigDefault(tempfile1Path), true);
+    ASSERT_EQ(configManager.isConfigDefault("aweasdassddddddddddddddd"), false);
+    ASSERT_EQ(configManager.isConifgDiffrent(tempfile1Path), true);
+    ASSERT_EQ(configManager.isConifgDiffrent(tempfile2Path), false);
+
 }

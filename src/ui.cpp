@@ -421,4 +421,20 @@ void printFailedToSetupMotor(mab::Md80Reg_E regId)
 	vout << "Failed to setup motor! Error while writing: 0x" << std::hex << static_cast<uint16_t>(regId) << " register" << std::endl;
 }
 
+bool getDiffrentConfigsConfirmation(std::string configName)
+{
+	vout << "You config " << configName << " is diffrent than default one." << std::endl;
+	vout << "Do you revert it to default? [Y/n]" << std::endl;
+	char x;
+	std::cin >> x;
+	if (x != 'Y')
+	{
+		vout << "Using user-changed config." << std::endl;
+		return false;
+	}
+	vout << "Reverting to default config." << std::endl;
+	return true;
+
+}
+
 }  // namespace ui
