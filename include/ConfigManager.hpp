@@ -9,14 +9,17 @@ class ConfigManager
 	ConfigManager(std::string originalConfigPath, std::string userConfigPath);
 	~ConfigManager();
 
+	bool performUpdate();
 	std::set<std::string> getDifferentFilePaths();
 	std::set<std::string> getIdenticalFilePaths();
-	bool static compareFiles(std::string originalFile, std::string userFile);
+	bool static compareFiles(std::string originalFilePath, std::string userFilePath);
+	bool static doesFileExists(std::string filePath);
 
    private:
-	std::set<std::string> differentFilePaths;
-	std::set<std::string> identicalFilePaths;
-	std::set<std::string> defaultFilenames;
+	std::set<std::string> differentFilePaths, identicalFilePaths, defaultFilenames;
 
-	void update(std::string originalConfigPath, std::string userConfigPath);
+	std::string originalConfigPath, userConfigPath;
+
+	void update();
+
 };
