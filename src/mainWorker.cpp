@@ -138,7 +138,6 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 	mdtoolBaseDir = std::string(getenv("HOME")) + "/" + mdtoolHomeConfigDirName + "/" + mdtoolDirName;
 	mdtoolIniFilePath = mdtoolBaseDir + "/" + mdtoolIniFileName;
 
-
 	/* copy motors configs directory - not the best practice to use system() but std::filesystem is not available until C++17 */
 	struct stat info;
 	int result = 0;
