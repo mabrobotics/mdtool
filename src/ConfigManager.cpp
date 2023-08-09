@@ -12,10 +12,6 @@ ConfigManager::ConfigManager(std::string originalConfigPath, std::string userCon
 	update();
 }
 
-ConfigManager::~ConfigManager()
-{
-}
-
 void ConfigManager::update()
 {
 	// Clear the sets
