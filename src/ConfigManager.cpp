@@ -87,9 +87,7 @@ bool ConfigManager::compareFiles(std::string originalFilePath, std::string userF
 	std::string originalFile((std::istreambuf_iterator<char>(originalFileStream)), std::istreambuf_iterator<char>());
 	std::string userFile((std::istreambuf_iterator<char>(userFileStream)), std::istreambuf_iterator<char>());
 
-	std::hash<std::string> hasher;
-
-	return hasher(originalFile) == hasher(userFile);
+	return originalFile == userFile;
 }
 
 bool ConfigManager::doesFileExists(std::string filePath)
