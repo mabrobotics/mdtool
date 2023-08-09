@@ -157,8 +157,6 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 			ini["general"]["version"] = getVersion();
 			file.write(ini);
 		}
-		//deprecated becouse it always ovewrtitten the config files
-		//result = system(("cp -a " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName + "/." + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/").c_str());
 	}
 
 	/* defaults */
