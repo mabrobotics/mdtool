@@ -3,14 +3,13 @@
 #include <set>
 #include <string>
 
-
 /// @brief Class that manages the original and user motor config files directories
 class ConfigManager
 {
    public:
-   /// @brief Construct a new Config Manager object which right away scans and creates list of compared files in two directiories
-   /// @param originalConfigPath Path to the original (containing defaults) config directory
-   /// @param userConfigPath Path to the user config directory
+	/// @brief Construct a new Config Manager object which right away scans and creates list of compared files in two directiories
+	/// @param originalConfigPath Path to the original (containing defaults) config directory
+	/// @param userConfigPath Path to the user config directory
 	ConfigManager(std::string originalConfigPath, std::string userConfigPath);
 	~ConfigManager() = default;
 
@@ -44,5 +43,4 @@ class ConfigManager
 	std::string originalConfigPath, userConfigPath;
 
 	void update();
-
 };

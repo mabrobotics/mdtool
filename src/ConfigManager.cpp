@@ -5,9 +5,8 @@
 #include "dirent.h"
 #include "mini/ini.h"
 
-ConfigManager::ConfigManager(std::string originalConfigPath, std::string userConfigPath) :
-    originalConfigPath(originalConfigPath),
-    userConfigPath(userConfigPath)
+ConfigManager::ConfigManager(std::string originalConfigPath, std::string userConfigPath) : originalConfigPath(originalConfigPath),
+																						   userConfigPath(userConfigPath)
 {
 	update();
 }
@@ -103,23 +102,23 @@ std::set<std::string> ConfigManager::getIdenticalFilePaths()
 
 bool ConfigManager::performUpdate()
 {
-    this->update();
-    return true;
+	this->update();
+	return true;
 }
 
 bool ConfigManager::isConfigDefault(std::string configName)
 {
-    return defaultFilenames.find(configName) != defaultFilenames.end();
+	return defaultFilenames.find(configName) != defaultFilenames.end();
 }
 
 bool ConfigManager::isConifgDiffrent(std::string configName)
 {
-    if (!isConfigDefault(configName))
-    {
-        return false;
-    }
-    else 
-    {
-        return differentFilePaths.find(configName) != differentFilePaths.end();
-    }
+	if (!isConfigDefault(configName))
+	{
+		return false;
+	}
+	else
+	{
+		return differentFilePaths.find(configName) != differentFilePaths.end();
+	}
 }
