@@ -38,7 +38,6 @@ void ConfigManager::update()
 		exit(18886);
 	}
 
-	// Compare the files
 	for (auto& filename : defaultFilenames)
 	{
 		std::string originalFile = originalConfigPath + "/" + filename;

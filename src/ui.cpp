@@ -423,16 +423,16 @@ void printFailedToSetupMotor(mab::Md80Reg_E regId)
 
 bool getDiffrentConfigsConfirmation(std::string configName)
 {
-	vout << "You config " << configName << " is diffrent than default one." << std::endl;
-	vout << "Do you revert it to default? [Y/n]" << std::endl;
+	vout << "[MDTOOL] The default " << configName << " config was modified." << std::endl;
+	vout << "[MDTOOL] Would you like to revert it to default before downloading? [Y/n]" << std::endl;
 	char x;
 	std::cin >> x;
 	if (x != 'Y')
 	{
-		vout << "Using user-changed config." << std::endl;
+		vout << "[MDTOOL] Using modified config." << std::endl;
 		return false;
 	}
-	vout << "Reverting to default config." << std::endl;
+	vout << "[MDTOOL] Using default config." << std::endl;
 	return true;
 
 }
