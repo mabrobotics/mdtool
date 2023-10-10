@@ -6,6 +6,7 @@
 #include <numeric>
 
 #include "ui.hpp"
+#include "ConfigManager.hpp"
 
 enum class toolsCmd_E
 {
@@ -156,8 +157,6 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 			ini["general"]["version"] = getVersion();
 			file.write(ini);
 		}
-
-		result = system(("cp -a " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName + "/." + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/").c_str());
 	}
 
 	/* defaults */
@@ -445,6 +444,19 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (id == -1) return;
 
 	std::string path = (mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" + args[4].c_str());
+
+	std::string filename = args[4].c_str();
+
+	ConfigManager configManager(mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName, mdtoolBaseDir + "/" + mdtoolMotorCfgDirName);
+
+	if(configManager.isConfigDefault(filename) && configManager.isConifgDiffrent(filename))
+	{
+		if (ui::getDiffrentConfigsConfirmation(filename))
+		{
+			system(("cp " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName + "/" + filename + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" + filename).c_str());
+		}
+			
+	}
 
 	mINI::INIFile motorCfg(path);
 	mINI::INIStructure cfg;

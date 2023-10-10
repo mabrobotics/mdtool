@@ -50,7 +50,7 @@ target_compile_definitions(${PROJECT_NAME}
     PRIVATE MDTOOL_VTAG=${MDTOOL_VERSION_TAG}
 )
 
-if(MAKE_TESTS)
+if(MAKE_TESTS_MDTOOL)
     add_subdirectory(test)
 endif()
 
