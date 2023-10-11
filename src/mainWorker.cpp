@@ -5,8 +5,8 @@
 #include <filesystem>
 #include <numeric>
 
-#include "ui.hpp"
 #include "ConfigManager.hpp"
+#include "ui.hpp"
 
 enum class toolsCmd_E
 {
@@ -449,13 +449,12 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 
 	ConfigManager configManager(mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName, mdtoolBaseDir + "/" + mdtoolMotorCfgDirName);
 
-	if(configManager.isConfigDefault(filename) && configManager.isConifgDiffrent(filename))
+	if (configManager.isConfigDefault(filename) && configManager.isConifgDiffrent(filename))
 	{
 		if (ui::getDiffrentConfigsConfirmation(filename))
 		{
 			system(("cp " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName + "/" + filename + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" + filename).c_str());
 		}
-			
 	}
 
 	mINI::INIFile motorCfg(path);
@@ -708,7 +707,6 @@ void MainWorker::testMoveAbsolute(std::vector<std::string>& args)
 	std::cout << "[MDTOOL] TARGET REACHED!" << std::endl;
 
 	candle->end();
-	candle->controlMd80Enable(id, false);
 }
 
 void MainWorker::testLatency(std::vector<std::string>& args)
@@ -1054,7 +1052,7 @@ bool MainWorker::getField(mINI::INIStructure& cfg, mINI::INIStructure& ini, std:
 
 bool MainWorker::checkArgs(std::vector<std::string>& args, uint32_t size)
 {
-	if (args.size() != size)
+	if (args.size() < size)
 	{
 		ui::printTooFewArgsNoHelp();
 		return false;
