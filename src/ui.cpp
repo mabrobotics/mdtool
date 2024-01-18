@@ -268,7 +268,7 @@ void printDriveInfoExtended(mab::Md80& drive, bool printAll)
 	vout << "- actuator name: " << drive.getReadReg().RW.motorName << std::endl;
 	vout << "- CAN speed: " << drive.getReadReg().RW.canBaudrate / 1000000 << " M" << std::endl;
 	vout << "- CAN termination resistor: " << ((drive.getReadReg().RW.canTermination == true) ? "enabled" : "disabled") << std::endl;
-	vout << "- gear ratio: " << std::setprecision(3) << drive.getReadReg().RW.gearRatio << std::endl;
+	vout << "- gear ratio: " << std::setprecision(5) << drive.getReadReg().RW.gearRatio << std::endl;
 	mab::version_ut firmwareVersion = {{0, 0, 0, 0}};
 	firmwareVersion.i = drive.getReadReg().RO.firmwareVersion;
 	vout << "- firmware version: v" << mab::getVersionString(firmwareVersion) << std::endl;

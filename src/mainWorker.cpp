@@ -663,7 +663,6 @@ void MainWorker::testMove(std::vector<std::string>& args)
 	std::cout << std::endl;
 
 	candle->end();
-	candle->controlMd80Enable(id, false);
 }
 
 void MainWorker::testMoveAbsolute(std::vector<std::string>& args)
