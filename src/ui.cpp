@@ -287,6 +287,7 @@ void printDriveInfoExtended(mab::Md80& drive, bool printAll)
 	vout << "- d-axis inductance: " << std::setprecision(6) << drive.getReadReg().RO.inductance << " H" << std::endl;
 	vout << "- torque bandwidth: " << drive.getReadReg().RW.torqueBandwidth << " Hz" << std::endl;
 	vout << "- CAN watchdog: " << drive.getReadReg().RW.canWatchdog << " ms" << std::endl;
+	vout << "- brake mode: " << getListElement(brakeModes, drive.getReadReg().RW.brakeMode) << std::endl;
 
 	if (printAll)
 	{

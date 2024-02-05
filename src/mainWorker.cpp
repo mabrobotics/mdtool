@@ -520,6 +520,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	regW.RW.outputEncoderMode = getNumericParamFromList(cfg["output encoder"]["output encoder mode"], ui::encoderModes);
 	regW.RW.outputEncoderCalibrationMode = getNumericParamFromList(cfg["output encoder"]["output encoder calibration mode"], ui::encoderCalibrationModes);
 	regW.RW.homingMode = getNumericParamFromList(cfg["homing"]["mode"], ui::homingModes);
+	regW.RW.brakeMode = getNumericParamFromList(cfg["brake"]["mode"], ui::brakeModes);
 
 	auto floatFromField = [&](const char* category, const char* field) -> float
 	{
@@ -596,6 +597,10 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 								   mab::Md80Reg_E::quickStopDeceleration, floatFromField("profile", "quick stop deceleration"),
 								   mab::Md80Reg_E::profileVelocity, floatFromField("profile", "velocity")))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::positionLimitMin);
+
+	if (!candle->writeMd80Register(id,
+								   mab::Md80Reg_E::brakeMode, regW.RW.brakeMode))
+		ui::printFailedToSetupMotor(mab::Md80Reg_E::brakeMode);
 
 	candle->configMd80Save(id);
 
