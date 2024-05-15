@@ -51,7 +51,7 @@ namespace ui
 	void printParameterOutOfBounds(std::string category, std::string field);
 	void printFailedToSetupMotor(mab::Md80Reg_E regId);
 
-	bool getDiffrentConfigsConfirmation(std::string configName);
+	bool getDifferentConfigsConfirmation(std::string configName);
 
 	/* these are only used to light up the values in */
 	constexpr float outputEncoderStdDevMax = 0.05f;

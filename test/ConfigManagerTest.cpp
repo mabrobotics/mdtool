@@ -72,7 +72,7 @@ TEST_F(ConfigManagerTest, CompareOnlyOriginalFilesInDirectory)
 
 	// change file to check if it is detected
 	std::ofstream file1(tempUserDirectory + tempfile1Path);
-	file1 << "This is again a test file but diffrent";
+	file1 << "This is again a test file but different";
 	file1.close();
 
 	configManager.performUpdate();
@@ -88,16 +88,16 @@ TEST_F(ConfigManagerTest, CompareOnlyOriginalFilesInDirectory)
 	file1.close();
 }
 
-TEST_F(ConfigManagerTest, IsConfigValidAndDiffrent)
+TEST_F(ConfigManagerTest, IsConfigValidAndDifferent)
 {
 	// change file
 	std::ofstream file1(tempUserDirectory + tempfile1Path);
-	file1 << "This is again a test file but diffrent";
+	file1 << "This is again a test file but different";
 	file1.close();
 
 	ConfigManager configManager(tempOriginalDirectory, tempUserDirectory);
 	ASSERT_EQ(configManager.isConfigDefault(tempfile1Path), true);
 	ASSERT_EQ(configManager.isConfigDefault("aweasdassddddddddddddddd"), false);
-	ASSERT_EQ(configManager.isConifgDiffrent(tempfile1Path), true);
-	ASSERT_EQ(configManager.isConifgDiffrent(tempfile2Path), false);
+	ASSERT_EQ(configManager.isConifgNameDifferent(tempfile1Path), true);
+	ASSERT_EQ(configManager.isConifgNameDifferent(tempfile2Path), false);
 }

@@ -545,7 +545,7 @@ namespace ui
 			 << static_cast<uint16_t>(regId) << " register" << std::endl;
 	}
 
-	bool getDiffrentConfigsConfirmation(std::string configName)
+	bool getDifferentConfigsConfirmation(std::string configName)
 	{
 		vout << "[MDTOOL] The default " << configName << " config was modified." << std::endl;
 		vout << "[MDTOOL] Would you like to revert it to default before downloading? [Y/n]"
