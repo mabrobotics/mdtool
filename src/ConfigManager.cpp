@@ -78,10 +78,10 @@ bool ConfigManager::compareFiles(std::string originalFilePath, std::string userF
 		return false;
 	}
 
-	std::string originalFile(
-		(std::istreambuf_iterator<char>(originalFileStream)), std::istreambuf_iterator<char>());
-	std::string userFile(
-		(std::istreambuf_iterator<char>(userFileStream)), std::istreambuf_iterator<char>());
+	std::string originalFile((std::istreambuf_iterator<char>(originalFileStream)),
+							 std::istreambuf_iterator<char>());
+	std::string userFile((std::istreambuf_iterator<char>(userFileStream)),
+						 std::istreambuf_iterator<char>());
 
 	return originalFile == userFile;
 }

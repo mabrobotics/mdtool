@@ -462,7 +462,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	std::string filename = args[4].c_str();
 
 	ConfigManager configManager(mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName,
-		mdtoolBaseDir + "/" + mdtoolMotorCfgDirName);
+								mdtoolBaseDir + "/" + mdtoolMotorCfgDirName);
 
 	if (configManager.isConfigDefault(filename) && configManager.isConifgDiffrent(filename))
 	{
@@ -491,8 +491,8 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	mab::regRead_st& regR = candle->getMd80FromList(id).getReadReg();
 
 	/* add a field here only if you want to test it against limits form the mdtool.ini file */
-	memcpy(
-		regW.RW.motorName, (cfg["motor"]["name"]).c_str(), strlen((cfg["motor"]["name"]).c_str()));
+	memcpy(regW.RW.motorName, (cfg["motor"]["name"]).c_str(),
+		   strlen((cfg["motor"]["name"]).c_str()));
 	if (!getField(cfg, ini, "motor", "pole pairs", regW.RW.polePairs))
 		return;
 	if (!getField(cfg, ini, "motor", "torque constant", regW.RW.motorKt))
@@ -542,11 +542,11 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	};
 
 	if (!checkFieldWriteIfPopulated("hardware", "shunt resistance", regR.RO.shuntResistance,
-			mab::Md80Reg_E::shuntResistance))
+									mab::Md80Reg_E::shuntResistance))
 		return;
 
 	if (!checkFieldWriteIfPopulated("motor", "reverse direction", regR.RW.reverseDirection,
-			mab::Md80Reg_E::reverseDirection))
+									mab::Md80Reg_E::reverseDirection))
 		return;
 
 	regW.RW.motorCalibrationMode =
@@ -567,66 +567,71 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	{ return atof(cfg[category][field].c_str()); };
 
 	/* motor base config */
-	if (!candle->writeMd80Register(id, mab::Md80Reg_E::motorName, regW.RW.motorName,
-			mab::Md80Reg_E::motorPolePairs, regW.RW.polePairs, mab::Md80Reg_E::motorKt,
-			regW.RW.motorKt, mab::Md80Reg_E::motorKV, regW.RW.motorKV,
-			mab::Md80Reg_E::motorGearRatio, regW.RW.gearRatio, mab::Md80Reg_E::motorIMax,
-			regW.RW.iMax, mab::Md80Reg_E::motorTorgueBandwidth, regW.RW.torqueBandwidth))
+	if (!candle->writeMd80Register(
+			id, mab::Md80Reg_E::motorName, regW.RW.motorName, mab::Md80Reg_E::motorPolePairs,
+			regW.RW.polePairs, mab::Md80Reg_E::motorKt, regW.RW.motorKt, mab::Md80Reg_E::motorKV,
+			regW.RW.motorKV, mab::Md80Reg_E::motorGearRatio, regW.RW.gearRatio,
+			mab::Md80Reg_E::motorIMax, regW.RW.iMax, mab::Md80Reg_E::motorTorgueBandwidth,
+			regW.RW.torqueBandwidth))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorTorgueBandwidth);
 
 	/* motor advanced config */
-	if (!candle->writeMd80Register(id, mab::Md80Reg_E::motorFriction, regW.RW.friction,
-			mab::Md80Reg_E::motorStiction, regW.RW.stiction, mab::Md80Reg_E::motorKt_a,
-			regW.RW.motorKt_a, mab::Md80Reg_E::motorKt_b, regW.RW.motorKt_b,
-			mab::Md80Reg_E::motorKt_c, regW.RW.motorKt_c, mab::Md80Reg_E::outputEncoder,
-			regW.RW.outputEncoder, mab::Md80Reg_E::outputEncoderMode, regW.RW.outputEncoderMode,
+	if (!candle->writeMd80Register(
+			id, mab::Md80Reg_E::motorFriction, regW.RW.friction, mab::Md80Reg_E::motorStiction,
+			regW.RW.stiction, mab::Md80Reg_E::motorKt_a, regW.RW.motorKt_a,
+			mab::Md80Reg_E::motorKt_b, regW.RW.motorKt_b, mab::Md80Reg_E::motorKt_c,
+			regW.RW.motorKt_c, mab::Md80Reg_E::outputEncoder, regW.RW.outputEncoder,
+			mab::Md80Reg_E::outputEncoderMode, regW.RW.outputEncoderMode,
 			mab::Md80Reg_E::outputEncoderDefaultBaud, regW.RW.outputEncoderDefaultBaud))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::outputEncoderDefaultBaud);
 
 	/* motor motion config - Position and velocity PID*/
-	if (!candle->writeMd80Register(id, mab::Md80Reg_E::motorPosPidKp,
-			floatFromField("position PID", "kp"), mab::Md80Reg_E::motorPosPidKi,
-			floatFromField("position PID", "ki"), mab::Md80Reg_E::motorPosPidKd,
-			floatFromField("position PID", "kd"), mab::Md80Reg_E::motorPosPidWindup,
-			floatFromField("position PID", "windup"), mab::Md80Reg_E::motorVelPidKp,
-			floatFromField("velocity PID", "kp"), mab::Md80Reg_E::motorVelPidKi,
-			floatFromField("velocity PID", "ki"), mab::Md80Reg_E::motorVelPidKd,
-			floatFromField("velocity PID", "kd"), mab::Md80Reg_E::motorVelPidWindup,
-			floatFromField("velocity PID", "windup")))
+	if (!candle->writeMd80Register(
+			id, mab::Md80Reg_E::motorPosPidKp, floatFromField("position PID", "kp"),
+			mab::Md80Reg_E::motorPosPidKi, floatFromField("position PID", "ki"),
+			mab::Md80Reg_E::motorPosPidKd, floatFromField("position PID", "kd"),
+			mab::Md80Reg_E::motorPosPidWindup, floatFromField("position PID", "windup"),
+			mab::Md80Reg_E::motorVelPidKp, floatFromField("velocity PID", "kp"),
+			mab::Md80Reg_E::motorVelPidKi, floatFromField("velocity PID", "ki"),
+			mab::Md80Reg_E::motorVelPidKd, floatFromField("velocity PID", "kd"),
+			mab::Md80Reg_E::motorVelPidWindup, floatFromField("velocity PID", "windup")))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorVelPidWindup);
 
 	/* motor motion config - Impedance PD*/
-	if (!candle->writeMd80Register(id, mab::Md80Reg_E::motorImpPidKp,
-			floatFromField("impedance PD", "kp"), mab::Md80Reg_E::motorImpPidKd,
-			floatFromField("impedance PD", "kd"), mab::Md80Reg_E::motorShutdownTemp,
-			regW.RW.motorShutdownTemp))
+	if (!candle->writeMd80Register(
+			id, mab::Md80Reg_E::motorImpPidKp, floatFromField("impedance PD", "kp"),
+			mab::Md80Reg_E::motorImpPidKd, floatFromField("impedance PD", "kd"),
+			mab::Md80Reg_E::motorShutdownTemp, regW.RW.motorShutdownTemp))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorShutdownTemp);
 
-	if (!candle->writeMd80Register(
-			id, mab::Md80Reg_E::outputEncoderCalibrationMode, regW.RW.outputEncoderCalibrationMode))
+	if (!candle->writeMd80Register(id, mab::Md80Reg_E::outputEncoderCalibrationMode,
+								   regW.RW.outputEncoderCalibrationMode))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::outputEncoderCalibrationMode);
 
-	if (!candle->writeMd80Register(
-			id, mab::Md80Reg_E::motorCalibrationMode, regW.RW.motorCalibrationMode))
+	if (!candle->writeMd80Register(id, mab::Md80Reg_E::motorCalibrationMode,
+								   regW.RW.motorCalibrationMode))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorCalibrationMode);
 
-	if (!candle->writeMd80Register(id, mab::Md80Reg_E::homingMode, regW.RW.homingMode,
-			mab::Md80Reg_E::homingMaxTravel, floatFromField("homing", "max travel"),
-			mab::Md80Reg_E::homingTorque, floatFromField("homing", "max torque"),
-			mab::Md80Reg_E::homingVelocity, floatFromField("homing", "max velocity")))
+	if (!candle->writeMd80Register(
+			id, mab::Md80Reg_E::homingMode, regW.RW.homingMode, mab::Md80Reg_E::homingMaxTravel,
+			floatFromField("homing", "max travel"), mab::Md80Reg_E::homingTorque,
+			floatFromField("homing", "max torque"), mab::Md80Reg_E::homingVelocity,
+			floatFromField("homing", "max velocity")))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::homingMode);
 
-	if (!candle->writeMd80Register(id, mab::Md80Reg_E::maxTorque,
-			floatFromField("limits", "max torque"), mab::Md80Reg_E::maxAcceleration,
-			regW.RW.maxAcceleration, mab::Md80Reg_E::maxDeceleration, regW.RW.maxDeceleration,
-			mab::Md80Reg_E::maxVelocity, regW.RW.maxVelocity, mab::Md80Reg_E::positionLimitMin,
+	if (!candle->writeMd80Register(
+			id, mab::Md80Reg_E::maxTorque, floatFromField("limits", "max torque"),
+			mab::Md80Reg_E::maxAcceleration, regW.RW.maxAcceleration,
+			mab::Md80Reg_E::maxDeceleration, regW.RW.maxDeceleration, mab::Md80Reg_E::maxVelocity,
+			regW.RW.maxVelocity, mab::Md80Reg_E::positionLimitMin,
 			floatFromField("limits", "min position"), mab::Md80Reg_E::positionLimitMax,
 			floatFromField("limits", "max position")))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::positionLimitMin);
 
-	if (!candle->writeMd80Register(id, mab::Md80Reg_E::profileAcceleration,
-			floatFromField("profile", "acceleration"), mab::Md80Reg_E::profileDeceleration,
-			floatFromField("profile", "deceleration"), mab::Md80Reg_E::quickStopDeceleration,
+	if (!candle->writeMd80Register(
+			id, mab::Md80Reg_E::profileAcceleration, floatFromField("profile", "acceleration"),
+			mab::Md80Reg_E::profileDeceleration, floatFromField("profile", "deceleration"),
+			mab::Md80Reg_E::quickStopDeceleration,
 			floatFromField("profile", "quick stop deceleration"), mab::Md80Reg_E::profileVelocity,
 			floatFromField("profile", "velocity")))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::positionLimitMin);
@@ -696,8 +701,8 @@ void MainWorker::testMove(std::vector<std::string>& args)
 		pos += dp;
 		candle->md80s[0].setTargetPosition(pos);
 		usleep(10000);
-		ui::printPositionAndVelocity(
-			id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity());
+		ui::printPositionAndVelocity(id, candle->md80s[0].getPosition(),
+									 candle->md80s[0].getVelocity());
 	}
 	std::cout << std::endl;
 
@@ -729,11 +734,11 @@ void MainWorker::testMoveAbsolute(std::vector<std::string>& args)
 	if (args.size() > 6)
 		candle->writeMd80Register(id, mab::Md80Reg_E::profileVelocity, std::stof(args[6].c_str()));
 	if (args.size() > 7)
-		candle->writeMd80Register(
-			id, mab::Md80Reg_E::profileAcceleration, std::stof(args[7].c_str()));
+		candle->writeMd80Register(id, mab::Md80Reg_E::profileAcceleration,
+								  std::stof(args[7].c_str()));
 	if (args.size() > 8)
-		candle->writeMd80Register(
-			id, mab::Md80Reg_E::profileDeceleration, std::stof(args[8].c_str()));
+		candle->writeMd80Register(id, mab::Md80Reg_E::profileDeceleration,
+								  std::stof(args[8].c_str()));
 
 	candle->controlMd80Mode(id, mab::Md80Mode_E::POSITION_PROFILE);
 	candle->controlMd80Enable(id, true);
@@ -794,8 +799,8 @@ void MainWorker::testLatency(std::vector<std::string>& args)
 	float m = sum / samples.size();
 
 	float accum = 0.0;
-	std::for_each(
-		std::begin(samples), std::end(samples), [&](const float d) { accum += (d - m) * (d - m); });
+	std::for_each(std::begin(samples), std::end(samples),
+				  [&](const float d) { accum += (d - m) * (d - m); });
 
 	float stdev = sqrt(accum / (samples.size() - 1));
 
@@ -886,8 +891,8 @@ void MainWorker::registerWrite(std::vector<std::string>& args)
 			success = candle->writeMd80Register(id, regId, static_cast<int32_t>(regValue));
 			break;
 		case mab::Register::type::F32:
-			success = candle->writeMd80Register(
-				id, regId, static_cast<float>(std::atof(args[5].c_str())));
+			success = candle->writeMd80Register(id, regId,
+												static_cast<float>(std::atof(args[5].c_str())));
 			break;
 		case mab::Register::type::STR:
 		{
@@ -973,8 +978,8 @@ void MainWorker::encoder(std::vector<std::string>& args)
 
 	while (1)
 	{
-		ui::printPositionAndVelocity(
-			id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity());
+		ui::printPositionAndVelocity(id, candle->md80s[0].getPosition(),
+									 candle->md80s[0].getVelocity());
 		usleep(100000);
 	}
 	candle->end();
@@ -1036,9 +1041,9 @@ void MainWorker::reset(std::vector<std::string>& args)
 
 mab::CANdleBaudrate_E MainWorker::checkSpeedForId(uint16_t id)
 {
-	std::initializer_list<mab::CANdleBaudrate_E> bauds = {mab::CANdleBaudrate_E::CAN_BAUD_1M,
-		mab::CANdleBaudrate_E::CAN_BAUD_2M, mab::CANdleBaudrate_E::CAN_BAUD_5M,
-		mab::CANdleBaudrate_E::CAN_BAUD_8M};
+	std::initializer_list<mab::CANdleBaudrate_E> bauds = {
+		mab::CANdleBaudrate_E::CAN_BAUD_1M, mab::CANdleBaudrate_E::CAN_BAUD_2M,
+		mab::CANdleBaudrate_E::CAN_BAUD_5M, mab::CANdleBaudrate_E::CAN_BAUD_8M};
 
 	for (auto& baud : bauds)
 	{
@@ -1050,8 +1055,8 @@ mab::CANdleBaudrate_E MainWorker::checkSpeedForId(uint16_t id)
 	return mab::CANdleBaudrate_E::CAN_BAUD_1M;
 }
 
-uint8_t MainWorker::getNumericParamFromList(
-	std::string& param, const std::vector<std::string>& list)
+uint8_t MainWorker::getNumericParamFromList(std::string& param,
+											const std::vector<std::string>& list)
 {
 	int i = 0;
 	for (auto& type : list)
@@ -1081,7 +1086,7 @@ bool MainWorker::checkErrors(uint16_t canId)
 /* gets field only if the value is within bounds form the ini file */
 template <class T>
 bool MainWorker::getField(mINI::INIStructure& cfg, mINI::INIStructure& ini, std::string category,
-	std::string field, T& value)
+						  std::string field, T& value)
 {
 	T min = 0;
 	T max = 0;

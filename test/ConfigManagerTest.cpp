@@ -80,7 +80,7 @@ TEST_F(ConfigManagerTest, CompareOnlyOriginalFilesInDirectory)
 	ASSERT_EQ(configManager.getDifferentFilePaths().size(), 1);
 	ASSERT_EQ(configManager.getDifferentFilePaths().find(tempfile1Path) !=
 				  configManager.getDifferentFilePaths().end(),
-		true);
+			  true);
 
 	// revert file to original
 	file1.open(tempUserDirectory + tempfile1Path);

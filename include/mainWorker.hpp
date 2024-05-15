@@ -65,7 +65,7 @@ class MainWorker
 
 	template <class T>
 	bool getField(mINI::INIStructure& cfg, mINI::INIStructure& ini, std::string category,
-		std::string field, T& value);
+				  std::string field, T& value);
 
 	template <typename T>
 	bool readRegisterToString(uint16_t id, mab::Md80Reg_E regId, std::string& str)
