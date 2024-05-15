@@ -5,8 +5,8 @@
 #include "dirent.h"
 #include "mini/ini.h"
 
-ConfigManager::ConfigManager(std::string originalConfigPath, std::string userConfigPath) : originalConfigPath(originalConfigPath),
-																						   userConfigPath(userConfigPath)
+ConfigManager::ConfigManager(std::string originalConfigPath, std::string userConfigPath)
+	: originalConfigPath(originalConfigPath), userConfigPath(userConfigPath)
 {
 	update();
 }
@@ -78,8 +78,10 @@ bool ConfigManager::compareFiles(std::string originalFilePath, std::string userF
 		return false;
 	}
 
-	std::string originalFile((std::istreambuf_iterator<char>(originalFileStream)), std::istreambuf_iterator<char>());
-	std::string userFile((std::istreambuf_iterator<char>(userFileStream)), std::istreambuf_iterator<char>());
+	std::string originalFile(
+		(std::istreambuf_iterator<char>(originalFileStream)), std::istreambuf_iterator<char>());
+	std::string userFile(
+		(std::istreambuf_iterator<char>(userFileStream)), std::istreambuf_iterator<char>());
 
 	return originalFile == userFile;
 }
@@ -90,14 +92,8 @@ bool ConfigManager::doesFileExists(std::string filePath)
 	return fileStream.good();
 }
 
-std::set<std::string> ConfigManager::getDifferentFilePaths()
-{
-	return differentFilePaths;
-}
-std::set<std::string> ConfigManager::getIdenticalFilePaths()
-{
-	return identicalFilePaths;
-}
+std::set<std::string> ConfigManager::getDifferentFilePaths() { return differentFilePaths; }
+std::set<std::string> ConfigManager::getIdenticalFilePaths() { return identicalFilePaths; }
 
 bool ConfigManager::performUpdate()
 {

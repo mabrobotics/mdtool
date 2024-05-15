@@ -6,8 +6,9 @@
 /// @brief Class that manages the original and user motor config files directories
 class ConfigManager
 {
-   public:
-	/// @brief Construct a new Config Manager object which right away scans and creates list of compared files in two directiories
+  public:
+	/// @brief Construct a new Config Manager object which right away scans and creates list of
+	/// compared files in two directiories
 	/// @param originalConfigPath Path to the original (containing defaults) config directory
 	/// @param userConfigPath Path to the user config directory
 	ConfigManager(std::string originalConfigPath, std::string userConfigPath);
@@ -33,11 +34,12 @@ class ConfigManager
 	/// @param configName - filename
 	/// @return True on present, false otherwise
 	bool isConfigDefault(std::string configName);
-	/// @brief Check if filename is in set that contains files that differ from the original defaults
+	/// @brief Check if filename is in set that contains files that differ from the original
+	/// defaults
 	/// @param configName - filename
 	bool isConifgDiffrent(std::string configName);
 
-   private:
+  private:
 	std::set<std::string> differentFilePaths, identicalFilePaths, defaultFilenames;
 
 	std::string originalConfigPath, userConfigPath;

@@ -6,11 +6,11 @@
 
 class MainWorker
 {
-   public:
+  public:
 	MainWorker(std::vector<std::string>& args);
 	static std::string getVersion();
 
-   private:
+  private:
 	const std::string mdtoolHomeConfigDirName = ".config";
 	const std::string mdtoolDirName = "mdtool";
 	const std::string mdtoolMotorCfgDirName = "mdtool_motors";
@@ -64,7 +64,8 @@ class MainWorker
 	bool checkErrors(uint16_t canId);
 
 	template <class T>
-	bool getField(mINI::INIStructure& cfg, mINI::INIStructure& ini, std::string category, std::string field, T& value);
+	bool getField(mINI::INIStructure& cfg, mINI::INIStructure& ini, std::string category,
+		std::string field, T& value);
 
 	template <typename T>
 	bool readRegisterToString(uint16_t id, mab::Md80Reg_E regId, std::string& str)
