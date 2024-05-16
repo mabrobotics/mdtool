@@ -117,7 +117,7 @@ bool ConfigManager::isConifgNameDifferent(std::string configName)
 	}
 }
 
-std::string ConfigManager::validateConfig(std::string configName)
+bool ConfigManager::isConfigValid(std::string configName)
 {
 	// Read default config file.
 	mINI::INIFile defaultFile(userConfigPath + "/" + defaultConfigFileName);
@@ -134,22 +134,33 @@ std::string ConfigManager::validateConfig(std::string configName)
 	{
 		auto const& section = it.first;
 		if (!userIni.has(section))
-			goto should_update;
+			return false;
 		auto const& collection = it.second;
 		for (auto const& it2 : collection)
 		{
 			auto const& key = it2.first;
 			auto const& value = it2.second;
 			if (!userIni[section].has(key))
-				goto should_update;
+				return false;
 		}
 	}
-	return configName;
+	return true;
+}
 
-should_update:
+std::string ConfigManager::validateConfig(std::string configName)
+{
+	// Read default config file.
+	mINI::INIFile defaultFile(userConfigPath + "/" + defaultConfigFileName);
+	mINI::INIStructure defaultIni;
+	defaultFile.read(defaultIni);
+
+	// Read user config file.
+	mINI::INIFile userFile(userConfigPath + "/" + configName);
+	mINI::INIStructure userIni;
+	userFile.read(userIni);
+
 	std::string updatedConfigName =
 		configName.substr(0, configName.find_last_of(".")) + "_updated.cfg";
-
 	/* copy motors configs directory - not the best practice to use
 	 * system() but std::filesystem is not available until C++17 */
 	int result = 0;

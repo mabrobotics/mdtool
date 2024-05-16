@@ -41,6 +41,8 @@ class ConfigManager
 	/// @param configName - filename
 	bool isConifgNameDifferent(std::string configName);
 
+	bool isConfigValid(std::string configName);
+
 	std::string validateConfig(std::string configName);
 
   private:
