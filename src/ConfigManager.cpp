@@ -117,7 +117,7 @@ bool ConfigManager::isConifgNameDifferent(std::string configName)
 	}
 }
 
-void ConfigManager::isConfigValid(std::string configName)
+std::string ConfigManager::validateConfig(std::string configName)
 {
 	// Read default config file.
 	mINI::INIFile defaultFile(userConfigPath + "/" + defaultConfigFileName);
@@ -144,7 +144,7 @@ void ConfigManager::isConfigValid(std::string configName)
 				goto should_update;
 		}
 	}
-	return;
+	return configName;
 
 should_update:
 	std::string updatedConfigName =
@@ -179,5 +179,5 @@ should_update:
 	}
 	// Write an updated config file
 	updatedFile.write(updatedIni);
-	return;
+	return updatedConfigName;
 }

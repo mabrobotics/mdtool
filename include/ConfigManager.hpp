@@ -41,7 +41,7 @@ class ConfigManager
 	/// @param configName - filename
 	bool isConifgNameDifferent(std::string configName);
 
-	void isConfigValid(std::string configName);
+	std::string validateConfig(std::string configName);
 
   private:
 	std::set<std::string> differentFilePaths, identicalFilePaths, defaultFilenames;
