@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "dirent.h"
-#include "mini/ini.h"
 
 ConfigManager::ConfigManager(std::string originalConfigPath, std::string userConfigPath)
 	: originalConfigPath(originalConfigPath), userConfigPath(userConfigPath)
@@ -116,4 +115,69 @@ bool ConfigManager::isConifgNameDifferent(std::string configName)
 	{
 		return differentFilePaths.find(configName) != differentFilePaths.end();
 	}
+}
+
+void ConfigManager::isConfigValid(std::string configName)
+{
+	// Read default config file.
+	mINI::INIFile defaultFile(userConfigPath + "/" + defaultConfigFileName);
+	mINI::INIStructure defaultIni;
+	defaultFile.read(defaultIni);
+
+	// Read user config file.
+	mINI::INIFile userFile(userConfigPath + "/" + configName);
+	mINI::INIStructure userIni;
+	userFile.read(userIni);
+
+	// Loop checks if all required fields are present in the config file.
+	for (auto const& it : defaultIni)
+	{
+		auto const& section = it.first;
+		if (!userIni.has(section))
+			goto should_update;
+		auto const& collection = it.second;
+		for (auto const& it2 : collection)
+		{
+			auto const& key = it2.first;
+			auto const& value = it2.second;
+			if (!userIni[section].has(key))
+				goto should_update;
+		}
+	}
+	return;
+
+should_update:
+	std::string updatedConfigName =
+		configName.substr(0, configName.find_last_of(".")) + "_updated.cfg";
+
+	/* copy motors configs directory - not the best practice to use
+	 * system() but std::filesystem is not available until C++17 */
+	int result = 0;
+	result = system(
+		("cp " + userConfigPath + "/" + configName + " " + userConfigPath + "/" + updatedConfigName)
+			.c_str());
+
+	// Read updated config file.
+	mINI::INIFile updatedFile(userConfigPath + "/" + updatedConfigName);
+	mINI::INIStructure updatedIni;
+	updatedFile.read(updatedIni);
+
+	// Loop fills all lacking fields in the user's config file.
+	for (auto const& it : defaultIni)
+	{
+		auto const& section = it.first;
+		auto const& collection = it.second;
+		for (auto const& it2 : collection)
+		{
+			auto const& key = it2.first;
+			auto const& value = it2.second;
+			if (!userIni[section].has(key))
+				updatedIni[section][key] = value;
+			else
+				updatedIni[section][key] = userIni.get(section).get(key);
+		}
+	}
+	// Write an updated config file
+	updatedFile.write(updatedIni);
+	return;
 }

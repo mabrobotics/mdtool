@@ -473,6 +473,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 					   .c_str());
 		}
 	}
+	configManager.isConfigValid(filename);
 
 	mINI::INIFile motorCfg(path);
 	mINI::INIStructure cfg;

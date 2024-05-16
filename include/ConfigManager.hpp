@@ -3,6 +3,8 @@
 #include <set>
 #include <string>
 
+#include "mini/ini.h"
+
 /// @brief Class that manages the original and user motor config files directories
 class ConfigManager
 {
@@ -39,10 +41,13 @@ class ConfigManager
 	/// @param configName - filename
 	bool isConifgNameDifferent(std::string configName);
 
+	void isConfigValid(std::string configName);
+
   private:
 	std::set<std::string> differentFilePaths, identicalFilePaths, defaultFilenames;
 
 	std::string originalConfigPath, userConfigPath;
+	const std::string defaultConfigFileName = "default.ini";
 
 	void update();
 };
