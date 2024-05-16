@@ -552,7 +552,7 @@ namespace ui
 			 << std::endl;
 		char x;
 		std::cin >> x;
-		if (x != 'Y')
+		if (x != 'Y' && x != 'y')
 		{
 			vout << "[MDTOOL] Using modified config." << std::endl;
 			return false;
@@ -561,4 +561,22 @@ namespace ui
 		return true;
 	}
 
+	bool getUpdateConfigConfirmation(std::string configName)
+	{
+		vout << "[MDTOOL] The " << configName << " config is not complete." << std::endl;
+		vout << "[MDTOOL] Would you like to update lacking fields with default values before "
+				"downloading? [Y/n]"
+			 << std::endl;
+		char x;
+		std::cin >> x;
+		if (x != 'Y' && x != 'y')
+		{
+			vout << "[MDTOOL] Using unchanged user's config." << std::endl;
+			return false;
+		}
+		vout << "[MDTOOL] Updating config with default values." << std::endl;
+		vout << "[MDTOOL] New confing saved under name: [config_original_name]_updated.cfg."
+			 << std::endl;
+		return true;
+	}
 }  // namespace ui

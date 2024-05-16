@@ -52,6 +52,7 @@ namespace ui
 	void printFailedToSetupMotor(mab::Md80Reg_E regId);
 
 	bool getDifferentConfigsConfirmation(std::string configName);
+	bool getUpdateConfigConfirmation(std::string configName);
 
 	/* these are only used to light up the values in */
 	constexpr float outputEncoderStdDevMax = 0.05f;

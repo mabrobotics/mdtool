@@ -476,8 +476,11 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 
 	if (!configManager.isConfigValid(filename))
 	{
-		path = mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" +
-			   configManager.validateConfig(filename);
+		if (ui::getUpdateConfigConfirmation(filename))
+		{
+			path = mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" +
+				   configManager.validateConfig(filename);
+		}
 	}
 
 	mINI::INIFile motorCfg(path);
