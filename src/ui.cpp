@@ -193,7 +193,7 @@ namespace ui
 		vout << "Are you sure you want to start the calibration? [Y/n]" << std::endl;
 		char x;
 		std::cin >> x;
-		if (x != 'Y')
+		if (x != 'Y' && x != 'y')
 		{
 			vout << "Calibration abandoned." << std::endl;
 			return false;
@@ -219,7 +219,7 @@ namespace ui
 		vout << "Are you sure you want to start the calibration? [Y/n]" << std::endl;
 		char x;
 		std::cin >> x;
-		if (x != 'Y')
+		if (x != 'Y' && x != 'y')
 		{
 			vout << "Output encoder calibration abandoned." << std::endl;
 			return false;
