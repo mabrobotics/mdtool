@@ -474,6 +474,14 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 		}
 	}
 
+	if (configManager.isConfigDefault("default.ini") &&
+		configManager.isConifgDifferent("default.ini"))
+	{
+		system(("cp " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName +
+				"/default.ini" + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/default.ini")
+				   .c_str());
+	}
+
 	if (!configManager.isConfigValid(filename))
 	{
 		if (ui::getUpdateConfigConfirmation(filename))
