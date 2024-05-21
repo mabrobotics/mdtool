@@ -98,6 +98,6 @@ TEST_F(ConfigManagerTest, IsConfigValidAndDifferent)
 	ConfigManager configManager(tempOriginalDirectory, tempUserDirectory);
 	ASSERT_EQ(configManager.isConfigDefault(tempfile1Path), true);
 	ASSERT_EQ(configManager.isConfigDefault("aweasdassddddddddddddddd"), false);
-	ASSERT_EQ(configManager.isConifgNameDifferent(tempfile1Path), true);
-	ASSERT_EQ(configManager.isConifgNameDifferent(tempfile2Path), false);
+	ASSERT_EQ(configManager.isConifgDifferent(tempfile1Path), true);
+	ASSERT_EQ(configManager.isConifgDifferent(tempfile2Path), false);
 }

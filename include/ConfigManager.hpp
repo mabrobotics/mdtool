@@ -39,7 +39,7 @@ class ConfigManager
 	/// @brief Check if filename is in set that contains files that differ from the original
 	/// defaults
 	/// @param configName - filename
-	bool isConifgNameDifferent(std::string configName);
+	bool isConifgDifferent(std::string configName);
 
 	bool isConfigValid(std::string configName);
 

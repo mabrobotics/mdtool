@@ -105,7 +105,7 @@ bool ConfigManager::isConfigDefault(std::string configName)
 	return defaultFilenames.find(configName) != defaultFilenames.end();
 }
 
-bool ConfigManager::isConifgNameDifferent(std::string configName)
+bool ConfigManager::isConifgDifferent(std::string configName)
 {
 	if (!isConfigDefault(configName))
 	{

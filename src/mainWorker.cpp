@@ -464,7 +464,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	ConfigManager configManager(mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName,
 								mdtoolBaseDir + "/" + mdtoolMotorCfgDirName);
 
-	if (configManager.isConfigDefault(filename) && configManager.isConifgNameDifferent(filename))
+	if (configManager.isConfigDefault(filename) && configManager.isConifgDifferent(filename))
 	{
 		if (ui::getDifferentConfigsConfirmation(filename))
 		{
