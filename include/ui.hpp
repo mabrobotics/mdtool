@@ -60,7 +60,7 @@ constexpr float mainEncoderStdDevMax = 0.012f;
 constexpr float mainEncoderMaxError = 0.05f;
 
 const std::vector<std::string> encoderTypes = {"NONE", "AS5047_CENTER", "AS5047_OFFAXIS", "MB053SFA17BENT00", "CM_OFFAXIS", "M24B_CENTER", "M24B_OFFAXIS"};
-const std::vector<std::string> encoderModes = {"NONE", "STARTUP", "MOTION", "REPORT", "MAIN"};
+const std::vector<std::string> encoderModes = {"NONE", "STARTUP", "MOTION", "REPORT", "MAIN","CALIBRATED_REPORT"};
 const std::vector<std::string> encoderCalibrationModes = {"FULL", "DIRONLY"};
 const std::vector<std::string> motorCalibrationModes = {"FULL", "NOPPDET"};
 const std::vector<std::string> homingModes = {"OFF", "SENSORLESS"};
