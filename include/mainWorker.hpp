@@ -12,9 +12,9 @@ class MainWorker
 
   private:
 	const std::string mdtoolHomeConfigDirName = ".config";
-	const std::string mdtoolDirName = "mdtool";
-	const std::string mdtoolMotorCfgDirName = "mdtool_motors";
-	const std::string mdtoolIniFileName = "mdtool.ini";
+	const std::string mdtoolDirName			  = "mdtool";
+	const std::string mdtoolMotorCfgDirName	  = "mdtool_motors";
+	const std::string mdtoolIniFileName		  = "mdtool.ini";
 
 	const std::string mdtoolConfigPath = "/etc/";
 
@@ -56,7 +56,7 @@ class MainWorker
 	void clearWarnings(std::vector<std::string>& args);
 	void reset(std::vector<std::string>& args);
 
-	void changeDefaultConfig(std::string bus, std::string device);
+	void				  changeDefaultConfig(std::string bus, std::string device);
 	mab::CANdleBaudrate_E checkSpeedForId(uint16_t id);
 
 	uint8_t getNumericParamFromList(std::string& param, const std::vector<std::string>& list);
@@ -64,20 +64,23 @@ class MainWorker
 	bool checkErrors(uint16_t canId);
 
 	template <class T>
-	bool getField(mINI::INIStructure& cfg, mINI::INIStructure& ini, std::string category,
-				  std::string field, T& value);
+	bool getField(mINI::INIStructure& cfg,
+				  mINI::INIStructure& ini,
+				  std::string		  category,
+				  std::string		  field,
+				  T&				  value);
 
 	template <typename T>
 	bool readRegisterToString(uint16_t id, mab::Md80Reg_E regId, std::string& str)
 	{
-		T value = 0;
+		T	 value	= 0;
 		bool status = candle->readMd80Register(id, regId, value);
-		str = std::to_string(value);
+		str			= std::to_string(value);
 		return status;
 	}
 
 	bool checkArgs(std::vector<std::string>& args, uint32_t size);
 	bool tryAddMD80(uint16_t id);
-	int checkArgsAndGetId(std::vector<std::string>& args, uint32_t size, uint32_t idPos);
+	int	 checkArgsAndGetId(std::vector<std::string>& args, uint32_t size, uint32_t idPos);
 	bool checkSetupError(uint16_t id);
 };

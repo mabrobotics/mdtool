@@ -9,7 +9,7 @@ namespace ui
 	class mystreambuf : public std::streambuf
 	{
 	};
-	mystreambuf nostreambuf;
+	mystreambuf	 nostreambuf;
 	std::ostream nocout(&nostreambuf);
 #define vout (std::cout)  // For easy customization later on
 
@@ -323,7 +323,7 @@ namespace ui
 		vout << "- gear ratio: " << std::setprecision(5) << drive.getReadReg().RW.gearRatio
 			 << std::endl;
 		mab::version_ut firmwareVersion = {{0, 0, 0, 0}};
-		firmwareVersion.i = drive.getReadReg().RO.firmwareVersion;
+		firmwareVersion.i				= drive.getReadReg().RO.firmwareVersion;
 		vout << "- firmware version: v" << mab::getVersionString(firmwareVersion) << std::endl;
 		vout << "- hardware version: " << getHardwareVersion(drive.getReadReg().RO.hardwareVersion)
 			 << std::endl;
@@ -357,8 +357,8 @@ namespace ui
 		if (printAll)
 		{
 			float stddevE = drive.getReadReg().RO.calMainEncoderStdDev;
-			float minE = drive.getReadReg().RO.calMainEncoderMinE;
-			float maxE = drive.getReadReg().RO.calMainEncoderMaxE;
+			float minE	  = drive.getReadReg().RO.calMainEncoderMinE;
+			float maxE	  = drive.getReadReg().RO.calMainEncoderMaxE;
 			vout << "- main encoder last check error stddev: "
 				 << (stddevE < mainEncoderStdDevMax ? std::to_string(stddevE)
 													: YELLOW_(std::to_string(stddevE)))
@@ -396,8 +396,8 @@ namespace ui
 			if (printAll)
 			{
 				float stddevE = drive.getReadReg().RO.calOutputEncoderStdDev;
-				float minE = drive.getReadReg().RO.calOutputEncoderMinE;
-				float maxE = drive.getReadReg().RO.calOutputEncoderMaxE;
+				float minE	  = drive.getReadReg().RO.calOutputEncoderMinE;
+				float maxE	  = drive.getReadReg().RO.calOutputEncoderMaxE;
 				vout << "   - output encoder last check error stddev: "
 					 << (stddevE < outputEncoderStdDevMax ? std::to_string(stddevE)
 														  : YELLOW_(std::to_string(stddevE)))

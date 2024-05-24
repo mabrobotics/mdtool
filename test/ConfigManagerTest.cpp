@@ -45,7 +45,7 @@ class ConfigManagerTest : public ::testing::Test
 	}
 
 	std::string tempOriginalDirectory = "./original/";
-	std::string tempUserDirectory = "./user/";
+	std::string tempUserDirectory	  = "./user/";
 
 	std::string tempfile1Path = "asepoawinoeaine.txt";
 	std::string tempfile2Path = "aweradswaeawesdae.txt";

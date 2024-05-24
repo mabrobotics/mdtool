@@ -18,7 +18,7 @@ void ConfigManager::update()
 	defaultFilenames.clear();
 
 	// Get the filenames of the original config
-	DIR* dir;
+	DIR*		   dir;
 	struct dirent* ent;
 	if ((dir = opendir(originalConfigPath.c_str())) != NULL)
 	{
@@ -40,7 +40,7 @@ void ConfigManager::update()
 	for (auto& filename : defaultFilenames)
 	{
 		std::string originalFile = originalConfigPath + "/" + filename;
-		std::string userFile = userConfigPath + "/" + filename;
+		std::string userFile	 = userConfigPath + "/" + filename;
 
 		if (compareFiles(originalFile, userFile))
 		{
@@ -120,12 +120,12 @@ bool ConfigManager::isConifgDifferent(std::string configName)
 bool ConfigManager::isConfigValid(std::string configName)
 {
 	// Read default config file.
-	mINI::INIFile defaultFile(userConfigPath + "/" + defaultConfigFileName);
+	mINI::INIFile	   defaultFile(userConfigPath + "/" + defaultConfigFileName);
 	mINI::INIStructure defaultIni;
 	defaultFile.read(defaultIni);
 
 	// Read user config file.
-	mINI::INIFile userFile(userConfigPath + "/" + configName);
+	mINI::INIFile	   userFile(userConfigPath + "/" + configName);
 	mINI::INIStructure userIni;
 	userFile.read(userIni);
 
@@ -138,7 +138,7 @@ bool ConfigManager::isConfigValid(std::string configName)
 		auto const& collection = it.second;
 		for (auto const& it2 : collection)
 		{
-			auto const& key = it2.first;
+			auto const& key	  = it2.first;
 			auto const& value = it2.second;
 			if (!userIni[section].has(key))
 				return false;
@@ -150,12 +150,12 @@ bool ConfigManager::isConfigValid(std::string configName)
 std::string ConfigManager::validateConfig(std::string configName)
 {
 	// Read default config file.
-	mINI::INIFile defaultFile(userConfigPath + "/" + defaultConfigFileName);
+	mINI::INIFile	   defaultFile(userConfigPath + "/" + defaultConfigFileName);
 	mINI::INIStructure defaultIni;
 	defaultFile.read(defaultIni);
 
 	// Read user config file.
-	mINI::INIFile userFile(userConfigPath + "/" + configName);
+	mINI::INIFile	   userFile(userConfigPath + "/" + configName);
 	mINI::INIStructure userIni;
 	userFile.read(userIni);
 
@@ -164,23 +164,23 @@ std::string ConfigManager::validateConfig(std::string configName)
 	/* copy motors configs directory - not the best practice to use
 	 * system() but std::filesystem is not available until C++17 */
 	int result = 0;
-	result = system(
+	result	   = system(
 		("cp " + userConfigPath + "/" + configName + " " + userConfigPath + "/" + updatedConfigName)
 			.c_str());
 
 	// Read updated config file.
-	mINI::INIFile updatedFile(userConfigPath + "/" + updatedConfigName);
+	mINI::INIFile	   updatedFile(userConfigPath + "/" + updatedConfigName);
 	mINI::INIStructure updatedIni;
 	updatedFile.read(updatedIni);
 
 	// Loop fills all lacking fields in the user's config file.
 	for (auto const& it : defaultIni)
 	{
-		auto const& section = it.first;
+		auto const& section	   = it.first;
 		auto const& collection = it.second;
 		for (auto const& it2 : collection)
 		{
-			auto const& key = it2.first;
+			auto const& key	  = it2.first;
 			auto const& value = it2.second;
 			if (!userIni[section].has(key))
 				updatedIni[section][key] = value;

@@ -48,7 +48,7 @@ class ConfigManager
   private:
 	std::set<std::string> differentFilePaths, identicalFilePaths, defaultFilenames;
 
-	std::string originalConfigPath, userConfigPath;
+	std::string		  originalConfigPath, userConfigPath;
 	const std::string defaultConfigFileName = "default.ini";
 
 	void update();
