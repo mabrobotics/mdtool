@@ -575,7 +575,8 @@ namespace ui
 			return false;
 		}
 		vout << "[MDTOOL] Updating config with default values." << std::endl;
-		vout << "[MDTOOL] New confing saved under name: [config_original_name]_updated.cfg."
+		vout << "[MDTOOL] New confing saved under name: " +
+					configName.substr(0, configName.find_last_of(".")) + "_updated.cfg."
 			 << std::endl;
 		return true;
 	}
