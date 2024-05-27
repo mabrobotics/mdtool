@@ -73,7 +73,8 @@ namespace ui
 												   "CM_OFFAXIS",
 												   "M24B_CENTER",
 												   "M24B_OFFAXIS"};
-	const std::vector<std::string> encoderModes = {"NONE", "STARTUP", "MOTION", "REPORT", "MAIN"};
+	const std::vector<std::string> encoderModes = {
+		"NONE", "STARTUP", "MOTION", "REPORT", "MAIN", "CALIBRATED_REPORT"};
 	const std::vector<std::string> encoderCalibrationModes = {"FULL", "DIRONLY"};
 	const std::vector<std::string> motorCalibrationModes   = {"FULL", "NOPPDET"};
 	const std::vector<std::string> homingModes			   = {"OFF", "SENSORLESS"};
