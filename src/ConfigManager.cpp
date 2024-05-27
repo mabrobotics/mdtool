@@ -3,10 +3,9 @@
 #include <iostream>
 
 #include "dirent.h"
-#include "mini/ini.h"
 
-ConfigManager::ConfigManager(std::string originalConfigPath, std::string userConfigPath) : originalConfigPath(originalConfigPath),
-																						   userConfigPath(userConfigPath)
+ConfigManager::ConfigManager(std::string originalConfigPath, std::string userConfigPath)
+	: originalConfigPath(originalConfigPath), userConfigPath(userConfigPath)
 {
 	update();
 }
@@ -19,7 +18,7 @@ void ConfigManager::update()
 	defaultFilenames.clear();
 
 	// Get the filenames of the original config
-	DIR* dir;
+	DIR*		   dir;
 	struct dirent* ent;
 	if ((dir = opendir(originalConfigPath.c_str())) != NULL)
 	{
@@ -41,7 +40,7 @@ void ConfigManager::update()
 	for (auto& filename : defaultFilenames)
 	{
 		std::string originalFile = originalConfigPath + "/" + filename;
-		std::string userFile = userConfigPath + "/" + filename;
+		std::string userFile	 = userConfigPath + "/" + filename;
 
 		if (compareFiles(originalFile, userFile))
 		{
@@ -78,8 +77,10 @@ bool ConfigManager::compareFiles(std::string originalFilePath, std::string userF
 		return false;
 	}
 
-	std::string originalFile((std::istreambuf_iterator<char>(originalFileStream)), std::istreambuf_iterator<char>());
-	std::string userFile((std::istreambuf_iterator<char>(userFileStream)), std::istreambuf_iterator<char>());
+	std::string originalFile((std::istreambuf_iterator<char>(originalFileStream)),
+							 std::istreambuf_iterator<char>());
+	std::string userFile((std::istreambuf_iterator<char>(userFileStream)),
+						 std::istreambuf_iterator<char>());
 
 	return originalFile == userFile;
 }
@@ -90,14 +91,8 @@ bool ConfigManager::doesFileExists(std::string filePath)
 	return fileStream.good();
 }
 
-std::set<std::string> ConfigManager::getDifferentFilePaths()
-{
-	return differentFilePaths;
-}
-std::set<std::string> ConfigManager::getIdenticalFilePaths()
-{
-	return identicalFilePaths;
-}
+std::set<std::string> ConfigManager::getDifferentFilePaths() { return differentFilePaths; }
+std::set<std::string> ConfigManager::getIdenticalFilePaths() { return identicalFilePaths; }
 
 bool ConfigManager::performUpdate()
 {
@@ -110,7 +105,7 @@ bool ConfigManager::isConfigDefault(std::string configName)
 	return defaultFilenames.find(configName) != defaultFilenames.end();
 }
 
-bool ConfigManager::isConifgDiffrent(std::string configName)
+bool ConfigManager::isConifgDifferent(std::string configName)
 {
 	if (!isConfigDefault(configName))
 	{
@@ -120,4 +115,80 @@ bool ConfigManager::isConifgDiffrent(std::string configName)
 	{
 		return differentFilePaths.find(configName) != differentFilePaths.end();
 	}
+}
+
+bool ConfigManager::isConfigValid(std::string configName)
+{
+	// Read default config file.
+	mINI::INIFile	   defaultFile(userConfigPath + "/" + defaultConfigFileName);
+	mINI::INIStructure defaultIni;
+	defaultFile.read(defaultIni);
+
+	// Read user config file.
+	mINI::INIFile	   userFile(userConfigPath + "/" + configName);
+	mINI::INIStructure userIni;
+	userFile.read(userIni);
+
+	// Loop checks if all required fields are present in the config file.
+	for (auto const& it : defaultIni)
+	{
+		auto const& section = it.first;
+		if (!userIni.has(section))
+			return false;
+		auto const& collection = it.second;
+		for (auto const& it2 : collection)
+		{
+			auto const& key	  = it2.first;
+			auto const& value = it2.second;
+			if (!userIni[section].has(key))
+				return false;
+		}
+	}
+	return true;
+}
+
+std::string ConfigManager::validateConfig(std::string configName)
+{
+	// Read default config file.
+	mINI::INIFile	   defaultFile(userConfigPath + "/" + defaultConfigFileName);
+	mINI::INIStructure defaultIni;
+	defaultFile.read(defaultIni);
+
+	// Read user config file.
+	mINI::INIFile	   userFile(userConfigPath + "/" + configName);
+	mINI::INIStructure userIni;
+	userFile.read(userIni);
+
+	std::string updatedConfigName =
+		configName.substr(0, configName.find_last_of(".")) + "_updated.cfg";
+	/* copy motors configs directory - not the best practice to use
+	 * system() but std::filesystem is not available until C++17 */
+	int result = 0;
+	result	   = system(
+		("cp " + userConfigPath + "/" + configName + " " + userConfigPath + "/" + updatedConfigName)
+			.c_str());
+
+	// Read updated config file.
+	mINI::INIFile	   updatedFile(userConfigPath + "/" + updatedConfigName);
+	mINI::INIStructure updatedIni;
+	updatedFile.read(updatedIni);
+
+	// Loop fills all lacking fields in the user's config file.
+	for (auto const& it : defaultIni)
+	{
+		auto const& section	   = it.first;
+		auto const& collection = it.second;
+		for (auto const& it2 : collection)
+		{
+			auto const& key	  = it2.first;
+			auto const& value = it2.second;
+			if (!userIni[section].has(key))
+				updatedIni[section][key] = value;
+			else
+				updatedIni[section][key] = userIni.get(section).get(key);
+		}
+	}
+	// Write an updated config file
+	updatedFile.write(updatedIni);
+	return updatedConfigName;
 }
