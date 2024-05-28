@@ -8,6 +8,13 @@ ConfigManager::ConfigManager(std::string originalConfigPath, std::string userCon
 	: originalConfigPath(originalConfigPath), userConfigPath(userConfigPath)
 {
 	update();
+
+	if (isConfigDefault(defaultConfigFileName) && isConifgDifferent(defaultConfigFileName))
+	{
+		system(("cp " + originalConfigPath + "/" + defaultConfigFileName + " " + userConfigPath +
+				"/" + defaultConfigFileName)
+				   .c_str());
+	}
 }
 
 void ConfigManager::update()

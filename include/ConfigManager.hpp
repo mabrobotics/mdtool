@@ -48,7 +48,10 @@ class ConfigManager
   private:
 	std::set<std::string> differentFilePaths, identicalFilePaths, defaultFilenames;
 
-	std::string		  originalConfigPath, userConfigPath;
+	std::string originalConfigPath, userConfigPath;
+	// const std::string userConfigPath =
+	// 	std::string(getenv("HOME")) + "/.config/mdtool/mdtool_motors";
+	// const std::string originalConfigPath	= "/etc/mdtool/mdtool_motors";
 	const std::string defaultConfigFileName = "default.ini";
 
 	void update();
