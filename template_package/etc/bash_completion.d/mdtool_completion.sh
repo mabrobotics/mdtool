@@ -26,7 +26,7 @@ _mdtool_complete()
 			COMPREPLY=( $(compgen -W "zero can save current bandwidth" -- $cur) )
 			;; 
 			"setup")
-			COMPREPLY=( $(compgen -W "calibration calibration_out motor info homing" -- $cur) )
+			COMPREPLY=( $(compgen -W "calibration calibration_out motor info homing read_config" -- $cur) )
 			;;
 			"test")
 			COMPREPLY=( $(compgen -W "move latency encoder" -- $cur) )
