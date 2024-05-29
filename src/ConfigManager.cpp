@@ -4,18 +4,21 @@
 
 #include "dirent.h"
 
-ConfigManager::ConfigManager(std::string originalConfigPath, std::string userConfigPath)
-	: originalConfigPath(originalConfigPath), userConfigPath(userConfigPath)
+ConfigManager::ConfigManager(std::string originalConfigDir, std::string userConfigDir)
+	: originalConfigDir(originalConfigDir), userConfigDir(userConfigDir)
 {
 	update();
 
 	if (isConfigDefault(defaultConfigFileName) && isConifgDifferent(defaultConfigFileName))
 	{
-		system(("cp " + originalConfigPath + "/" + defaultConfigFileName + " " + userConfigPath +
+		system(("cp " + originalConfigDir + "/" + defaultConfigFileName + " " + userConfigDir +
 				"/" + defaultConfigFileName)
 				   .c_str());
 	}
 }
+
+std::string ConfigManager::getConfigPath() { return userConfigPath; }
+std::string ConfigManager::getConfigName() { return userConfigName; }
 
 void ConfigManager::update()
 {
@@ -27,7 +30,7 @@ void ConfigManager::update()
 	// Get the filenames of the original config
 	DIR*		   dir;
 	struct dirent* ent;
-	if ((dir = opendir(originalConfigPath.c_str())) != NULL)
+	if ((dir = opendir(originalConfigDir.c_str())) != NULL)
 	{
 		while ((ent = readdir(dir)) != NULL)
 		{
@@ -46,8 +49,8 @@ void ConfigManager::update()
 
 	for (auto& filename : defaultFilenames)
 	{
-		std::string originalFile = originalConfigPath + "/" + filename;
-		std::string userFile	 = userConfigPath + "/" + filename;
+		std::string originalFile = originalConfigDir + "/" + filename;
+		std::string userFile	 = userConfigDir + "/" + filename;
 
 		if (compareFiles(originalFile, userFile))
 		{
@@ -114,7 +117,7 @@ bool ConfigManager::isConfigDefault(std::string configName)
 
 bool ConfigManager::isConfigDefault()
 {
-	return defaultFilenames.find(userFileName) != defaultFilenames.end();
+	return defaultFilenames.find(userConfigName) != defaultFilenames.end();
 }
 
 bool ConfigManager::isConifgDifferent(std::string configName)
@@ -131,25 +134,25 @@ bool ConfigManager::isConifgDifferent(std::string configName)
 
 bool ConfigManager::isConifgDifferent()
 {
-	if (!isConfigDefault(userFileName))
+	if (!isConfigDefault(userConfigName))
 	{
 		return false;
 	}
 	else
 	{
-		return differentFilePaths.find(userFileName) != differentFilePaths.end();
+		return differentFilePaths.find(userConfigName) != differentFilePaths.end();
 	}
 }
 
 bool ConfigManager::isConfigValid(std::string configName)
 {
 	// Read default config file.
-	mINI::INIFile	   defaultFile(userConfigPath + "/" + defaultConfigFileName);
+	mINI::INIFile	   defaultFile(userConfigDir + "/" + defaultConfigFileName);
 	mINI::INIStructure defaultIni;
 	defaultFile.read(defaultIni);
 
 	// Read user config file.
-	mINI::INIFile	   userFile(userConfigPath + "/" + configName);
+	mINI::INIFile	   userFile(userConfigDir + "/" + configName);
 	mINI::INIStructure userIni;
 	userFile.read(userIni);
 
@@ -174,12 +177,12 @@ bool ConfigManager::isConfigValid(std::string configName)
 std::string ConfigManager::validateConfig(std::string configName)
 {
 	// Read default config file.
-	mINI::INIFile	   defaultFile(userConfigPath + "/" + defaultConfigFileName);
+	mINI::INIFile	   defaultFile(userConfigDir + "/" + defaultConfigFileName);
 	mINI::INIStructure defaultIni;
 	defaultFile.read(defaultIni);
 
 	// Read user config file.
-	mINI::INIFile	   userFile(userConfigPath + "/" + configName);
+	mINI::INIFile	   userFile(userConfigDir + "/" + configName);
 	mINI::INIStructure userIni;
 	userFile.read(userIni);
 
@@ -189,11 +192,11 @@ std::string ConfigManager::validateConfig(std::string configName)
 	 * system() but std::filesystem is not available until C++17 */
 	int result = 0;
 	result	   = system(
-		("cp " + userConfigPath + "/" + configName + " " + userConfigPath + "/" + updatedConfigName)
+		("cp " + userConfigDir + "/" + configName + " " + userConfigDir + "/" + updatedConfigName)
 			.c_str());
 
 	// Read updated config file.
-	mINI::INIFile	   updatedFile(userConfigPath + "/" + updatedConfigName);
+	mINI::INIFile	   updatedFile(userConfigDir + "/" + updatedConfigName);
 	mINI::INIStructure updatedIni;
 	updatedFile.read(updatedIni);
 

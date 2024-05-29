@@ -11,10 +11,13 @@ class ConfigManager
   public:
 	/// @brief Construct a new Config Manager object which right away scans and creates list of
 	/// compared files in two directiories
-	/// @param originalConfigPath Path to the original (containing defaults) config directory
-	/// @param userConfigPath Path to the user config directory
-	ConfigManager(std::string originalConfigPath, std::string userConfigPath);
+	/// @param originalConfigDir Path to the original (containing defaults) config directory
+	/// @param userConfigDir Path to the user config directory
+	ConfigManager(std::string originalConfigDir, std::string userConfigDir);
 	~ConfigManager() = default;
+
+	std::string getConfigPath();
+	std::string getConfigName();
 
 	/// @brief Performs the update on directories of compared files
 	/// @return Was the update successful
@@ -50,11 +53,11 @@ class ConfigManager
   private:
 	std::set<std::string> differentFilePaths, identicalFilePaths, defaultFilenames;
 
-	std::string userFileName;
-	std::string originalConfigPath, userConfigPath;
-	// const std::string userConfigPath =
+	std::string userConfigName, userConfigPath;
+	std::string originalConfigDir, userConfigDir;
+	// const std::string userConfigDir =
 	// 	std::string(getenv("HOME")) + "/.config/mdtool/mdtool_motors";
-	// const std::string originalConfigPath	= "/etc/mdtool/mdtool_motors";
+	// const std::string originalConfigDir	= "/etc/mdtool/mdtool_motors";
 	const std::string defaultConfigFileName = "default.ini";
 
 	void update();
