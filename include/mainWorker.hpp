@@ -55,6 +55,7 @@ class MainWorker
 	void setupHoming(std::vector<std::string>& args);
 	void setupInfo(std::vector<std::string>& args);
 	void setupMotor(std::vector<std::string>& args);
+	void setupReadConfig(std::vector<std::string>& args);
 
 	void testEncoderMain(std::vector<std::string>& args);
 	void testEncoderOutput(std::vector<std::string>& args);

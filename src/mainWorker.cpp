@@ -43,6 +43,7 @@ enum class toolsOptions_E
 	MOVE,
 	OUTPUT,
 	READ,
+	READ_CONFIG,
 	SAVE,
 	WARNING,
 	WRITE,
@@ -108,6 +109,8 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::OUTPUT;
 	if (opt == "read")
 		return toolsOptions_E::READ;
+	if (opt == "read_config")
+		return toolsOptions_E::READ_CONFIG;
 	if (opt == "save")
 		return toolsOptions_E::SAVE;
 	if (opt == "warning")
@@ -294,6 +297,8 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 				setupInfo(args);
 			else if (option == toolsOptions_E::MOTOR)
 				setupMotor(args);
+			else if (option == toolsOptions_E::READ_CONFIG)
+				setupReadConfig(args);
 			else
 				ui::printHelpSetup();
 			break;
@@ -897,6 +902,11 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 
 	/* wait for a full reboot */
 	sleep(3);
+}
+
+void MainWorker::setupReadConfig(std::vector<std::string>& args)
+{
+	std::cout << "Read config." << std::endl;
 }
 
 void MainWorker::testEncoderMain(std::vector<std::string>& args)
