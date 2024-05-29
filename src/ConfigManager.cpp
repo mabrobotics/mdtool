@@ -9,11 +9,11 @@
 
 #include "dirent.h"
 
-ConfigManager::ConfigManager(std::string originalConfigDir, std::string userConfigDir)
-	: originalConfigDir(originalConfigDir), userConfigDir(userConfigDir)
+ConfigManager::ConfigManager(std::string userConfigPath) : userConfigPath(userConfigPath)
 {
 	update();
 	checkDefaultConfig();
+	computeFullPathAndName();
 }
 
 std::string ConfigManager::getConfigPath() { return userConfigPath; }
@@ -143,7 +143,7 @@ bool ConfigManager::isConifgDifferent()
 	}
 }
 
-bool ConfigManager::isConfigValid(std::string configName)
+bool ConfigManager::isConfigValid()
 {
 	// Read default config file.
 	mINI::INIFile	   defaultFile(userConfigDir + "/" + defaultConfigFileName);
@@ -151,7 +151,7 @@ bool ConfigManager::isConfigValid(std::string configName)
 	defaultFile.read(defaultIni);
 
 	// Read user config file.
-	mINI::INIFile	   userFile(userConfigDir + "/" + configName);
+	mINI::INIFile	   userFile(userConfigPath);
 	mINI::INIStructure userIni;
 	userFile.read(userIni);
 
@@ -173,7 +173,7 @@ bool ConfigManager::isConfigValid(std::string configName)
 	return true;
 }
 
-std::string ConfigManager::validateConfig(std::string configName)
+std::string ConfigManager::validateConfig()
 {
 	// Read default config file.
 	mINI::INIFile	   defaultFile(userConfigDir + "/" + defaultConfigFileName);
@@ -181,21 +181,19 @@ std::string ConfigManager::validateConfig(std::string configName)
 	defaultFile.read(defaultIni);
 
 	// Read user config file.
-	mINI::INIFile	   userFile(userConfigDir + "/" + configName);
+	mINI::INIFile	   userFile(userConfigPath);
 	mINI::INIStructure userIni;
 	userFile.read(userIni);
 
-	std::string updatedConfigName =
-		configName.substr(0, configName.find_last_of(".")) + "_updated.cfg";
+	std::string updatedUserConfigPath =
+		userConfigPath.substr(0, userConfigPath.find_last_of(".")) + "_updated.cfg";
 	/* copy motors configs directory - not the best practice to use
 	 * system() but std::filesystem is not available until C++17 */
 	int result = 0;
-	result	   = system(
-		("cp " + userConfigDir + "/" + configName + " " + userConfigDir + "/" + updatedConfigName)
-			.c_str());
+	result	   = system(("cp " + userConfigPath + " " + updatedUserConfigPath).c_str());
 
 	// Read updated config file.
-	mINI::INIFile	   updatedFile(userConfigDir + "/" + updatedConfigName);
+	mINI::INIFile	   updatedFile(updatedUserConfigPath);
 	mINI::INIStructure updatedIni;
 	updatedFile.read(updatedIni);
 
@@ -216,10 +214,10 @@ std::string ConfigManager::validateConfig(std::string configName)
 	}
 	// Write an updated config file
 	updatedFile.write(updatedIni);
-	return updatedConfigName;
+	return updatedUserConfigPath;
 }
 
-std::string ConfigManager::getFullPath()
+void ConfigManager::computeFullPathAndName()
 {
 	if ((userConfigPath.rfind("./", 0) == 0) || (userConfigPath.rfind("/", 0) == 0))
 	{
@@ -239,7 +237,7 @@ std::string ConfigManager::getFullPath()
 #else
 			if (getcwd(buffer, sizeof(buffer)) != NULL)
 			{
-				return (buffer + userConfigPath.substr(1));
+				userConfigPath = (buffer + userConfigPath.substr(1));
 			}
 			else
 			{
@@ -250,8 +248,9 @@ std::string ConfigManager::getFullPath()
 	}
 	else
 	{
-		return (userConfigPath + "/" + userConfigPath);
+		userConfigPath = (userConfigDir + "/" + userConfigPath);
 	}
+	userConfigName = userConfigPath.substr(userConfigPath.find_last_of("/") + 1);
 }
 
 void ConfigManager::checkDefaultConfig()

@@ -457,14 +457,12 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (id == -1)
 		return;
 
-	std::string path = (mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" + args[4].c_str());
+	ConfigManager configManager(args[4].c_str());
 
-	std::string filename = args[4].c_str();
+	std::string path	 = configManager.getConfigPath();
+	std::string filename = configManager.getConfigName();
 
-	ConfigManager configManager(mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName,
-								mdtoolBaseDir + "/" + mdtoolMotorCfgDirName);
-
-	if (configManager.isConfigDefault(filename) && configManager.isConifgDifferent(filename))
+	if (configManager.isConfigDefault() && configManager.isConifgDifferent())
 	{
 		if (ui::getDifferentConfigsConfirmation(filename))
 		{
@@ -474,12 +472,11 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 		}
 	}
 
-	if (!configManager.isConfigValid(filename))
+	if (!configManager.isConfigValid())
 	{
 		if (ui::getUpdateConfigConfirmation(filename))
 		{
-			path = mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" +
-				   configManager.validateConfig(filename);
+			path = configManager.validateConfig();
 		}
 	}
 

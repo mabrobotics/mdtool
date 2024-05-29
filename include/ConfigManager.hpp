@@ -13,7 +13,7 @@ class ConfigManager
 	/// compared files in two directiories
 	/// @param originalConfigDir Path to the original (containing defaults) config directory
 	/// @param userConfigDir Path to the user config directory
-	ConfigManager(std::string originalConfigDir, std::string userConfigDir);
+	ConfigManager(std::string userConfigPath);
 	~ConfigManager() = default;
 
 	std::string getConfigPath();
@@ -46,21 +46,19 @@ class ConfigManager
 	bool isConifgDifferent(std::string configName);
 	bool isConifgDifferent();
 
-	bool isConfigValid(std::string configName);
+	bool isConfigValid();
 
-	std::string validateConfig(std::string configName);
+	std::string validateConfig();
 
   private:
 	std::set<std::string> differentFilePaths, identicalFilePaths, defaultFilenames;
 
-	std::string userConfigName, userConfigPath;
-	std::string originalConfigDir, userConfigDir;
-	// const std::string userConfigDir =
-	// 	std::string(getenv("HOME")) + "/.config/mdtool/mdtool_motors";
-	// const std::string originalConfigDir	= "/etc/mdtool/mdtool_motors";
+	std::string		  userConfigName, userConfigPath;
+	const std::string userConfigDir = std::string(getenv("HOME")) + "/.config/mdtool/mdtool_motors";
+	const std::string originalConfigDir		= "/etc/mdtool/mdtool_motors";
 	const std::string defaultConfigFileName = "default.ini";
 
-	void		update();
-	std::string getFullPath();
-	void		checkDefaultConfig();
+	void update();
+	void computeFullPathAndName();
+	void checkDefaultConfig();
 };
