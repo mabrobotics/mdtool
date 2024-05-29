@@ -36,10 +36,12 @@ class ConfigManager
 	/// @param configName - filename
 	/// @return True on present, false otherwise
 	bool isConfigDefault(std::string configName);
+	bool isConfigDefault();
 	/// @brief Check if filename is in set that contains files that differ from the original
 	/// defaults
 	/// @param configName - filename
 	bool isConifgDifferent(std::string configName);
+	bool isConifgDifferent();
 
 	bool isConfigValid(std::string configName);
 
@@ -48,6 +50,7 @@ class ConfigManager
   private:
 	std::set<std::string> differentFilePaths, identicalFilePaths, defaultFilenames;
 
+	std::string userFileName;
 	std::string originalConfigPath, userConfigPath;
 	// const std::string userConfigPath =
 	// 	std::string(getenv("HOME")) + "/.config/mdtool/mdtool_motors";

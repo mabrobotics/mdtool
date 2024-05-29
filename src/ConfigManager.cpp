@@ -112,6 +112,11 @@ bool ConfigManager::isConfigDefault(std::string configName)
 	return defaultFilenames.find(configName) != defaultFilenames.end();
 }
 
+bool ConfigManager::isConfigDefault()
+{
+	return defaultFilenames.find(userFileName) != defaultFilenames.end();
+}
+
 bool ConfigManager::isConifgDifferent(std::string configName)
 {
 	if (!isConfigDefault(configName))
@@ -121,6 +126,18 @@ bool ConfigManager::isConifgDifferent(std::string configName)
 	else
 	{
 		return differentFilePaths.find(configName) != differentFilePaths.end();
+	}
+}
+
+bool ConfigManager::isConifgDifferent()
+{
+	if (!isConfigDefault(userFileName))
+	{
+		return false;
+	}
+	else
+	{
+		return differentFilePaths.find(userFileName) != differentFilePaths.end();
 	}
 }
 
