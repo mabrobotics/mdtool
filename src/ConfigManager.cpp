@@ -1,7 +1,11 @@
 #include "ConfigManager.hpp"
 
 #include <iostream>
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <unistd.h>
+#endif
 
 #include "dirent.h"
 
@@ -228,7 +232,17 @@ std::string ConfigManager::getFullPath()
 		if ((userConfigPath.rfind("./", 0) == 0))
 		{
 			char buffer[PATH_MAX];
-
+#ifdef _WIN32
+			if (GetCurrentDirectory(PATH_MAX, buffer))
+			{
+				return (buffer + userFilePath.substr(1));
+			}
+			else
+			{
+				throw std::runtime_error("GetCurrentDirectory() error: " +
+										 std::to_string(GetLastError()));
+			}
+#else
 			if (getcwd(buffer, sizeof(buffer)) != NULL)
 			{
 				return (buffer + userConfigPath.substr(1));
@@ -237,6 +251,7 @@ std::string ConfigManager::getFullPath()
 			{
 				perror("getcwd() error");
 			}
+#endif
 		}
 	}
 	else
