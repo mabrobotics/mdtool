@@ -20,49 +20,6 @@ ConfigManager::ConfigManager(std::string userConfigPath) : userConfigPath(userCo
 std::string ConfigManager::getConfigPath() { return userConfigPath; }
 std::string ConfigManager::getConfigName() { return userConfigName; }
 
-void ConfigManager::update()
-{
-	// Clear the sets
-	differentFilePaths.clear();
-	identicalFilePaths.clear();
-	defaultFilenames.clear();
-
-	// Get the filenames of the original config
-	DIR*		   dir;
-	struct dirent* ent;
-	if ((dir = opendir(originalConfigDir.c_str())) != NULL)
-	{
-		while ((ent = readdir(dir)) != NULL)
-		{
-			std::string filename = ent->d_name;
-			if (filename != "." && filename != "..")
-			{
-				defaultFilenames.insert(filename);
-			}
-		}
-		closedir(dir);
-	}
-	else
-	{
-		exit(18886);
-	}
-
-	for (auto& filename : defaultFilenames)
-	{
-		std::string originalFile = originalConfigDir + "/" + filename;
-		std::string userFile	 = userConfigDir + "/" + filename;
-
-		if (compareFiles(originalFile, userFile))
-		{
-			identicalFilePaths.insert(filename);
-		}
-		else
-		{
-			differentFilePaths.insert(filename);
-		}
-	}
-}
-
 bool ConfigManager::compareFiles(std::string originalFilePath, std::string userFilePath)
 {
 	// check if files exist
@@ -144,6 +101,17 @@ bool ConfigManager::isConifgDifferent()
 	}
 }
 
+void ConfigManager::copyDefaultConfig(std::string configName)
+{
+	int result = system(
+		("cp " + originalConfigDir + "/" + configName + " " + userConfigDir + "/" + configName)
+			.c_str());
+	if (result)
+		std::cerr << "Error: Failed to copy the user's file: "
+				  << (originalConfigDir + "/" + configName).c_str() << std::endl
+				  << "Please check the file and try again." << std::endl;
+}
+
 bool ConfigManager::isConfigValid()
 {
 	// Read default config file.
@@ -219,15 +187,47 @@ std::string ConfigManager::validateConfig()
 	return updatedUserConfigPath;
 }
 
-void ConfigManager::copyDefaultConfig(std::string configName)
+void ConfigManager::update()
 {
-	int result = system(
-		("cp " + originalConfigDir + "/" + configName + " " + userConfigDir + "/" + configName)
-			.c_str());
-	if (result)
-		std::cerr << "Error: Failed to copy the user's file: "
-				  << (originalConfigDir + "/" + configName).c_str() << std::endl
-				  << "Please check the file and try again." << std::endl;
+	// Clear the sets
+	differentFilePaths.clear();
+	identicalFilePaths.clear();
+	defaultFilenames.clear();
+
+	// Get the filenames of the original config
+	DIR*		   dir;
+	struct dirent* ent;
+	if ((dir = opendir(originalConfigDir.c_str())) != NULL)
+	{
+		while ((ent = readdir(dir)) != NULL)
+		{
+			std::string filename = ent->d_name;
+			if (filename != "." && filename != "..")
+			{
+				defaultFilenames.insert(filename);
+			}
+		}
+		closedir(dir);
+	}
+	else
+	{
+		exit(18886);
+	}
+
+	for (auto& filename : defaultFilenames)
+	{
+		std::string originalFile = originalConfigDir + "/" + filename;
+		std::string userFile	 = userConfigDir + "/" + filename;
+
+		if (compareFiles(originalFile, userFile))
+		{
+			identicalFilePaths.insert(filename);
+		}
+		else
+		{
+			differentFilePaths.insert(filename);
+		}
+	}
 }
 
 void ConfigManager::computeFullPathAndName()
