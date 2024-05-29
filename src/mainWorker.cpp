@@ -11,113 +11,112 @@
 enum class toolsCmd_E
 {
 	NONE,
-	PING,
+	BLINK,
+	BUS,
+	CLEAR,
 	CONFIG,
+	ENCODER,
+	PING,
+	REGISTER,
+	RESET,
 	SETUP,
 	TEST,
-	BLINK,
-	ENCODER,
-	BUS,
-	REGISTER,
-	CLEAR,
-	RESET,
 };
 enum class toolsOptions_E
 {
 	NONE,
-	CURRENT,
-	CAN,
-	SAVE,
-	ZERO,
+	ABSOLUTE,
 	BANDWIDTH,
 	CALIBRATION,
-	DIAGNOSTIC,
-	MOTOR,
-	INFO,
-	MOVE,
-	LATENCY,
 	CALIBRATION_OUTPUT,
-	ENCODER,
-	MAIN,
-	OUTPUT,
-	HOMING,
-	ABSOLUTE,
-	READ,
-	WRITE,
-	ERROR,
-	WARNING,
+	CAN,
 	CLEAR,
+	CURRENT,
+	DIAGNOSTIC,
+	ENCODER,
+	ERROR,
+	HOMING,
+	INFO,
+	LATENCY,
+	MAIN,
+	MOTOR,
+	MOVE,
+	OUTPUT,
+	READ,
+	SAVE,
+	WARNING,
+	WRITE,
+	ZERO,
 };
+toolsCmd_E str2cmd(std::string& cmd)
+{
+	if (cmd == "blink")
+		return toolsCmd_E::BLINK;
+	if (cmd == "bus")
+		return toolsCmd_E::BUS;
+	if (cmd == "clear")
+		return toolsCmd_E::CLEAR;
+	if (cmd == "config")
+		return toolsCmd_E::CONFIG;
+	if (cmd == "encoder")
+		return toolsCmd_E::ENCODER;
+	if (cmd == "ping")
+		return toolsCmd_E::PING;
+	if (cmd == "register")
+		return toolsCmd_E::REGISTER;
+	if (cmd == "reset")
+		return toolsCmd_E::RESET;
+	if (cmd == "setup")
+		return toolsCmd_E::SETUP;
+	if (cmd == "test")
+		return toolsCmd_E::TEST;
+	return toolsCmd_E::NONE;
+}
 toolsOptions_E str2option(std::string& opt)
 {
-	if (opt == "current")
-		return toolsOptions_E::CURRENT;
-	if (opt == "can")
-		return toolsOptions_E::CAN;
-	if (opt == "zero")
-		return toolsOptions_E::ZERO;
-	if (opt == "save")
-		return toolsOptions_E::SAVE;
+	if (opt == "absolute")
+		return toolsOptions_E::ABSOLUTE;
 	if (opt == "bandwidth")
 		return toolsOptions_E::BANDWIDTH;
 	if (opt == "calibration")
 		return toolsOptions_E::CALIBRATION;
 	if (opt == "calibration_out")
 		return toolsOptions_E::CALIBRATION_OUTPUT;
-	if (opt == "motor")
-		return toolsOptions_E::MOTOR;
+	if (opt == "can")
+		return toolsOptions_E::CAN;
+	if (opt == "clear")
+		return toolsOptions_E::CLEAR;
+	if (opt == "current")
+		return toolsOptions_E::CURRENT;
+	if (opt == "encoder")
+		return toolsOptions_E::ENCODER;
+	if (opt == "error")
+		return toolsOptions_E::ERROR;
+	if (opt == "homing")
+		return toolsOptions_E::HOMING;
 	if (opt == "info")
 		return toolsOptions_E::INFO;
 	if (opt == "latency")
 		return toolsOptions_E::LATENCY;
-	if (opt == "move")
-		return toolsOptions_E::MOVE;
-	if (opt == "encoder")
-		return toolsOptions_E::ENCODER;
 	if (opt == "main")
 		return toolsOptions_E::MAIN;
+	if (opt == "motor")
+		return toolsOptions_E::MOTOR;
+	if (opt == "move")
+		return toolsOptions_E::MOVE;
 	if (opt == "output")
 		return toolsOptions_E::OUTPUT;
-	if (opt == "homing")
-		return toolsOptions_E::HOMING;
-	if (opt == "absolute")
-		return toolsOptions_E::ABSOLUTE;
 	if (opt == "read")
 		return toolsOptions_E::READ;
-	if (opt == "write")
-		return toolsOptions_E::WRITE;
-	if (opt == "error")
-		return toolsOptions_E::ERROR;
+	if (opt == "save")
+		return toolsOptions_E::SAVE;
 	if (opt == "warning")
 		return toolsOptions_E::WARNING;
-	if (opt == "clear")
-		return toolsOptions_E::CLEAR;
-
+	if (opt == "write")
+		return toolsOptions_E::WRITE;
+	if (opt == "zero")
+		return toolsOptions_E::ZERO;
 	return toolsOptions_E::NONE;
-}
-toolsCmd_E str2cmd(std::string& cmd)
-{
-	if (cmd == "ping")
-		return toolsCmd_E::PING;
-	if (cmd == "config")
-		return toolsCmd_E::CONFIG;
-	if (cmd == "setup")
-		return toolsCmd_E::SETUP;
-	if (cmd == "test")
-		return toolsCmd_E::TEST;
-	if (cmd == "blink")
-		return toolsCmd_E::BLINK;
-	if (cmd == "encoder")
-		return toolsCmd_E::ENCODER;
-	if (cmd == "bus")
-		return toolsCmd_E::BUS;
-	if (cmd == "register")
-		return toolsCmd_E::REGISTER;
-	if (cmd == "clear")
-		return toolsCmd_E::CLEAR;
-	if (cmd == "reset")
-		return toolsCmd_E::RESET;
-	return toolsCmd_E::NONE;
 }
 
 mab::CANdleBaudrate_E str2baud(std::string& baud)
@@ -225,85 +224,9 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 
 	switch (cmd)
 	{
-		case toolsCmd_E::PING:
-			ping(args);
-			break;
-		case toolsCmd_E::CONFIG:
-		{
-			if (option == toolsOptions_E::CAN)
-				configCan(args);
-			else if (option == toolsOptions_E::SAVE)
-				configSave(args);
-			else if (option == toolsOptions_E::ZERO)
-				configZero(args);
-			else if (option == toolsOptions_E::CURRENT)
-				configCurrent(args);
-			else if (option == toolsOptions_E::BANDWIDTH)
-				configBandwidth(args);
-			else if (option == toolsOptions_E::CLEAR)
-				configClear(args);
-			else
-				ui::printHelpConfig();
-			break;
-		}
-		case toolsCmd_E::SETUP:
-		{
-			if (option == toolsOptions_E::CALIBRATION)
-				setupCalibration(args);
-			else if (option == toolsOptions_E::CALIBRATION_OUTPUT)
-				setupCalibrationOutput(args);
-			else if (option == toolsOptions_E::MOTOR)
-				setupMotor(args);
-			else if (option == toolsOptions_E::INFO)
-				setupInfo(args);
-			else if (option == toolsOptions_E::HOMING)
-				setupHoming(args);
-			else
-				ui::printHelpSetup();
-			break;
-		}
-		case toolsCmd_E::TEST:
-		{
-			if (option == toolsOptions_E::LATENCY)
-				testLatency(args);
-			else if (option == toolsOptions_E::MOVE)
-			{
-				if (option2 == toolsOptions_E::ABSOLUTE)
-					testMoveAbsolute(args);
-				else
-					testMove(args);
-			}
-			else if (option == toolsOptions_E::ENCODER)
-			{
-				if (option2 == toolsOptions_E::MAIN)
-					testEncoderMain(args);
-				else if (option2 == toolsOptions_E::OUTPUT)
-					testEncoderOutput(args);
-				else
-					ui::printHelpTest();
-			}
-			else
-				ui::printHelpTest();
-			break;
-		}
 		case toolsCmd_E::BLINK:
 		{
 			blink(args);
-			break;
-		}
-		case toolsCmd_E::ENCODER:
-		{
-			encoder(args);
-			break;
-		}
-		case toolsCmd_E::REGISTER:
-		{
-			if (option == toolsOptions_E::WRITE)
-				registerWrite(args);
-			else if (option == toolsOptions_E::READ)
-				registerRead(args);
-			else
-				ui::printHelpTest();
 			break;
 		}
 		case toolsCmd_E::CLEAR:
@@ -316,9 +239,87 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 				ui::printHelpTest();
 			break;
 		}
+		case toolsCmd_E::CONFIG:
+		{
+			if (option == toolsOptions_E::BANDWIDTH)
+				configBandwidth(args);
+			else if (option == toolsOptions_E::CAN)
+				configCan(args);
+			else if (option == toolsOptions_E::CLEAR)
+				configClear(args);
+			else if (option == toolsOptions_E::CURRENT)
+				configCurrent(args);
+			else if (option == toolsOptions_E::SAVE)
+				configSave(args);
+			else if (option == toolsOptions_E::ZERO)
+				configZero(args);
+			else
+				ui::printHelpConfig();
+			break;
+		}
+		case toolsCmd_E::ENCODER:
+		{
+			encoder(args);
+			break;
+		}
+		case toolsCmd_E::PING:
+		{
+			ping(args);
+			break;
+		}
+		case toolsCmd_E::REGISTER:
+		{
+			if (option == toolsOptions_E::READ)
+				registerRead(args);
+			else if (option == toolsOptions_E::WRITE)
+				registerWrite(args);
+			else
+				ui::printHelpTest();
+			break;
+		}
 		case toolsCmd_E::RESET:
 		{
 			reset(args);
+			break;
+		}
+		case toolsCmd_E::SETUP:
+		{
+			if (option == toolsOptions_E::CALIBRATION)
+				setupCalibration(args);
+			else if (option == toolsOptions_E::CALIBRATION_OUTPUT)
+				setupCalibrationOutput(args);
+			else if (option == toolsOptions_E::HOMING)
+				setupHoming(args);
+			else if (option == toolsOptions_E::INFO)
+				setupInfo(args);
+			else if (option == toolsOptions_E::MOTOR)
+				setupMotor(args);
+			else
+				ui::printHelpSetup();
+			break;
+		}
+		case toolsCmd_E::TEST:
+		{
+			if (option == toolsOptions_E::ENCODER)
+			{
+				if (option2 == toolsOptions_E::MAIN)
+					testEncoderMain(args);
+				else if (option2 == toolsOptions_E::OUTPUT)
+					testEncoderOutput(args);
+				else
+					ui::printHelpTest();
+			}
+			else if (option == toolsOptions_E::LATENCY)
+				testLatency(args);
+			else if (option == toolsOptions_E::MOVE)
+			{
+				if (option2 == toolsOptions_E::ABSOLUTE)
+					testMoveAbsolute(args);
+				else
+					testMove(args);
+			}
+			else
+				ui::printHelpTest();
 			break;
 		}
 		default:
@@ -329,6 +330,123 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 std::string MainWorker::getVersion()
 {
 	return mab::getVersionString({MDTOOL_VTAG, MDTOOL_VREVISION, MDTOOL_VMINOR, MDTOOL_VMAJOR});
+}
+
+void MainWorker::bus(std::vector<std::string>& args)
+{
+	if (args.size() < 3 || args.size() > 4)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+
+	if (args[2] != "SPI" && args[2] != "UART" && args[2] != "USB")
+	{
+		ui::printWrongArgumentsSpecified();
+		return;
+	}
+
+	changeDefaultConfig(args[2], args[3]);
+}
+
+void MainWorker::blink(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 3, 2);
+	if (id == -1)
+		return;
+	candle->configMd80Blink(id);
+}
+
+void MainWorker::clearErrors(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1)
+		return;
+	candle->setupMd80ClearErrors(id);
+}
+
+void MainWorker::clearWarnings(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1)
+		return;
+	candle->setupMd80ClearWarnings(id);
+}
+
+void MainWorker::configBandwidth(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 5, 3);
+	if (id == -1)
+		return;
+	candle->configMd80TorqueBandwidth(id, atof(args[4].c_str()));
+}
+
+void MainWorker::configCan(std::vector<std::string>& args)
+{
+	if (!checkArgs(args, 7))
+		return;
+	int id = atoi(args[3].c_str());
+	checkSpeedForId(id);
+	int					  new_id   = atoi(args[4].c_str());
+	mab::CANdleBaudrate_E new_baud = str2baud(args[5]);
+	int					  timeout  = atoi(args[6].c_str());
+	bool canTermination			   = (args.size() > 7 && atoi(args[7].c_str()) > 0) ? true : false;
+
+	candle->configMd80Can(id, new_id, new_baud, timeout, canTermination);
+}
+
+void MainWorker::configClear(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1)
+		return;
+
+	if (candle->writeMd80Register(id, mab::Md80Reg_E::runRestoreFactoryConfig, true))
+		std::cout << "[MDTOOL] Config reverted to factory state!" << std::endl;
+	else
+		std::cout << "[MDTOOL] Error reverting config to factory state!" << std::endl;
+}
+
+void MainWorker::configCurrent(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 5, 3);
+	if (id == -1)
+		return;
+	candle->configMd80SetCurrentLimit(id, atof(args[4].c_str()));
+}
+
+void MainWorker::configSave(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1)
+		return;
+	candle->configMd80Save(id);
+}
+
+void MainWorker::configZero(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1)
+		return;
+	candle->controlMd80SetEncoderZero(id);
+}
+
+void MainWorker::encoder(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 3, 2);
+	if (id == -1)
+		return;
+	candle->controlMd80Mode(id, mab::Md80Mode_E::IDLE);
+	candle->controlMd80Enable(id, true);
+	candle->begin();
+
+	while (1)
+	{
+		ui::printPositionAndVelocity(
+			id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity());
+		usleep(100000);
+	}
+	candle->end();
 }
 
 void MainWorker::ping(std::vector<std::string>& args)
@@ -363,59 +481,113 @@ void MainWorker::ping(std::vector<std::string>& args)
 	}
 }
 
-void MainWorker::configCan(std::vector<std::string>& args)
-{
-	if (!checkArgs(args, 7))
-		return;
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	int					  new_id   = atoi(args[4].c_str());
-	mab::CANdleBaudrate_E new_baud = str2baud(args[5]);
-	int					  timeout  = atoi(args[6].c_str());
-	bool canTermination			   = (args.size() > 7 && atoi(args[7].c_str()) > 0) ? true : false;
-
-	candle->configMd80Can(id, new_id, new_baud, timeout, canTermination);
-}
-void MainWorker::configSave(std::vector<std::string>& args)
-{
-	int32_t id = checkArgsAndGetId(args, 4, 3);
-	if (id == -1)
-		return;
-	candle->configMd80Save(id);
-}
-void MainWorker::configZero(std::vector<std::string>& args)
-{
-	int32_t id = checkArgsAndGetId(args, 4, 3);
-	if (id == -1)
-		return;
-	candle->controlMd80SetEncoderZero(id);
-}
-void MainWorker::configCurrent(std::vector<std::string>& args)
+void MainWorker::registerRead(std::vector<std::string>& args)
 {
 	int32_t id = checkArgsAndGetId(args, 5, 3);
 	if (id == -1)
 		return;
-	candle->configMd80SetCurrentLimit(id, atof(args[4].c_str()));
+
+	mab::Md80Reg_E regId = static_cast<mab::Md80Reg_E>(std::strtol(args[4].c_str(), nullptr, 16));
+
+	std::string value = "";
+
+	switch (mab::Register::getType(regId))
+	{
+		case mab::Register::type::U8:
+			readRegisterToString<uint8_t>(id, regId, value);
+			break;
+		case mab::Register::type::I8:
+			readRegisterToString<int8_t>(id, regId, value);
+			break;
+		case mab::Register::type::U16:
+			readRegisterToString<uint16_t>(id, regId, value);
+			break;
+		case mab::Register::type::I16:
+			readRegisterToString<int16_t>(id, regId, value);
+			break;
+		case mab::Register::type::U32:
+			readRegisterToString<uint32_t>(id, regId, value);
+			break;
+		case mab::Register::type::I32:
+			readRegisterToString<int32_t>(id, regId, value);
+			break;
+		case mab::Register::type::F32:
+			readRegisterToString<float>(id, regId, value);
+			break;
+		case mab::Register::type::STR:
+		{
+			char str[24]{};
+			candle->readMd80Register(id, regId, str);
+			value = std::string(str);
+			break;
+		}
+		case mab::Register::type::UNKNOWN:
+			std::cout << "[MDTOOL] Unknown register! Please check the ID and try again"
+					  << std::endl;
+			break;
+	}
+
+	std::cout << "[MDTOOL] Register value: " << value << std::endl;
 }
 
-void MainWorker::configBandwidth(std::vector<std::string>& args)
+void MainWorker::registerWrite(std::vector<std::string>& args)
 {
-	int32_t id = checkArgsAndGetId(args, 5, 3);
-	if (id == -1)
-		return;
-	candle->configMd80TorqueBandwidth(id, atof(args[4].c_str()));
-}
-
-void MainWorker::configClear(std::vector<std::string>& args)
-{
-	int32_t id = checkArgsAndGetId(args, 4, 3);
+	int32_t id = checkArgsAndGetId(args, 6, 3);
 	if (id == -1)
 		return;
 
-	if (candle->writeMd80Register(id, mab::Md80Reg_E::runRestoreFactoryConfig, true))
-		std::cout << "[MDTOOL] Config reverted to factory state!" << std::endl;
+	mab::Md80Reg_E regId = static_cast<mab::Md80Reg_E>(std::strtol(args[4].c_str(), nullptr, 16));
+	uint32_t	   regValue = atoi(args[5].c_str());
+
+	bool success = false;
+
+	switch (mab::Register::getType(regId))
+	{
+		case mab::Register::type::U8:
+			success = candle->writeMd80Register(id, regId, static_cast<uint8_t>(regValue));
+			break;
+		case mab::Register::type::I8:
+			success = candle->writeMd80Register(id, regId, static_cast<int8_t>(regValue));
+			break;
+		case mab::Register::type::U16:
+			success = candle->writeMd80Register(id, regId, static_cast<uint16_t>(regValue));
+			break;
+		case mab::Register::type::I16:
+			success = candle->writeMd80Register(id, regId, static_cast<int16_t>(regValue));
+			break;
+		case mab::Register::type::U32:
+			success = candle->writeMd80Register(id, regId, static_cast<uint32_t>(regValue));
+			break;
+		case mab::Register::type::I32:
+			success = candle->writeMd80Register(id, regId, static_cast<int32_t>(regValue));
+			break;
+		case mab::Register::type::F32:
+			success = candle->writeMd80Register(
+				id, regId, static_cast<float>(std::atof(args[5].c_str())));
+			break;
+		case mab::Register::type::STR:
+		{
+			char str[24]{};
+			memcpy(str, args[5].c_str(), sizeof(str));
+			success = candle->writeMd80Register(id, regId, str);
+			break;
+		}
+		case mab::Register::type::UNKNOWN:
+			std::cout << "[MDTOOL] Unknown register! Please check the ID and try again"
+					  << std::endl;
+	}
+	if (success)
+		std::cout << "[MDTOOL] Writing register successful!" << std::endl;
 	else
-		std::cout << "[MDTOOL] Error reverting config to factory state!" << std::endl;
+		std::cout << "[MDTOOL] Writing register failed!" << std::endl;
+}
+
+void MainWorker::reset(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 3, 2);
+	if (id == -1)
+		return;
+	candle->setupMd80PerformReset(id);
 }
 
 void MainWorker::setupCalibration(std::vector<std::string>& args)
@@ -449,6 +621,37 @@ void MainWorker::setupCalibrationOutput(std::vector<std::string>& args)
 	}
 
 	candle->setupMd80CalibrationOutput(id);
+}
+
+void MainWorker::setupHoming(std::vector<std::string>& args)
+{
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1)
+		return;
+	candle->setupMd80PerformHoming(id);
+}
+
+void MainWorker::setupInfo(std::vector<std::string>& args)
+{
+	bool printAll = false;
+
+	if (args.size() < 4)
+	{
+		ui::printTooFewArgsNoHelp();
+		return;
+	}
+	if (args.size() == 5)
+	{
+		if (args[4] == "all")
+			printAll = true;
+	}
+	int id = atoi(args[3].c_str());
+	checkSpeedForId(id);
+	if (!candle->addMd80(id))
+		return;
+
+	candle->setupMd80DiagnosticExtended(id);
+	ui::printDriveInfoExtended(candle->getMd80FromList(id), printAll);
 }
 
 void MainWorker::setupMotor(std::vector<std::string>& args)
@@ -696,41 +899,12 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	sleep(3);
 }
 
-void MainWorker::setupInfo(std::vector<std::string>& args)
+void MainWorker::testEncoderMain(std::vector<std::string>& args)
 {
-	bool printAll = false;
-
-	if (args.size() < 4)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-	if (args.size() == 5)
-	{
-		if (args[4] == "all")
-			printAll = true;
-	}
-	int id = atoi(args[3].c_str());
-	checkSpeedForId(id);
-	if (!candle->addMd80(id))
-		return;
-
-	candle->setupMd80DiagnosticExtended(id);
-	ui::printDriveInfoExtended(candle->getMd80FromList(id), printAll);
-}
-
-void MainWorker::testMove(std::vector<std::string>& args)
-{
-	int32_t id = checkArgsAndGetId(args, 5, 3);
+	int32_t id = checkArgsAndGetId(args, 5, 4);
 	if (id == -1)
 		return;
 
-	float targetPos = atof(args[4].c_str());
-	if (targetPos > 10.0f)
-		targetPos = 10.0f;
-	if (targetPos < -10.0f)
-		targetPos = -10.0f;
-
 	/* check if no critical errors are present */
 	if (checkErrors(id))
 	{
@@ -739,41 +913,14 @@ void MainWorker::testMove(std::vector<std::string>& args)
 		return;
 	}
 
-	candle->controlMd80SetEncoderZero(id);
-	candle->controlMd80Mode(id, mab::Md80Mode_E::IMPEDANCE);
-	candle->controlMd80Enable(id, true);
-	candle->begin();
-	usleep(100000);
-
-	float dp  = (targetPos + candle->md80s[0].getPosition()) / 300;
-	float pos = 0.0f;
-	for (int i = 0; i < 300; i++)
-	{
-		pos += dp;
-		candle->md80s[0].setTargetPosition(pos);
-		usleep(10000);
-		ui::printPositionAndVelocity(
-			id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity());
-	}
-	std::cout << std::endl;
-
-	candle->end();
+	candle->setupMd80TestMainEncoder(id);
 }
 
-void MainWorker::testMoveAbsolute(std::vector<std::string>& args)
+void MainWorker::testEncoderOutput(std::vector<std::string>& args)
 {
-	if (args.size() < 6)
-	{
-		ui::printTooFewArgsNoHelp();
+	int32_t id = checkArgsAndGetId(args, 5, 4);
+	if (id == -1)
 		return;
-	}
-	uint16_t id = atoi(args[4].c_str());
-
-	if (!tryAddMD80(id))
-		return;
-
-	float targetPos = std::stof(args[5].c_str());
-
 	/* check if no critical errors are present */
 	if (checkErrors(id))
 	{
@@ -782,27 +929,16 @@ void MainWorker::testMoveAbsolute(std::vector<std::string>& args)
 		return;
 	}
 
-	if (args.size() > 6)
-		candle->writeMd80Register(id, mab::Md80Reg_E::profileVelocity, std::stof(args[6].c_str()));
-	if (args.size() > 7)
-		candle->writeMd80Register(
-			id, mab::Md80Reg_E::profileAcceleration, std::stof(args[7].c_str()));
-	if (args.size() > 8)
-		candle->writeMd80Register(
-			id, mab::Md80Reg_E::profileDeceleration, std::stof(args[8].c_str()));
+	uint16_t outputEncoder = 0;
+	candle->readMd80Register(id, mab::Md80Reg_E::outputEncoder, outputEncoder);
 
-	candle->controlMd80Mode(id, mab::Md80Mode_E::POSITION_PROFILE);
-	candle->controlMd80Enable(id, true);
-	candle->begin();
-
-	candle->md80s[0].setTargetPosition(targetPos);
-	while (!candle->md80s[0].isTargetPositionReached())
+	if (!outputEncoder)
 	{
-		sleep(1);
-	};
-	std::cout << "[MDTOOL] TARGET REACHED!" << std::endl;
+		std::cout << "[MDTOOL] No output encoder is configured! " << RED("[FAILED]") << std::endl;
+		return;
+	}
 
-	candle->end();
+	candle->setupMd80TestOutputEncoder(id);
 }
 
 void MainWorker::testLatency(std::vector<std::string>& args)
@@ -860,36 +996,19 @@ void MainWorker::testLatency(std::vector<std::string>& args)
 	candle->end();
 }
 
-void MainWorker::testEncoderOutput(std::vector<std::string>& args)
+void MainWorker::testMoveAbsolute(std::vector<std::string>& args)
 {
-	int32_t id = checkArgsAndGetId(args, 5, 4);
-	if (id == -1)
-		return;
-	/* check if no critical errors are present */
-	if (checkErrors(id))
+	if (args.size() < 6)
 	{
-		std::cout << "[MDTOOL] Could not proceed due to errors: " << std::endl;
-		ui::printAllErrors(candle->md80s[0]);
+		ui::printTooFewArgsNoHelp();
 		return;
 	}
+	uint16_t id = atoi(args[4].c_str());
 
-	uint16_t outputEncoder = 0;
-	candle->readMd80Register(id, mab::Md80Reg_E::outputEncoder, outputEncoder);
-
-	if (!outputEncoder)
-	{
-		std::cout << "[MDTOOL] No output encoder is configured! " << RED("[FAILED]") << std::endl;
+	if (!tryAddMD80(id))
 		return;
-	}
 
-	candle->setupMd80TestOutputEncoder(id);
-}
-
-void MainWorker::testEncoderMain(std::vector<std::string>& args)
-{
-	int32_t id = checkArgsAndGetId(args, 5, 4);
-	if (id == -1)
-		return;
+	float targetPos = std::stof(args[5].c_str());
 
 	/* check if no critical errors are present */
 	if (checkErrors(id))
@@ -899,157 +1018,68 @@ void MainWorker::testEncoderMain(std::vector<std::string>& args)
 		return;
 	}
 
-	candle->setupMd80TestMainEncoder(id);
-}
+	if (args.size() > 6)
+		candle->writeMd80Register(id, mab::Md80Reg_E::profileVelocity, std::stof(args[6].c_str()));
+	if (args.size() > 7)
+		candle->writeMd80Register(
+			id, mab::Md80Reg_E::profileAcceleration, std::stof(args[7].c_str()));
+	if (args.size() > 8)
+		candle->writeMd80Register(
+			id, mab::Md80Reg_E::profileDeceleration, std::stof(args[8].c_str()));
 
-void MainWorker::setupHoming(std::vector<std::string>& args)
-{
-	int32_t id = checkArgsAndGetId(args, 4, 3);
-	if (id == -1)
-		return;
-	candle->setupMd80PerformHoming(id);
-}
+	candle->controlMd80Mode(id, mab::Md80Mode_E::POSITION_PROFILE);
+	candle->controlMd80Enable(id, true);
+	candle->begin();
 
-void MainWorker::registerWrite(std::vector<std::string>& args)
-{
-	int32_t id = checkArgsAndGetId(args, 6, 3);
-	if (id == -1)
-		return;
-
-	mab::Md80Reg_E regId = static_cast<mab::Md80Reg_E>(std::strtol(args[4].c_str(), nullptr, 16));
-	uint32_t	   regValue = atoi(args[5].c_str());
-
-	bool success = false;
-
-	switch (mab::Register::getType(regId))
+	candle->md80s[0].setTargetPosition(targetPos);
+	while (!candle->md80s[0].isTargetPositionReached())
 	{
-		case mab::Register::type::U8:
-			success = candle->writeMd80Register(id, regId, static_cast<uint8_t>(regValue));
-			break;
-		case mab::Register::type::I8:
-			success = candle->writeMd80Register(id, regId, static_cast<int8_t>(regValue));
-			break;
-		case mab::Register::type::U16:
-			success = candle->writeMd80Register(id, regId, static_cast<uint16_t>(regValue));
-			break;
-		case mab::Register::type::I16:
-			success = candle->writeMd80Register(id, regId, static_cast<int16_t>(regValue));
-			break;
-		case mab::Register::type::U32:
-			success = candle->writeMd80Register(id, regId, static_cast<uint32_t>(regValue));
-			break;
-		case mab::Register::type::I32:
-			success = candle->writeMd80Register(id, regId, static_cast<int32_t>(regValue));
-			break;
-		case mab::Register::type::F32:
-			success = candle->writeMd80Register(
-				id, regId, static_cast<float>(std::atof(args[5].c_str())));
-			break;
-		case mab::Register::type::STR:
-		{
-			char str[24]{};
-			memcpy(str, args[5].c_str(), sizeof(str));
-			success = candle->writeMd80Register(id, regId, str);
-			break;
-		}
-		case mab::Register::type::UNKNOWN:
-			std::cout << "[MDTOOL] Unknown register! Please check the ID and try again"
-					  << std::endl;
-	}
-	if (success)
-		std::cout << "[MDTOOL] Writing register successful!" << std::endl;
-	else
-		std::cout << "[MDTOOL] Writing register failed!" << std::endl;
+		sleep(1);
+	};
+	std::cout << "[MDTOOL] TARGET REACHED!" << std::endl;
+
+	candle->end();
 }
 
-void MainWorker::registerRead(std::vector<std::string>& args)
+void MainWorker::testMove(std::vector<std::string>& args)
 {
 	int32_t id = checkArgsAndGetId(args, 5, 3);
 	if (id == -1)
 		return;
 
-	mab::Md80Reg_E regId = static_cast<mab::Md80Reg_E>(std::strtol(args[4].c_str(), nullptr, 16));
+	float targetPos = atof(args[4].c_str());
+	if (targetPos > 10.0f)
+		targetPos = 10.0f;
+	if (targetPos < -10.0f)
+		targetPos = -10.0f;
 
-	std::string value = "";
-
-	switch (mab::Register::getType(regId))
+	/* check if no critical errors are present */
+	if (checkErrors(id))
 	{
-		case mab::Register::type::U8:
-			readRegisterToString<uint8_t>(id, regId, value);
-			break;
-		case mab::Register::type::I8:
-			readRegisterToString<int8_t>(id, regId, value);
-			break;
-		case mab::Register::type::U16:
-			readRegisterToString<uint16_t>(id, regId, value);
-			break;
-		case mab::Register::type::I16:
-			readRegisterToString<int16_t>(id, regId, value);
-			break;
-		case mab::Register::type::U32:
-			readRegisterToString<uint32_t>(id, regId, value);
-			break;
-		case mab::Register::type::I32:
-			readRegisterToString<int32_t>(id, regId, value);
-			break;
-		case mab::Register::type::F32:
-			readRegisterToString<float>(id, regId, value);
-			break;
-		case mab::Register::type::STR:
-		{
-			char str[24]{};
-			candle->readMd80Register(id, regId, str);
-			value = std::string(str);
-			break;
-		}
-		case mab::Register::type::UNKNOWN:
-			std::cout << "[MDTOOL] Unknown register! Please check the ID and try again"
-					  << std::endl;
-			break;
+		std::cout << "[MDTOOL] Could not proceed due to errors: " << std::endl;
+		ui::printAllErrors(candle->md80s[0]);
+		return;
 	}
 
-	std::cout << "[MDTOOL] Register value: " << value << std::endl;
-}
-
-void MainWorker::blink(std::vector<std::string>& args)
-{
-	int32_t id = checkArgsAndGetId(args, 3, 2);
-	if (id == -1)
-		return;
-	candle->configMd80Blink(id);
-}
-void MainWorker::encoder(std::vector<std::string>& args)
-{
-	int32_t id = checkArgsAndGetId(args, 3, 2);
-	if (id == -1)
-		return;
-	candle->controlMd80Mode(id, mab::Md80Mode_E::IDLE);
+	candle->controlMd80SetEncoderZero(id);
+	candle->controlMd80Mode(id, mab::Md80Mode_E::IMPEDANCE);
 	candle->controlMd80Enable(id, true);
 	candle->begin();
+	usleep(100000);
 
-	while (1)
+	float dp  = (targetPos + candle->md80s[0].getPosition()) / 300;
+	float pos = 0.0f;
+	for (int i = 0; i < 300; i++)
 	{
+		pos += dp;
+		candle->md80s[0].setTargetPosition(pos);
+		usleep(10000);
 		ui::printPositionAndVelocity(
 			id, candle->md80s[0].getPosition(), candle->md80s[0].getVelocity());
-		usleep(100000);
 	}
+	std::cout << std::endl;
+
 	candle->end();
-}
-void MainWorker::bus(std::vector<std::string>& args)
-{
-	if (args.size() < 3 || args.size() > 4)
-	{
-		ui::printTooFewArgsNoHelp();
-		return;
-	}
-
-	if (args[2] != "SPI" && args[2] != "UART" && args[2] != "USB")
-	{
-		ui::printWrongArgumentsSpecified();
-		return;
-	}
-
-	changeDefaultConfig(args[2], args[3]);
 }
 
 void MainWorker::changeDefaultConfig(std::string bus, std::string device)
@@ -1064,30 +1094,6 @@ void MainWorker::changeDefaultConfig(std::string bus, std::string device)
 	else
 		ini["communication"]["device"] = "";
 	file.write(ini);
-}
-
-void MainWorker::clearErrors(std::vector<std::string>& args)
-{
-	int32_t id = checkArgsAndGetId(args, 4, 3);
-	if (id == -1)
-		return;
-	candle->setupMd80ClearErrors(id);
-}
-
-void MainWorker::clearWarnings(std::vector<std::string>& args)
-{
-	int32_t id = checkArgsAndGetId(args, 4, 3);
-	if (id == -1)
-		return;
-	candle->setupMd80ClearWarnings(id);
-}
-
-void MainWorker::reset(std::vector<std::string>& args)
-{
-	int32_t id = checkArgsAndGetId(args, 3, 2);
-	if (id == -1)
-		return;
-	candle->setupMd80PerformReset(id);
 }
 
 mab::CANdleBaudrate_E MainWorker::checkSpeedForId(uint16_t id)
