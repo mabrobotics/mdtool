@@ -1,6 +1,7 @@
 #include "ConfigManager.hpp"
 
 #include <iostream>
+#include <unistd.h>
 
 #include "dirent.h"
 
@@ -218,4 +219,28 @@ std::string ConfigManager::validateConfig(std::string configName)
 	// Write an updated config file
 	updatedFile.write(updatedIni);
 	return updatedConfigName;
+}
+
+std::string ConfigManager::getFullPath()
+{
+	if ((userConfigPath.rfind("./", 0) == 0) || (userConfigPath.rfind("/", 0) == 0))
+	{
+		if ((userConfigPath.rfind("./", 0) == 0))
+		{
+			char buffer[PATH_MAX];
+
+			if (getcwd(buffer, sizeof(buffer)) != NULL)
+			{
+				return (buffer + userConfigPath.substr(1));
+			}
+			else
+			{
+				perror("getcwd() error");
+			}
+		}
+	}
+	else
+	{
+		return (userConfigPath + "/" + userConfigPath);
+	}
 }

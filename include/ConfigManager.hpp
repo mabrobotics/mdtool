@@ -51,6 +51,8 @@ class ConfigManager
 	std::string validateConfig(std::string configName);
 
   private:
+	std::string getFullPath();
+
 	std::set<std::string> differentFilePaths, identicalFilePaths, defaultFilenames;
 
 	std::string userConfigName, userConfigPath;
