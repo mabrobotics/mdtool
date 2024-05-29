@@ -51,8 +51,6 @@ class ConfigManager
 	std::string validateConfig(std::string configName);
 
   private:
-	std::string getFullPath();
-
 	std::set<std::string> differentFilePaths, identicalFilePaths, defaultFilenames;
 
 	std::string userConfigName, userConfigPath;
@@ -62,5 +60,7 @@ class ConfigManager
 	// const std::string originalConfigDir	= "/etc/mdtool/mdtool_motors";
 	const std::string defaultConfigFileName = "default.ini";
 
-	void update();
+	void		update();
+	std::string getFullPath();
+	void		checkDefaultConfig();
 };

@@ -13,13 +13,7 @@ ConfigManager::ConfigManager(std::string originalConfigDir, std::string userConf
 	: originalConfigDir(originalConfigDir), userConfigDir(userConfigDir)
 {
 	update();
-
-	if (isConfigDefault(defaultConfigFileName) && isConifgDifferent(defaultConfigFileName))
-	{
-		system(("cp " + originalConfigDir + "/" + defaultConfigFileName + " " + userConfigDir +
-				"/" + defaultConfigFileName)
-				   .c_str());
-	}
+	checkDefaultConfig();
 }
 
 std::string ConfigManager::getConfigPath() { return userConfigPath; }
@@ -257,5 +251,15 @@ std::string ConfigManager::getFullPath()
 	else
 	{
 		return (userConfigPath + "/" + userConfigPath);
+	}
+}
+
+void ConfigManager::checkDefaultConfig()
+{
+	if (isConfigDefault(defaultConfigFileName) && isConifgDifferent(defaultConfigFileName))
+	{
+		system(("cp " + originalConfigDir + "/" + defaultConfigFileName + " " + userConfigDir +
+				"/" + defaultConfigFileName)
+				   .c_str());
 	}
 }
