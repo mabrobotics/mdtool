@@ -466,9 +466,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	{
 		if (ui::getDifferentConfigsConfirmation(filename))
 		{
-			system(("cp " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName + "/" +
-					filename + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" + filename)
-					   .c_str());
+			configManager.copyDefaultConfig(filename);
 		}
 	}
 

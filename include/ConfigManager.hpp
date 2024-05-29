@@ -46,6 +46,8 @@ class ConfigManager
 	bool isConifgDifferent(std::string configName);
 	bool isConifgDifferent();
 
+	void copyDefaultConfig(std::string configName);
+
 	bool isConfigValid();
 
 	std::string validateConfig();
@@ -60,5 +62,4 @@ class ConfigManager
 
 	void update();
 	void computeFullPathAndName();
-	void checkDefaultConfig();
 };

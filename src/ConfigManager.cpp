@@ -12,7 +12,8 @@
 ConfigManager::ConfigManager(std::string userConfigPath) : userConfigPath(userConfigPath)
 {
 	update();
-	checkDefaultConfig();
+	if (isConfigDefault(defaultConfigFileName) && isConifgDifferent(defaultConfigFileName))
+		copyDefaultConfig(defaultConfigFileName);
 	computeFullPathAndName();
 }
 
@@ -164,8 +165,7 @@ bool ConfigManager::isConfigValid()
 		auto const& collection = it.second;
 		for (auto const& it2 : collection)
 		{
-			auto const& key	  = it2.first;
-			auto const& value = it2.second;
+			auto const& key = it2.first;
 			if (!userIni[section].has(key))
 				return false;
 		}
@@ -189,8 +189,10 @@ std::string ConfigManager::validateConfig()
 		userConfigPath.substr(0, userConfigPath.find_last_of(".")) + "_updated.cfg";
 	/* copy motors configs directory - not the best practice to use
 	 * system() but std::filesystem is not available until C++17 */
-	int result = 0;
-	result	   = system(("cp " + userConfigPath + " " + updatedUserConfigPath).c_str());
+	int result = system(("cp " + userConfigPath + " " + updatedUserConfigPath).c_str());
+	if (result)
+		std::cerr << "Error: Failed to copy the user's file: " << userConfigPath << std::endl
+				  << "Please check the file and try again." << std::endl;
 
 	// Read updated config file.
 	mINI::INIFile	   updatedFile(updatedUserConfigPath);
@@ -215,6 +217,17 @@ std::string ConfigManager::validateConfig()
 	// Write an updated config file
 	updatedFile.write(updatedIni);
 	return updatedUserConfigPath;
+}
+
+void ConfigManager::copyDefaultConfig(std::string configName)
+{
+	int result = system(
+		("cp " + originalConfigDir + "/" + configName + " " + userConfigDir + "/" + configName)
+			.c_str());
+	if (result)
+		std::cerr << "Error: Failed to copy the user's file: "
+				  << (originalConfigDir + "/" + configName).c_str() << std::endl
+				  << "Please check the file and try again." << std::endl;
 }
 
 void ConfigManager::computeFullPathAndName()
@@ -251,14 +264,4 @@ void ConfigManager::computeFullPathAndName()
 		userConfigPath = (userConfigDir + "/" + userConfigPath);
 	}
 	userConfigName = userConfigPath.substr(userConfigPath.find_last_of("/") + 1);
-}
-
-void ConfigManager::checkDefaultConfig()
-{
-	if (isConfigDefault(defaultConfigFileName) && isConifgDifferent(defaultConfigFileName))
-	{
-		system(("cp " + originalConfigDir + "/" + defaultConfigFileName + " " + userConfigDir +
-				"/" + defaultConfigFileName)
-				   .c_str());
-	}
 }
