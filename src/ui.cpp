@@ -249,6 +249,8 @@ void printDriveInfoExtended(mab::Md80& drive, bool printAll)
 				return "HW20";
 			case 3:
 				return "HW21";
+			case 4:
+				return "HW30";
 			default:
 				return "UNKNOWN";
 		}
