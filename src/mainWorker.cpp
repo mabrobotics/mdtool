@@ -4,10 +4,9 @@
 
 #include <filesystem>
 #include <numeric>
-#include <iostream>
 #include <sstream>
 #include <iomanip>
-#include <limits>
+#include <limits.h>
 
 #include "ConfigManager.hpp"
 #include "ui.hpp"
@@ -922,7 +921,15 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 
 	candle->readMd80Register(id, mab::Md80Reg_E::motorName, motorNameChar);
 
+	std::string configName = std::string(motorNameChar) + "_read.cfg";
+
+	bool saveConfig = ui::getSaveMotorConfigConfirmation(configName);
+
+	std::string defaultConfigPath =
+		std::string(getenv("HOME")) + "/.config/mdtool/mdtool_motors/default.ini";
+	mINI::INIFile	   defaultFile(defaultConfigPath);
 	mINI::INIStructure readIni;
+	defaultFile.read(readIni);
 
 	candle->readMd80Register(id,
 							 mab::Md80Reg_E::motorPolePairs,
@@ -1055,6 +1062,24 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 	readIni["homing"]["max travel"]	  = floatToString(regR.RW.homingMaxTravel);
 	readIni["homing"]["max torque"]	  = floatToString(regR.RW.homingTorque);
 	readIni["homing"]["max velocity"] = floatToString(regR.RW.homingVelocity);
+
+	if (saveConfig)
+	{
+		std::string saveConfigPath;
+		char		buffer[PATH_MAX];
+
+		if (getcwd(buffer, sizeof(buffer)) != NULL)
+		{
+			saveConfigPath = buffer;
+		}
+		else
+		{
+			perror("getcwd() error");
+		}
+		saveConfigPath += "/" + configName;
+		mINI::INIFile configFile(saveConfigPath);
+		configFile.write(readIni);
+	}
 
 	for (auto const& it : readIni)
 	{
