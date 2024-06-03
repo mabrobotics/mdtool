@@ -1080,19 +1080,7 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 		mINI::INIFile configFile(saveConfigPath);
 		configFile.write(readIni);
 	}
-
-	for (auto const& it : readIni)
-	{
-		auto const& section	   = it.first;
-		auto const& collection = it.second;
-		std::cout << "[" << section << "]" << std::endl;
-		for (auto const& it2 : collection)
-		{
-			auto const& key	  = it2.first;
-			auto const& value = it2.second;
-			std::cout << key << "=" << value << std::endl;
-		}
-	}
+	ui::printMotorConfig(readIni);
 }
 
 void MainWorker::testEncoderMain(std::vector<std::string>& args)

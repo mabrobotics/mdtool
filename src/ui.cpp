@@ -545,6 +545,23 @@ namespace ui
 			 << static_cast<uint16_t>(regId) << " register" << std::endl;
 	}
 
+	void printMotorConfig(mINI::INIStructure Ini)
+	{
+		vout << "Motor config:" << std::endl;
+		for (auto const& it : Ini)
+		{
+			auto const& section	   = it.first;
+			auto const& collection = it.second;
+			std::cout << "- " << section << ":" << std::endl;
+			for (auto const& it2 : collection)
+			{
+				auto const& key	  = it2.first;
+				auto const& value = it2.second;
+				std::cout << "   - " << key << ": " << value << std::endl;
+			}
+		}
+	}
+
 	bool getDifferentConfigsConfirmation(std::string configName)
 	{
 		vout << "[MDTOOL] The default " << configName << " config was modified." << std::endl;
