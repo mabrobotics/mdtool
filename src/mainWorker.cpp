@@ -988,8 +988,16 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 							 mab::Md80Reg_E::outputEncoderMode,
 							 regR.RW.outputEncoderMode);
 
-	readIni["output encoder"]["output encoder"]		 = floatToString(regR.RW.outputEncoder);
-	readIni["output encoder"]["output encoder mode"] = floatToString(regR.RW.outputEncoderMode);
+	if (regR.RW.outputEncoder == 0.f)
+		readIni["output encoder"]["output encoder"] = 0.f;
+	else
+		readIni["output encoder"]["output encoder"] = ui::encoderTypes[regR.RW.outputEncoder];
+
+	if (regR.RW.outputEncoderMode == 0.f)
+		readIni["output encoder"]["output encoder mode"] = 0.f;
+	else
+		readIni["output encoder"]["output encoder mode"] =
+			ui::encoderModes[regR.RW.outputEncoderMode];
 
 	float kp = 0.f, ki = 0.f, kd = 0.f, windup = 0.f;
 
@@ -1043,7 +1051,7 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 							 mab::Md80Reg_E::homingVelocity,
 							 regR.RW.homingVelocity);
 
-	readIni["homing"]["mode"]		  = floatToString(regR.RW.homingMode);
+	readIni["homing"]["mode"]		  = ui::homingModes[regR.RW.homingMode];
 	readIni["homing"]["max travel"]	  = floatToString(regR.RW.homingMaxTravel);
 	readIni["homing"]["max torque"]	  = floatToString(regR.RW.homingTorque);
 	readIni["homing"]["max velocity"] = floatToString(regR.RW.homingVelocity);
