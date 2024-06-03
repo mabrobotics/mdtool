@@ -580,4 +580,19 @@ namespace ui
 			 << std::endl;
 		return true;
 	}
+
+	bool getSaveMotorConfigConfirmation(std::string configName)
+	{
+		vout << "[MDTOOL] Would you like to save the motor config under the name: " << configName
+			 << " in your current directory? [Y/n]" << std::endl;
+		char x;
+		std::cin >> x;
+		if (x != 'Y' && x != 'y')
+		{
+			vout << "[MDTOOL] Reading the motor config without saving to a file." << std::endl;
+			return false;
+		}
+		vout << "[MDTOOL] Saving the motor config." << std::endl;
+		return true;
+	}
 }  // namespace ui

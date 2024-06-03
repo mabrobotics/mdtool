@@ -59,6 +59,8 @@ namespace ui
 	bool getDifferentConfigsConfirmation(std::string configName);
 	bool getUpdateConfigConfirmation(std::string configName);
 
+	bool getSaveMotorConfigConfirmation(std::string configName);
+
 	/* these are only used to light up the values in */
 	constexpr float outputEncoderStdDevMax = 0.05f;
 	constexpr float outputEncoderMaxError  = 0.18f;
