@@ -13,29 +13,29 @@ _mdtool_complete()
 	prev2=${COMP_WORDS[COMP_CWORD-2]}
 	
 	if [ $COMP_CWORD -eq 1 ]; then
-		COMPREPLY=( $(compgen -W "bus ping config setup test blink encoder register clear reset" -- $cur) )
+		COMPREPLY=( $(compgen -W "blink bus clear config encoder ping register reset setup test" -- $cur) )
 	elif [ $COMP_CWORD -eq 2 ]; then
 		case "$prev" in
 			"bus")
-			COMPREPLY=( $(compgen -W "USB SPI UART" -- $cur) )
+			COMPREPLY=( $(compgen -W "SPI UART USB" -- $cur) )
+			;;
+			"clear")
+			COMPREPLY=( $(compgen -W "error warning" -- $cur) )
+			;;
+			"config")
+			COMPREPLY=( $(compgen -W "bandwidth can current save zero" -- $cur) )
 			;;
 			"ping")
 			COMPREPLY=( $(compgen -W "all" -- $cur) )
 			;;
-			"config")
-			COMPREPLY=( $(compgen -W "zero can save current bandwidth" -- $cur) )
-			;; 
-			"setup")
-			COMPREPLY=( $(compgen -W "calibration calibration_out motor info homing read_config" -- $cur) )
-			;;
-			"test")
-			COMPREPLY=( $(compgen -W "move latency encoder" -- $cur) )
-			;;
 			"register")
 			COMPREPLY=( $(compgen -W "read write" -- $cur) )
+			;; 
+			"setup")
+			COMPREPLY=( $(compgen -W "calibration calibration_out homing info motor read_config" -- $cur) )
 			;;
-			"clear")
-			COMPREPLY=( $(compgen -W "error warning" -- $cur) )
+			"test")
+			COMPREPLY=( $(compgen -W "encoder latency move" -- $cur) )
 			;;
 			*)
 			;;
