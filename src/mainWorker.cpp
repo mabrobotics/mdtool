@@ -909,29 +909,23 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 
 void MainWorker::setupReadConfig(std::vector<std::string>& args)
 {
-	std::cout << "Read config." << std::endl;
-
 	int32_t id = checkArgsAndGetId(args, 4, 3);
 	if (id == -1)
 		return;
 
-	mab::regRead_st& regR = candle->getMd80FromList(id).getReadReg();
-
-	char motorNameChar[24];
+	mINI::INIStructure readIni; /**< mINI structure for read data */
+	mab::regRead_st&   regR = candle->getMd80FromList(id).getReadReg(); /**< read register */
+	char			   motorNameChar[24];
 
 	if (!candle->readMd80Register(id, mab::Md80Reg_E::motorName, motorNameChar))
 		ui::printFailedToReadMotorConfig(mab::Md80Reg_E::motorName);
 
 	std::string configName = std::string(motorNameChar) + "_read.cfg";
 
+	/* Ask user if the motor config should be saved */
 	bool saveConfig = ui::getSaveMotorConfigConfirmation(configName);
 
-	std::string defaultConfigPath =
-		std::string(getenv("HOME")) + "/.config/mdtool/mdtool_motors/default.ini";
-	mINI::INIFile	   defaultFile(defaultConfigPath);
-	mINI::INIStructure readIni;
-	defaultFile.read(readIni);
-
+	/* Motor config - motor section */
 	if (!candle->readMd80Register(id,
 								  mab::Md80Reg_E::motorPolePairs,
 								  regR.RW.polePairs,
@@ -958,6 +952,7 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 	readIni["motor"]["torque bandwidth"] = floatToString(regR.RW.torqueBandwidth);
 	readIni["motor"]["shutdown temp"]	 = floatToString(regR.RW.motorShutdownTemp);
 
+	/* Motor config - limits section */
 	if (!candle->readMd80Register(id,
 								  mab::Md80Reg_E::maxTorque,
 								  regR.RW.maxTorque,
@@ -980,6 +975,7 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 	readIni["limits"]["max acceleration"] = floatToString(regR.RW.maxAcceleration);
 	readIni["limits"]["max deceleration"] = floatToString(regR.RW.maxDeceleration);
 
+	/* Motor config - profile section */
 	if (!candle->readMd80Register(id,
 								  mab::Md80Reg_E::profileAcceleration,
 								  regR.RW.profileAcceleration,
@@ -993,6 +989,7 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 	readIni["profile"]["deceleration"] = floatToString(regR.RW.profileDeceleration);
 	readIni["profile"]["velocity"]	   = floatToString(regR.RW.profileVelocity);
 
+	/* Motor config - output encoder section */
 	if (!candle->readMd80Register(id,
 								  mab::Md80Reg_E::outputEncoder,
 								  regR.RW.outputEncoder,
@@ -1013,6 +1010,7 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 
 	float kp = 0.f, ki = 0.f, kd = 0.f, windup = 0.f;
 
+	/* Motor config - position PID section */
 	if (!candle->readMd80Register(id,
 								  mab::Md80Reg_E::motorPosPidKp,
 								  kp,
@@ -1031,6 +1029,7 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 
 	kp = ki = kd = windup = 0.f;
 
+	/* Motor config - velocity PID section */
 	if (!candle->readMd80Register(id,
 								  mab::Md80Reg_E::motorVelPidKp,
 								  kp,
@@ -1049,6 +1048,7 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 
 	kp = ki = kd = windup = 0.f;
 
+	/* Motor config - impedance PD section */
 	if (!candle->readMd80Register(
 			id, mab::Md80Reg_E::motorImpPidKp, kp, mab::Md80Reg_E::motorImpPidKd, kd))
 		ui::printFailedToReadMotorConfig(mab::Md80Reg_E::motorImpPidKd);
@@ -1056,6 +1056,7 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 	readIni["impedance PD"]["kp"] = floatToString(kp);
 	readIni["impedance PD"]["kd"] = floatToString(kd);
 
+	/* Motor config - homing section */
 	if (!candle->readMd80Register(id,
 								  mab::Md80Reg_E::homingMode,
 								  regR.RW.homingMode,
@@ -1072,6 +1073,7 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 	readIni["homing"]["max torque"]	  = floatToString(regR.RW.homingTorque);
 	readIni["homing"]["max velocity"] = floatToString(regR.RW.homingVelocity);
 
+	/* Saving motor config to file */
 	if (saveConfig)
 	{
 		std::string saveConfigPath;
@@ -1089,6 +1091,8 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 		mINI::INIFile configFile(saveConfigPath);
 		configFile.write(readIni);
 	}
+
+	/* Printing motor config */
 	ui::printMotorConfig(readIni);
 }
 
