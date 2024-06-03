@@ -4,6 +4,10 @@
 
 #include <filesystem>
 #include <numeric>
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <limits>
 
 #include "ConfigManager.hpp"
 #include "ui.hpp"
@@ -907,6 +911,155 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 void MainWorker::setupReadConfig(std::vector<std::string>& args)
 {
 	std::cout << "Read config." << std::endl;
+
+	int32_t id = checkArgsAndGetId(args, 4, 3);
+	if (id == -1)
+		return;
+
+	mab::regRead_st& regR = candle->getMd80FromList(id).getReadReg();
+
+	char motorNameChar[24];
+
+	candle->readMd80Register(id, mab::Md80Reg_E::motorName, motorNameChar);
+
+	mINI::INIStructure readIni;
+
+	candle->readMd80Register(id,
+							 mab::Md80Reg_E::motorPolePairs,
+							 regR.RW.polePairs,
+							 mab::Md80Reg_E::motorKV,
+							 regR.RW.motorKV,
+							 mab::Md80Reg_E::motorKt,
+							 regR.RW.motorKt,
+							 mab::Md80Reg_E::motorGearRatio,
+							 regR.RW.gearRatio,
+							 mab::Md80Reg_E::motorIMax,
+							 regR.RW.iMax,
+							 mab::Md80Reg_E::motorTorgueBandwidth,
+							 regR.RW.torqueBandwidth,
+							 mab::Md80Reg_E::motorShutdownTemp,
+							 regR.RW.motorShutdownTemp);
+
+	readIni["motor"]["name"]			 = std::string(motorNameChar);
+	readIni["motor"]["pole pairs"]		 = std::to_string(regR.RW.polePairs);
+	readIni["motor"]["KV"]				 = std::to_string(regR.RW.motorKV);
+	readIni["motor"]["torque constant"]	 = std::to_string(regR.RW.motorKt);
+	readIni["motor"]["gear ratio"]		 = std::to_string(regR.RW.gearRatio);
+	readIni["motor"]["max current"]		 = std::to_string(regR.RW.iMax);
+	readIni["motor"]["torque bandwidth"] = std::to_string(regR.RW.torqueBandwidth);
+	readIni["motor"]["shutdown temp"]	 = std::to_string(regR.RW.motorShutdownTemp);
+
+	candle->readMd80Register(id,
+							 mab::Md80Reg_E::maxTorque,
+							 regR.RW.maxTorque,
+							 mab::Md80Reg_E::maxVelocity,
+							 regR.RW.maxVelocity,
+							 mab::Md80Reg_E::positionLimitMax,
+							 regR.RW.positionLimitMax,
+							 mab::Md80Reg_E::positionLimitMin,
+							 regR.RW.positionLimitMin,
+							 mab::Md80Reg_E::maxAcceleration,
+							 regR.RW.maxAcceleration,
+							 mab::Md80Reg_E::maxDeceleration,
+							 regR.RW.maxDeceleration);
+
+	readIni["limits"]["max torque"]		  = std::to_string(regR.RW.maxTorque);
+	readIni["limits"]["max velocity"]	  = std::to_string(regR.RW.maxVelocity);
+	readIni["limits"]["max position"]	  = std::to_string(regR.RW.positionLimitMax);
+	readIni["limits"]["min position"]	  = std::to_string(regR.RW.positionLimitMin);
+	readIni["limits"]["max acceleration"] = std::to_string(regR.RW.maxAcceleration);
+	readIni["limits"]["max deceleration"] = std::to_string(regR.RW.maxDeceleration);
+
+	candle->readMd80Register(id,
+							 mab::Md80Reg_E::profileAcceleration,
+							 regR.RW.profileAcceleration,
+							 mab::Md80Reg_E::profileDeceleration,
+							 regR.RW.profileDeceleration,
+							 mab::Md80Reg_E::profileVelocity,
+							 regR.RW.profileVelocity);
+
+	readIni["profile"]["acceleration"] = std::to_string(regR.RW.profileAcceleration);
+	readIni["profile"]["deceleration"] = std::to_string(regR.RW.profileDeceleration);
+	readIni["profile"]["velocity"]	   = std::to_string(regR.RW.profileVelocity);
+
+	candle->readMd80Register(id,
+							 mab::Md80Reg_E::outputEncoder,
+							 regR.RW.outputEncoder,
+							 mab::Md80Reg_E::outputEncoderMode,
+							 regR.RW.outputEncoderMode);
+
+	readIni["output encoder"]["output encoder"]		 = std::to_string(regR.RW.outputEncoder);
+	readIni["output encoder"]["output encoder mode"] = std::to_string(regR.RW.outputEncoderMode);
+
+	float kp = 0.f, ki = 0.f, kd = 0.f, windup = 0.f;
+
+	candle->readMd80Register(id,
+							 mab::Md80Reg_E::motorPosPidKp,
+							 kp,
+							 mab::Md80Reg_E::motorPosPidKi,
+							 ki,
+							 mab::Md80Reg_E::motorPosPidKd,
+							 kd,
+							 mab::Md80Reg_E::motorPosPidWindup,
+							 windup);
+
+	readIni["position PID"]["kp"]	  = std::to_string(kp);
+	readIni["position PID"]["ki"]	  = std::to_string(ki);
+	readIni["position PID"]["kd"]	  = std::to_string(kd);
+	readIni["position PID"]["windup"] = std::to_string(windup);
+
+	kp = ki = kd = windup = 0.f;
+
+	candle->readMd80Register(id,
+							 mab::Md80Reg_E::motorVelPidKp,
+							 kp,
+							 mab::Md80Reg_E::motorVelPidKi,
+							 ki,
+							 mab::Md80Reg_E::motorVelPidKd,
+							 kd,
+							 mab::Md80Reg_E::motorVelPidWindup,
+							 windup);
+
+	readIni["velocity PID"]["kp"]	  = std::to_string(kp);
+	readIni["velocity PID"]["ki"]	  = std::to_string(ki);
+	readIni["velocity PID"]["kd"]	  = std::to_string(kd);
+	readIni["velocity PID"]["windup"] = std::to_string(windup);
+
+	kp = ki = kd = windup = 0.f;
+
+	candle->readMd80Register(
+		id, mab::Md80Reg_E::motorImpPidKp, kp, mab::Md80Reg_E::motorImpPidKd, kd);
+
+	readIni["impedance PD"]["kp"] = std::to_string(kp);
+	readIni["impedance PD"]["kd"] = std::to_string(kd);
+
+	candle->readMd80Register(id,
+							 mab::Md80Reg_E::homingMode,
+							 regR.RW.homingMode,
+							 mab::Md80Reg_E::homingMaxTravel,
+							 regR.RW.homingMaxTravel,
+							 mab::Md80Reg_E::homingTorque,
+							 regR.RW.homingTorque,
+							 mab::Md80Reg_E::homingVelocity,
+							 regR.RW.homingVelocity);
+
+	readIni["homing"]["mode"]		  = std::to_string(regR.RW.homingMode);
+	readIni["homing"]["max travel"]	  = std::to_string(regR.RW.homingMaxTravel);
+	readIni["homing"]["max torque"]	  = std::to_string(regR.RW.homingTorque);
+	readIni["homing"]["max velocity"] = std::to_string(regR.RW.homingVelocity);
+
+	for (auto const& it : readIni)
+	{
+		auto const& section	   = it.first;
+		auto const& collection = it.second;
+		std::cout << "[" << section << "]" << std::endl;
+		for (auto const& it2 : collection)
+		{
+			auto const& key	  = it2.first;
+			auto const& value = it2.second;
+			std::cout << key << "=" << value << std::endl;
+		}
+	}
 }
 
 void MainWorker::testEncoderMain(std::vector<std::string>& args)
