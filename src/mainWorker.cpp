@@ -1001,12 +1001,12 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 		ui::printFailedToReadMotorConfig(mab::Md80Reg_E::outputEncoderMode);
 
 	if (regR.RW.outputEncoder == 0.f)
-		readIni["output encoder"]["output encoder"] = 0.f;
+		readIni["output encoder"]["output encoder"] = floatToString(0.f, true);
 	else
 		readIni["output encoder"]["output encoder"] = ui::encoderTypes[regR.RW.outputEncoder];
 
 	if (regR.RW.outputEncoderMode == 0.f)
-		readIni["output encoder"]["output encoder mode"] = 0.f;
+		readIni["output encoder"]["output encoder mode"] = floatToString(0.f, true);
 	else
 		readIni["output encoder"]["output encoder mode"] =
 			ui::encoderModes[regR.RW.outputEncoderMode];
@@ -1414,22 +1414,31 @@ bool MainWorker::checkSetupError(uint16_t id)
 	return false;
 }
 
-std::string MainWorker::floatToString(float value)
+std::string MainWorker::floatToString(float value, bool noDecimals)
 {
 	std::stringstream ss;
 	ss << std::fixed;
 
-	if (static_cast<int>(value) == value)
+	if (noDecimals)
 	{
-		ss << std::setprecision(1);
+		ss << std::setprecision(0);
 		ss << value;
 		return ss.str();
 	}
 	else
 	{
-		ss << std::setprecision(7);
-		ss << value;
-		std::string str = ss.str();
-		return str.substr(0, str.find_last_not_of('0') + 1);
+		if (static_cast<int>(value) == value)
+		{
+			ss << std::setprecision(1);
+			ss << value;
+			return ss.str();
+		}
+		else
+		{
+			ss << std::setprecision(7);
+			ss << value;
+			std::string str = ss.str();
+			return str.substr(0, str.find_last_not_of('0') + 1);
+		}
 	}
 }

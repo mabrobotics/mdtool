@@ -90,5 +90,5 @@ class MainWorker
 	bool		tryAddMD80(uint16_t id);
 	int			checkArgsAndGetId(std::vector<std::string>& args, uint32_t size, uint32_t idPos);
 	bool		checkSetupError(uint16_t id);
-	std::string floatToString(float value);
+	std::string floatToString(float value, bool noDecimals = false);
 };
