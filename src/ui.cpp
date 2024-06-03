@@ -545,6 +545,12 @@ namespace ui
 			 << static_cast<uint16_t>(regId) << " register" << std::endl;
 	}
 
+	void printFailedToReadMotorConfig(mab::Md80Reg_E regId)
+	{
+		vout << "Failed to read the motor config! Error while reading: 0x" << std::hex
+			 << static_cast<uint16_t>(regId) << " register" << std::endl;
+	}
+
 	void printMotorConfig(mINI::INIStructure Ini)
 	{
 		vout << "Motor config:" << std::endl;

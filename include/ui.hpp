@@ -57,6 +57,7 @@ namespace ui
 	void printErrorDetails(uint32_t error, const std::map<std::string, uint8_t>& errorMap);
 	void printParameterOutOfBounds(std::string category, std::string field);
 	void printFailedToSetupMotor(mab::Md80Reg_E regId);
+	void printFailedToReadMotorConfig(mab::Md80Reg_E regId);
 	void printMotorConfig(mINI::INIStructure Ini);
 
 	bool getDifferentConfigsConfirmation(std::string configName);
