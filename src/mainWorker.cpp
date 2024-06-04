@@ -929,19 +929,17 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 	if (!candle->readMd80Register(id,
 								  mab::Md80Reg_E::motorPolePairs,
 								  regR.RW.polePairs,
-								  mab::Md80Reg_E::motorKV,
-								  regR.RW.motorKV,
 								  mab::Md80Reg_E::motorKt,
 								  regR.RW.motorKt,
-								  mab::Md80Reg_E::motorGearRatio,
-								  regR.RW.gearRatio,
 								  mab::Md80Reg_E::motorIMax,
 								  regR.RW.iMax,
+								  mab::Md80Reg_E::motorGearRatio,
+								  regR.RW.gearRatio,
 								  mab::Md80Reg_E::motorTorgueBandwidth,
 								  regR.RW.torqueBandwidth,
-								  mab::Md80Reg_E::motorShutdownTemp,
-								  regR.RW.motorShutdownTemp))
-		ui::printFailedToReadMotorConfig(mab::Md80Reg_E::motorShutdownTemp);
+								  mab::Md80Reg_E::motorKV,
+								  regR.RW.motorKV))
+		ui::printFailedToReadMotorConfig(mab::Md80Reg_E::motorKV);
 
 	readIni["motor"]["name"]			 = std::string(motorNameChar);
 	readIni["motor"]["pole pairs"]		 = floatToString(regR.RW.polePairs);
@@ -950,18 +948,22 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 	readIni["motor"]["gear ratio"]		 = floatToString(regR.RW.gearRatio);
 	readIni["motor"]["max current"]		 = floatToString(regR.RW.iMax);
 	readIni["motor"]["torque bandwidth"] = floatToString(regR.RW.torqueBandwidth);
-	readIni["motor"]["shutdown temp"]	 = floatToString(regR.RW.motorShutdownTemp);
+
+	if (!candle->readMd80Register(id, mab::Md80Reg_E::motorShutdownTemp, regR.RW.motorShutdownTemp))
+		ui::printFailedToReadMotorConfig(mab::Md80Reg_E::motorShutdownTemp);
+
+	readIni["motor"]["shutdown temp"] = floatToString(regR.RW.motorShutdownTemp);
 
 	/* Motor config - limits section */
 	if (!candle->readMd80Register(id,
-								  mab::Md80Reg_E::maxTorque,
-								  regR.RW.maxTorque,
-								  mab::Md80Reg_E::maxVelocity,
-								  regR.RW.maxVelocity,
 								  mab::Md80Reg_E::positionLimitMax,
 								  regR.RW.positionLimitMax,
 								  mab::Md80Reg_E::positionLimitMin,
 								  regR.RW.positionLimitMin,
+								  mab::Md80Reg_E::maxTorque,
+								  regR.RW.maxTorque,
+								  mab::Md80Reg_E::maxVelocity,
+								  regR.RW.maxVelocity,
 								  mab::Md80Reg_E::maxAcceleration,
 								  regR.RW.maxAcceleration,
 								  mab::Md80Reg_E::maxDeceleration,
@@ -977,13 +979,13 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 
 	/* Motor config - profile section */
 	if (!candle->readMd80Register(id,
+								  mab::Md80Reg_E::profileVelocity,
+								  regR.RW.profileVelocity,
 								  mab::Md80Reg_E::profileAcceleration,
 								  regR.RW.profileAcceleration,
 								  mab::Md80Reg_E::profileDeceleration,
-								  regR.RW.profileDeceleration,
-								  mab::Md80Reg_E::profileVelocity,
-								  regR.RW.profileVelocity))
-		ui::printFailedToReadMotorConfig(mab::Md80Reg_E::profileVelocity);
+								  regR.RW.profileDeceleration))
+		ui::printFailedToReadMotorConfig(mab::Md80Reg_E::profileDeceleration);
 
 	readIni["profile"]["acceleration"] = floatToString(regR.RW.profileAcceleration);
 	readIni["profile"]["deceleration"] = floatToString(regR.RW.profileDeceleration);
@@ -1062,11 +1064,11 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 								  regR.RW.homingMode,
 								  mab::Md80Reg_E::homingMaxTravel,
 								  regR.RW.homingMaxTravel,
-								  mab::Md80Reg_E::homingTorque,
-								  regR.RW.homingTorque,
 								  mab::Md80Reg_E::homingVelocity,
-								  regR.RW.homingVelocity))
-		ui::printFailedToReadMotorConfig(mab::Md80Reg_E::homingVelocity);
+								  regR.RW.homingVelocity,
+								  mab::Md80Reg_E::homingTorque,
+								  regR.RW.homingTorque))
+		ui::printFailedToReadMotorConfig(mab::Md80Reg_E::homingTorque);
 
 	readIni["homing"]["mode"]		  = ui::homingModes[regR.RW.homingMode];
 	readIni["homing"]["max travel"]	  = floatToString(regR.RW.homingMaxTravel);
