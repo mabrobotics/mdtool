@@ -1010,53 +1010,50 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 		readIni["output encoder"]["output encoder mode"] =
 			ui::encoderModes[regR.RW.outputEncoderMode];
 
-	float kp = 0.f, ki = 0.f, kd = 0.f, windup = 0.f;
-
 	/* Motor config - position PID section */
 	if (!candle->readMd80Register(id,
 								  mab::Md80Reg_E::motorPosPidKp,
-								  kp,
+								  regR.RW.positionPidGains.kp,
 								  mab::Md80Reg_E::motorPosPidKi,
-								  ki,
+								  regR.RW.positionPidGains.ki,
 								  mab::Md80Reg_E::motorPosPidKd,
-								  kd,
+								  regR.RW.positionPidGains.kd,
 								  mab::Md80Reg_E::motorPosPidWindup,
-								  windup))
+								  regR.RW.positionPidGains.intWindup))
 		ui::printFailedToReadMotorConfig(mab::Md80Reg_E::motorPosPidWindup);
 
-	readIni["position PID"]["kp"]	  = floatToString(kp);
-	readIni["position PID"]["ki"]	  = floatToString(ki);
-	readIni["position PID"]["kd"]	  = floatToString(kd);
-	readIni["position PID"]["windup"] = floatToString(windup);
-
-	kp = ki = kd = windup = 0.f;
+	readIni["position PID"]["kp"]	  = floatToString(regR.RW.positionPidGains.kp);
+	readIni["position PID"]["ki"]	  = floatToString(regR.RW.positionPidGains.ki);
+	readIni["position PID"]["kd"]	  = floatToString(regR.RW.positionPidGains.kd);
+	readIni["position PID"]["windup"] = floatToString(regR.RW.positionPidGains.intWindup);
 
 	/* Motor config - velocity PID section */
 	if (!candle->readMd80Register(id,
 								  mab::Md80Reg_E::motorVelPidKp,
-								  kp,
+								  regR.RW.velocityPidGains.kp,
 								  mab::Md80Reg_E::motorVelPidKi,
-								  ki,
+								  regR.RW.velocityPidGains.ki,
 								  mab::Md80Reg_E::motorVelPidKd,
-								  kd,
+								  regR.RW.velocityPidGains.kd,
 								  mab::Md80Reg_E::motorVelPidWindup,
-								  windup))
+								  regR.RW.velocityPidGains.intWindup))
 		ui::printFailedToReadMotorConfig(mab::Md80Reg_E::motorVelPidWindup);
 
-	readIni["velocity PID"]["kp"]	  = floatToString(kp);
-	readIni["velocity PID"]["ki"]	  = floatToString(ki);
-	readIni["velocity PID"]["kd"]	  = floatToString(kd);
-	readIni["velocity PID"]["windup"] = floatToString(windup);
-
-	kp = ki = kd = windup = 0.f;
+	readIni["velocity PID"]["kp"]	  = floatToString(regR.RW.velocityPidGains.kp);
+	readIni["velocity PID"]["ki"]	  = floatToString(regR.RW.velocityPidGains.ki);
+	readIni["velocity PID"]["kd"]	  = floatToString(regR.RW.velocityPidGains.kd);
+	readIni["velocity PID"]["windup"] = floatToString(regR.RW.velocityPidGains.intWindup);
 
 	/* Motor config - impedance PD section */
-	if (!candle->readMd80Register(
-			id, mab::Md80Reg_E::motorImpPidKp, kp, mab::Md80Reg_E::motorImpPidKd, kd))
+	if (!candle->readMd80Register(id,
+								  mab::Md80Reg_E::motorImpPidKp,
+								  regR.RW.impedancePdGains.kp,
+								  mab::Md80Reg_E::motorImpPidKd,
+								  regR.RW.impedancePdGains.kd))
 		ui::printFailedToReadMotorConfig(mab::Md80Reg_E::motorImpPidKd);
 
-	readIni["impedance PD"]["kp"] = floatToString(kp);
-	readIni["impedance PD"]["kd"] = floatToString(kd);
+	readIni["impedance PD"]["kp"] = floatToString(regR.RW.impedancePdGains.kp);
+	readIni["impedance PD"]["kd"] = floatToString(regR.RW.impedancePdGains.kd);
 
 	/* Motor config - homing section */
 	if (!candle->readMd80Register(id,
