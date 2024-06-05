@@ -459,6 +459,9 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 
 	ConfigManager configManager(args[4].c_str());
 
+	if (!configManager.isFileValid())
+		return;
+
 	std::string path	 = configManager.getConfigPath();
 	std::string filename = configManager.getConfigName();
 

@@ -90,6 +90,8 @@ class ConfigManager
 	 */
 	std::string validateConfig();
 
+	bool isFileValid();
+
   private:
 	std::set<std::string> differentFilePaths, identicalFilePaths, defaultFilenames;
 

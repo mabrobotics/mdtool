@@ -187,6 +187,41 @@ std::string ConfigManager::validateConfig()
 	return updatedUserConfigPath;
 }
 
+bool ConfigManager::isFileValid()
+{
+	std::string fileExtension = userConfigPath.substr(userConfigPath.find_last_of("."));
+
+	if (!(fileExtension == ".cfg"))
+	{
+		std::cerr
+			<< "Error: Configuration file has invalid extension. Create .cfg file and try again."
+			<< std::endl;
+		return false;
+	}
+
+	std::ifstream file(userConfigPath, std::ios::binary | std::ios::ate);
+	if (!file.is_open())
+	{
+		std::cerr << "Error: Unable to open file: " << userConfigPath << std::endl;
+		return false;
+	}
+
+	std::streampos fileSize = file.tellg();	 // Get the file size
+	file.close();							 // Close the file
+
+	std::size_t size = static_cast<std::size_t>(fileSize);
+
+	const std::size_t oneMB = 1048576;	// 1 MB in bytes
+
+	if (size > oneMB)
+	{
+		std::cerr << "Error: File is larger than 1 MB, check the configuration file." << std::endl;
+		return false;
+	}
+
+	return true;
+}
+
 void ConfigManager::update()
 {
 	// Clear the sets
