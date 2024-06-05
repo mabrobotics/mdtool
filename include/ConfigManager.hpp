@@ -89,7 +89,11 @@ class ConfigManager
 	 * @return The path to the updated copy of the user's configuration file.
 	 */
 	std::string validateConfig();
-
+	/**
+	 * @brief Checks if a file has the proper .cfg extension and if it is smaller than 1MB.
+	 *
+	 * @return true if the configuration file is valid; false otherwise.
+	 */
 	bool isFileValid();
 
   private:
