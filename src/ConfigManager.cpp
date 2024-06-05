@@ -9,12 +9,12 @@
 
 #include "dirent.h"
 
-ConfigManager::ConfigManager(std::string userConfigPath) : userConfigPath(userConfigPath)
+ConfigManager::ConfigManager(std::string userPath) : userConfigPath(userConfigPath)
 {
 	update();
 	if (isConfigDefault(defaultConfigFileName) && isConifgDifferent(defaultConfigFileName))
 		copyDefaultConfig(defaultConfigFileName);
-	computeFullPathAndName();
+	computeFullPathAndName(userPath);
 }
 
 std::string ConfigManager::getConfigPath() { return userConfigPath; }
@@ -230,38 +230,30 @@ void ConfigManager::update()
 	}
 }
 
-void ConfigManager::computeFullPathAndName()
+void ConfigManager::computeFullPathAndName(std::string userPath)
 {
-	if ((userConfigPath.rfind("./", 0) == 0) || (userConfigPath.rfind("/", 0) == 0))
+	if ((userPath.rfind("./", 0) == 0) || (userPath.rfind("/", 0) == 0))
 	{
-		if ((userConfigPath.rfind("./", 0) == 0))
+		if ((userPath.rfind("./", 0) == 0))
 		{
 			char buffer[PATH_MAX];
 #ifdef _WIN32
 			if (GetCurrentDirectory(PATH_MAX, buffer))
-			{
 				return (buffer + userFilePath.substr(1));
-			}
 			else
-			{
 				throw std::runtime_error("GetCurrentDirectory() error: " +
 										 std::to_string(GetLastError()));
-			}
 #else
 			if (getcwd(buffer, sizeof(buffer)) != NULL)
-			{
-				userConfigPath = (buffer + userConfigPath.substr(1));
-			}
+				userConfigPath = (buffer + userPath.substr(1));
 			else
-			{
 				perror("getcwd() error");
-			}
 #endif
 		}
+		else
+			userConfigPath = userPath;
 	}
 	else
-	{
-		userConfigPath = (userConfigDir + "/" + userConfigPath);
-	}
+		userConfigPath = (userConfigDir + "/" + userPath);
 	userConfigName = userConfigPath.substr(userConfigPath.find_last_of("/") + 1);
 }

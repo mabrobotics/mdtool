@@ -16,9 +16,9 @@ class ConfigManager
 	 * Scans and creates list of files in two default directiories - user directories and mdtool
 	 * install direcotry.
 	 *
-	 * @param userConfigPath Path to the user config passed as an argument to mdtool function
+	 * @param userPath Path to the user config passed as an argument to mdtool function
 	 */
-	ConfigManager(std::string userConfigPath);
+	ConfigManager(std::string userPath);
 	~ConfigManager() = default;
 
 	std::string getConfigPath();
@@ -99,5 +99,5 @@ class ConfigManager
 	const std::string defaultConfigFileName = "default.cfg";
 
 	void update();
-	void computeFullPathAndName();
+	void computeFullPathAndName(std::string userPath);
 };
