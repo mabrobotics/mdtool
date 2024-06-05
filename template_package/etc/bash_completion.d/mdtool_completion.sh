@@ -54,7 +54,7 @@ _mdtool_complete()
 		if [[ "$prev2" == "motor" ]]; then
 			if [[ "$cur" == ./* || "$cur" == /* ]]; then
 				# Autocomplete with files from the current directory
-				_filedir
+				_filedir '@(fit?(s)|cfg)'
 			else
 				local arr i file
 
