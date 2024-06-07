@@ -16,9 +16,9 @@ class ConfigManager
 	 * Scans and creates list of files in two default directiories - user directories and mdtool
 	 * install direcotry.
 	 *
-	 * @param userConfigPath Path to the user config passed as an argument to mdtool function
+	 * @param userPath Path to the user config passed as an argument to mdtool function
 	 */
-	ConfigManager(std::string userConfigPath);
+	ConfigManager(std::string userPath);
 	~ConfigManager() = default;
 
 	std::string getConfigPath();
@@ -89,6 +89,12 @@ class ConfigManager
 	 * @return The path to the updated copy of the user's configuration file.
 	 */
 	std::string validateConfig();
+	/**
+	 * @brief Checks if a file has the proper .cfg extension and if it is smaller than 1MB.
+	 *
+	 * @return true if the configuration file is valid; false otherwise.
+	 */
+	bool isFileValid();
 
   private:
 	std::set<std::string> differentFilePaths, identicalFilePaths, defaultFilenames;
@@ -96,8 +102,8 @@ class ConfigManager
 	std::string		  userConfigName, userConfigPath;
 	const std::string userConfigDir = std::string(getenv("HOME")) + "/.config/mdtool/mdtool_motors";
 	const std::string originalConfigDir		= "/etc/mdtool/mdtool_motors";
-	const std::string defaultConfigFileName = "default.ini";
+	const std::string defaultConfigFileName = "default.cfg";
 
 	void update();
-	void computeFullPathAndName();
+	void computeFullPathAndName(std::string userPath);
 };
