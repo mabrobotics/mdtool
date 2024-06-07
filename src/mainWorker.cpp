@@ -1080,13 +1080,32 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 
 		if (getcwd(buffer, sizeof(buffer)) != NULL)
 		{
-			saveConfigPath = buffer;
+			saveConfigPath = std::string(buffer) + "/" + configName;
 		}
 		else
 		{
 			perror("getcwd() error");
 		}
-		saveConfigPath += "/" + configName;
+
+		bool checkFile = true;
+		while (checkFile)
+		{
+			struct stat st;
+			if (stat(saveConfigPath.c_str(), &st) == 0)
+			{
+				if (!ui::getOverwriteMotorConfigConfirmation(configName))
+				{
+					configName = ui::getNewMotorConfigName(configName);
+					saveConfigPath =
+						saveConfigPath.substr(0, saveConfigPath.find_last_of("/") + 1) + configName;
+				}
+				else
+					checkFile = false;
+			}
+			else
+				checkFile = false;
+		}
+
 		mINI::INIFile configFile(saveConfigPath);
 		configFile.write(readIni);
 	}

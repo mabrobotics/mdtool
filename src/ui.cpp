@@ -618,4 +618,37 @@ namespace ui
 		vout << "[MDTOOL] Saving the motor config." << std::endl;
 		return true;
 	}
+
+	bool getOverwriteMotorConfigConfirmation(std::string configName)
+	{
+		vout << "[MDTOOL] The " << configName
+			 << " file already exist in your current directory, would you like to overwrite the "
+				"file? [Y/n]"
+			 << std::endl;
+		char x;
+		std::cin >> x;
+		if (x != 'Y' && x != 'y')
+		{
+			return false;
+		}
+		vout << "[MDTOOL] Overwriting the motor config file." << std::endl;
+		return true;
+	}
+
+	std::string getNewMotorConfigName(std::string configName)
+	{
+		std::string newName = configName.substr(0, configName.find_last_of(".")) + "_new";
+		vout << "[MDTOOL] Please type the new config name (without extension!)" << std::endl
+			 << "[MDTOOL] The default new name is: " << newName << std::endl
+			 << "[MDTOOL] (Press Enter to accept the default)" << std::endl;
+		std::string x;
+		std::cin.ignore();
+		std::getline(std::cin, x);
+		if (!x.empty())
+		{
+			std::string str(x);
+			return str + ".cfg";
+		}
+		return newName + ".cfg";
+	}
 }  // namespace ui
