@@ -457,37 +457,27 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (id == -1)
 		return;
 
-	std::string path = (mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" + args[4].c_str());
+	ConfigManager configManager(args[4].c_str());
 
-	std::string filename = args[4].c_str();
+	if (!configManager.isFileValid())
+		return;
 
-	ConfigManager configManager(mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName,
-								mdtoolBaseDir + "/" + mdtoolMotorCfgDirName);
+	std::string path	 = configManager.getConfigPath();
+	std::string filename = configManager.getConfigName();
 
-	if (configManager.isConfigDefault(filename) && configManager.isConifgDifferent(filename))
+	if (configManager.isConfigDefault() && configManager.isConifgDifferent())
 	{
 		if (ui::getDifferentConfigsConfirmation(filename))
 		{
-			system(("cp " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName + "/" +
-					filename + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" + filename)
-					   .c_str());
+			configManager.copyDefaultConfig(filename);
 		}
 	}
 
-	if (configManager.isConfigDefault("default.ini") &&
-		configManager.isConifgDifferent("default.ini"))
-	{
-		system(("cp " + mdtoolConfigPath + mdtoolDirName + "/" + mdtoolMotorCfgDirName +
-				"/default.ini" + " " + mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/default.ini")
-				   .c_str());
-	}
-
-	if (!configManager.isConfigValid(filename))
+	if (!configManager.isConfigValid())
 	{
 		if (ui::getUpdateConfigConfirmation(filename))
 		{
-			path = mdtoolBaseDir + "/" + mdtoolMotorCfgDirName + "/" +
-				   configManager.validateConfig(filename);
+			path = configManager.validateConfig();
 		}
 	}
 

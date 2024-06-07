@@ -52,18 +52,22 @@ _mdtool_complete()
 
 	elif [ $COMP_CWORD -eq 4 ]; then
 		if [[ "$prev2" == "motor" ]]; then
+			if [[ "$cur" == ./* || "$cur" == /* ]]; then
+				# Autocomplete with files from the current directory
+				_filedir '@(fit?(s)|cfg)'
+			else
+				local arr i file
 
-			local arr i file
-
-			arr=( $( cd "$MEMO_DIR" && compgen -f -- "$cur" ) )
-			COMPREPLY=()
-			for ((i = 0; i < ${#arr[@]}; ++i)); do
-				file=${arr[i]}
-				if [[ -d $MEMO_DIR/$file ]]; then
-					file=$file/
-				fi
-				COMPREPLY[i]=$file
-			done
+				arr=( $( cd "$MEMO_DIR" && compgen -o nospace  -f -- "$cur" ) )
+				COMPREPLY=()
+				for ((i = 0; i < ${#arr[@]}; ++i)); do
+					file=${arr[i]}
+					if [[ -d $MEMO_DIR/$file ]]; then
+						file=$file/
+					fi
+					COMPREPLY[i]=$file
+				done
+			fi
 		fi
 	fi
 	
