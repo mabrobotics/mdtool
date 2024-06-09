@@ -13,29 +13,29 @@ _mdtool_complete()
 	prev2=${COMP_WORDS[COMP_CWORD-2]}
 	
 	if [ $COMP_CWORD -eq 1 ]; then
-		COMPREPLY=( $(compgen -W "bus ping config setup test blink encoder register clear reset" -- $cur) )
+		COMPREPLY=( $(compgen -W "blink bus clear config encoder ping register reset setup test" -- $cur) )
 	elif [ $COMP_CWORD -eq 2 ]; then
 		case "$prev" in
 			"bus")
-			COMPREPLY=( $(compgen -W "USB SPI UART" -- $cur) )
+			COMPREPLY=( $(compgen -W "SPI UART USB" -- $cur) )
+			;;
+			"clear")
+			COMPREPLY=( $(compgen -W "error warning" -- $cur) )
+			;;
+			"config")
+			COMPREPLY=( $(compgen -W "bandwidth can current save zero" -- $cur) )
 			;;
 			"ping")
 			COMPREPLY=( $(compgen -W "all" -- $cur) )
 			;;
-			"config")
-			COMPREPLY=( $(compgen -W "zero can save current bandwidth" -- $cur) )
-			;; 
-			"setup")
-			COMPREPLY=( $(compgen -W "calibration calibration_out motor info homing" -- $cur) )
-			;;
-			"test")
-			COMPREPLY=( $(compgen -W "move latency encoder" -- $cur) )
-			;;
 			"register")
 			COMPREPLY=( $(compgen -W "read write" -- $cur) )
+			;; 
+			"setup")
+			COMPREPLY=( $(compgen -W "calibration calibration_out homing info motor read_config" -- $cur) )
 			;;
-			"clear")
-			COMPREPLY=( $(compgen -W "error warning" -- $cur) )
+			"test")
+			COMPREPLY=( $(compgen -W "encoder latency move" -- $cur) )
 			;;
 			*)
 			;;
@@ -52,18 +52,22 @@ _mdtool_complete()
 
 	elif [ $COMP_CWORD -eq 4 ]; then
 		if [[ "$prev2" == "motor" ]]; then
+			if [[ "$cur" == ./* || "$cur" == /* ]]; then
+				# Autocomplete with files from the current directory
+				_filedir '@(fit?(s)|cfg)'
+			else
+				local arr i file
 
-			local arr i file
-
-			arr=( $( cd "$MEMO_DIR" && compgen -f -- "$cur" ) )
-			COMPREPLY=()
-			for ((i = 0; i < ${#arr[@]}; ++i)); do
-				file=${arr[i]}
-				if [[ -d $MEMO_DIR/$file ]]; then
-					file=$file/
-				fi
-				COMPREPLY[i]=$file
-			done
+				arr=( $( cd "$MEMO_DIR" && compgen -o nospace  -f -- "$cur" ) )
+				COMPREPLY=()
+				for ((i = 0; i < ${#arr[@]}; ++i)); do
+					file=${arr[i]}
+					if [[ -d $MEMO_DIR/$file ]]; then
+						file=$file/
+					fi
+					COMPREPLY[i]=$file
+				done
+			fi
 		fi
 	fi
 	
