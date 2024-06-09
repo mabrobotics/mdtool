@@ -27,34 +27,41 @@ class MainWorker
 
 	bool printVerbose = false;
 
-	void ping(std::vector<std::string>& args);
-	void configCan(std::vector<std::string>& args);
-	void configSave(std::vector<std::string>& args);
-	void configZero(std::vector<std::string>& args);
-	void configCurrent(std::vector<std::string>& args);
-	void configBandwidth(std::vector<std::string>& args);
-	void configClear(std::vector<std::string>& args);
-
-	void setupCalibration(std::vector<std::string>& args);
-	void setupCalibrationOutput(std::vector<std::string>& args);
-	void setupMotor(std::vector<std::string>& args);
-	void setupInfo(std::vector<std::string>& args);
-	void setupHoming(std::vector<std::string>& args);
-
-	void testMove(std::vector<std::string>& args);
-	void testMoveAbsolute(std::vector<std::string>& args);
-	void testLatency(std::vector<std::string>& args);
-	void testEncoderOutput(std::vector<std::string>& args);
-	void testEncoderMain(std::vector<std::string>& args);
-	void registerWrite(std::vector<std::string>& args);
-	void registerRead(std::vector<std::string>& args);
-	void blink(std::vector<std::string>& args);
-	void encoder(std::vector<std::string>& args);
 	void bus(std::vector<std::string>& args);
+
+	void blink(std::vector<std::string>& args);
 
 	void clearErrors(std::vector<std::string>& args);
 	void clearWarnings(std::vector<std::string>& args);
+
+	void configBandwidth(std::vector<std::string>& args);
+	void configCan(std::vector<std::string>& args);
+	void configClear(std::vector<std::string>& args);
+	void configCurrent(std::vector<std::string>& args);
+	void configSave(std::vector<std::string>& args);
+	void configZero(std::vector<std::string>& args);
+
+	void encoder(std::vector<std::string>& args);
+
+	void ping(std::vector<std::string>& args);
+
+	void registerRead(std::vector<std::string>& args);
+	void registerWrite(std::vector<std::string>& args);
+
 	void reset(std::vector<std::string>& args);
+
+	void setupCalibration(std::vector<std::string>& args);
+	void setupCalibrationOutput(std::vector<std::string>& args);
+	void setupHoming(std::vector<std::string>& args);
+	void setupInfo(std::vector<std::string>& args);
+	void setupMotor(std::vector<std::string>& args);
+	void setupReadConfig(std::vector<std::string>& args);
+
+	void testEncoderMain(std::vector<std::string>& args);
+	void testEncoderOutput(std::vector<std::string>& args);
+	void testLatency(std::vector<std::string>& args);
+	void testMoveAbsolute(std::vector<std::string>& args);
+	void testMove(std::vector<std::string>& args);
 
 	void				  changeDefaultConfig(std::string bus, std::string device);
 	mab::CANdleBaudrate_E checkSpeedForId(uint16_t id);
@@ -79,8 +86,9 @@ class MainWorker
 		return status;
 	}
 
-	bool checkArgs(std::vector<std::string>& args, uint32_t size);
-	bool tryAddMD80(uint16_t id);
-	int	 checkArgsAndGetId(std::vector<std::string>& args, uint32_t size, uint32_t idPos);
-	bool checkSetupError(uint16_t id);
+	bool		checkArgs(std::vector<std::string>& args, uint32_t size);
+	bool		tryAddMD80(uint16_t id);
+	int			checkArgsAndGetId(std::vector<std::string>& args, uint32_t size, uint32_t idPos);
+	bool		checkSetupError(uint16_t id);
+	std::string floatToString(float value, bool noDecimals = false);
 };

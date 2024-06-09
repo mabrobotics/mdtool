@@ -545,6 +545,29 @@ namespace ui
 			 << static_cast<uint16_t>(regId) << " register" << std::endl;
 	}
 
+	void printFailedToReadMotorConfig(mab::Md80Reg_E regId)
+	{
+		vout << "Failed to read the motor config! Error while reading: 0x" << std::hex
+			 << static_cast<uint16_t>(regId) << " register" << std::endl;
+	}
+
+	void printMotorConfig(mINI::INIStructure Ini)
+	{
+		vout << "Motor config:" << std::endl;
+		for (auto const& it : Ini)
+		{
+			auto const& section	   = it.first;
+			auto const& collection = it.second;
+			std::cout << "- " << section << ":" << std::endl;
+			for (auto const& it2 : collection)
+			{
+				auto const& key	  = it2.first;
+				auto const& value = it2.second;
+				std::cout << "   - " << key << ": " << value << std::endl;
+			}
+		}
+	}
+
 	bool getDifferentConfigsConfirmation(std::string configName)
 	{
 		vout << "[MDTOOL] The default " << configName << " config was modified." << std::endl;
@@ -579,5 +602,53 @@ namespace ui
 					configName.substr(0, configName.find_last_of(".")) + "_updated.cfg."
 			 << std::endl;
 		return true;
+	}
+
+	bool getSaveMotorConfigConfirmation(std::string configName)
+	{
+		vout << "[MDTOOL] Would you like to save the motor config under the name: " << configName
+			 << " in your current directory? [Y/n]" << std::endl;
+		char x;
+		std::cin >> x;
+		if (x != 'Y' && x != 'y')
+		{
+			vout << "[MDTOOL] Reading the motor config without saving to a file." << std::endl;
+			return false;
+		}
+		vout << "[MDTOOL] Saving the motor config." << std::endl;
+		return true;
+	}
+
+	bool getOverwriteMotorConfigConfirmation(std::string configName)
+	{
+		vout << "[MDTOOL] The " << configName
+			 << " file already exist in your current directory, would you like to overwrite the "
+				"file? [Y/n]"
+			 << std::endl;
+		char x;
+		std::cin >> x;
+		if (x != 'Y' && x != 'y')
+		{
+			return false;
+		}
+		vout << "[MDTOOL] Overwriting the motor config file." << std::endl;
+		return true;
+	}
+
+	std::string getNewMotorConfigName(std::string configName)
+	{
+		std::string newName = configName.substr(0, configName.find_last_of(".")) + "_new";
+		vout << "[MDTOOL] Please type the new config name (without extension!)" << std::endl
+			 << "[MDTOOL] The default new name is: " << newName << std::endl
+			 << "[MDTOOL] (Press Enter to accept the default)" << std::endl;
+		std::string x;
+		std::cin.ignore();
+		std::getline(std::cin, x);
+		if (!x.empty())
+		{
+			std::string str(x);
+			return str + ".cfg";
+		}
+		return newName + ".cfg";
 	}
 }  // namespace ui

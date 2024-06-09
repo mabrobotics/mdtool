@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "mini/ini.h"
+
 #include "candle.hpp"
 #include "mainWorker.hpp"
 
@@ -55,9 +57,15 @@ namespace ui
 	void printErrorDetails(uint32_t error, const std::map<std::string, uint8_t>& errorMap);
 	void printParameterOutOfBounds(std::string category, std::string field);
 	void printFailedToSetupMotor(mab::Md80Reg_E regId);
+	void printFailedToReadMotorConfig(mab::Md80Reg_E regId);
+	void printMotorConfig(mINI::INIStructure Ini);
 
 	bool getDifferentConfigsConfirmation(std::string configName);
 	bool getUpdateConfigConfirmation(std::string configName);
+
+	bool		getSaveMotorConfigConfirmation(std::string configName);
+	bool		getOverwriteMotorConfigConfirmation(std::string configName);
+	std::string getNewMotorConfigName(std::string configName);
 
 	/* these are only used to light up the values in */
 	constexpr float outputEncoderStdDevMax = 0.05f;
