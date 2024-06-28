@@ -32,7 +32,7 @@ enable_testing()
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CANDLE_BUILD_STATIC ON)
-set(CANDLE_OMIT_EXAMPLES ON)
+set(CANDLE_OMIT_EXAMPLES OFF)
 add_subdirectory(candle)
 
 set(CMAKE_BUILD_TYPE Release)

@@ -351,7 +351,7 @@ namespace ui
 		vout << "- torque bandwidth: " << drive.getReadReg().RW.torqueBandwidth << " Hz"
 			 << std::endl;
 		vout << "- CAN watchdog: " << drive.getReadReg().RW.canWatchdog << " ms" << std::endl;
-		vout << "- brake mode: " << getListElement(brakeModes, drive.getReadReg().RW.brakeMode)
+		vout << "- GPIO mode: " << getListElement(GPIOmodes, drive.getReadReg().RW.userGpioConfiguration)
 			 << std::endl;
 
 		if (printAll)

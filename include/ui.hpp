@@ -86,7 +86,7 @@ namespace ui
 	const std::vector<std::string> encoderCalibrationModes = {"FULL", "DIRONLY"};
 	const std::vector<std::string> motorCalibrationModes   = {"FULL", "NOPPDET"};
 	const std::vector<std::string> homingModes			   = {"OFF", "SENSORLESS"};
-	const std::vector<std::string> brakeModes			   = {"OFF", "AUTO", "MANUAL"};
+	const std::vector<std::string> GPIOmodes			   = {"OFF", "BRAKE", "GPIO INPUT"};
 	const std::vector<std::string> errorVectorList		   = {"ERROR_BRIDGE_OCP",
 															  "ERROR_BRIDGE_FAULT",
 															  "ERROR_OUT_ENCODER_E",

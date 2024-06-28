@@ -783,7 +783,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	regW.RW.outputEncoderCalibrationMode = getNumericParamFromList(
 		cfg["output encoder"]["output encoder calibration mode"], ui::encoderCalibrationModes);
 	regW.RW.homingMode = getNumericParamFromList(cfg["homing"]["mode"], ui::homingModes);
-	regW.RW.brakeMode  = getNumericParamFromList(cfg["brake"]["mode"], ui::brakeModes);
+	regW.RW.userGpioConfiguration  = getNumericParamFromList(cfg["GPIO"]["mode"], ui::GPIOmodes);
 
 	auto floatFromField = [&](const char* category, const char* field) -> float
 	{ return atof(cfg[category][field].c_str()); };
@@ -901,8 +901,8 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 								   floatFromField("profile", "velocity")))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::positionLimitMin);
 
-	if (!candle->writeMd80Register(id, mab::Md80Reg_E::brakeMode, regW.RW.brakeMode))
-		ui::printFailedToSetupMotor(mab::Md80Reg_E::brakeMode);
+	if (!candle->writeMd80Register(id, mab::Md80Reg_E::userGpioConfiguration, regW.RW.userGpioConfiguration))
+		ui::printFailedToSetupMotor(mab::Md80Reg_E::userGpioConfiguration);
 
 	candle->configMd80Save(id);
 
