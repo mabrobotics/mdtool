@@ -2,3 +2,4 @@ build/*
 .vscode/*
 package/*/usr/local/bin/
 package/*.deb
+test/*
