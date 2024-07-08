@@ -38,7 +38,6 @@ enum class toolsOptions_E
 	DIAGNOSTIC,
 	ENCODER,
 	ERROR,
-	HOMING,
 	INFO,
 	LATENCY,
 	MAIN,
@@ -96,8 +95,6 @@ toolsOptions_E str2option(std::string& opt)
 		return toolsOptions_E::ENCODER;
 	if (opt == "error")
 		return toolsOptions_E::ERROR;
-	if (opt == "homing")
-		return toolsOptions_E::HOMING;
 	if (opt == "info")
 		return toolsOptions_E::INFO;
 	if (opt == "latency")
@@ -292,10 +289,6 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 		{
 			if (option == toolsOptions_E::CALIBRATION)
 				setupCalibration(args);
-			else if (option == toolsOptions_E::CALIBRATION_OUTPUT)
-				setupCalibrationOutput(args);
-			else if (option == toolsOptions_E::HOMING)
-				setupHoming(args);
 			else if (option == toolsOptions_E::INFO)
 				setupInfo(args);
 			else if (option == toolsOptions_E::MOTOR)
@@ -631,14 +624,6 @@ void MainWorker::setupCalibrationOutput(std::vector<std::string>& args)
 	candle->setupMd80CalibrationOutput(id);
 }
 
-void MainWorker::setupHoming(std::vector<std::string>& args)
-{
-	int32_t id = checkArgsAndGetId(args, 4, 3);
-	if (id == -1)
-		return;
-	candle->setupMd80PerformHoming(id);
-}
-
 void MainWorker::setupInfo(std::vector<std::string>& args)
 {
 	bool printAll = false;
@@ -782,7 +767,6 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 		getNumericParamFromList(cfg["output encoder"]["output encoder mode"], ui::encoderModes);
 	regW.RW.outputEncoderCalibrationMode = getNumericParamFromList(
 		cfg["output encoder"]["output encoder calibration mode"], ui::encoderCalibrationModes);
-	regW.RW.homingMode = getNumericParamFromList(cfg["homing"]["mode"], ui::homingModes);
 	regW.RW.userGpioConfiguration  = getNumericParamFromList(cfg["GPIO"]["mode"], ui::GPIOmodes);
 
 	auto floatFromField = [&](const char* category, const char* field) -> float
@@ -863,17 +847,6 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!candle->writeMd80Register(
 			id, mab::Md80Reg_E::motorCalibrationMode, regW.RW.motorCalibrationMode))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorCalibrationMode);
-
-	if (!candle->writeMd80Register(id,
-								   mab::Md80Reg_E::homingMode,
-								   regW.RW.homingMode,
-								   mab::Md80Reg_E::homingMaxTravel,
-								   floatFromField("homing", "max travel"),
-								   mab::Md80Reg_E::homingTorque,
-								   floatFromField("homing", "max torque"),
-								   mab::Md80Reg_E::homingVelocity,
-								   floatFromField("homing", "max velocity")))
-		ui::printFailedToSetupMotor(mab::Md80Reg_E::homingMode);
 
 	if (!candle->writeMd80Register(id,
 								   mab::Md80Reg_E::maxTorque,
@@ -1057,23 +1030,6 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 
 	readIni["impedance PD"]["kp"] = floatToString(regR.RW.impedancePdGains.kp);
 	readIni["impedance PD"]["kd"] = floatToString(regR.RW.impedancePdGains.kd);
-
-	/* Motor config - homing section */
-	if (!candle->readMd80Register(id,
-								  mab::Md80Reg_E::homingMode,
-								  regR.RW.homingMode,
-								  mab::Md80Reg_E::homingMaxTravel,
-								  regR.RW.homingMaxTravel,
-								  mab::Md80Reg_E::homingVelocity,
-								  regR.RW.homingVelocity,
-								  mab::Md80Reg_E::homingTorque,
-								  regR.RW.homingTorque))
-		ui::printFailedToReadMotorConfig(mab::Md80Reg_E::homingTorque);
-
-	readIni["homing"]["mode"]		  = ui::homingModes[regR.RW.homingMode];
-	readIni["homing"]["max travel"]	  = floatToString(regR.RW.homingMaxTravel);
-	readIni["homing"]["max torque"]	  = floatToString(regR.RW.homingTorque);
-	readIni["homing"]["max velocity"] = floatToString(regR.RW.homingVelocity);
 
 	/* Saving motor config to file */
 	if (saveConfig)
