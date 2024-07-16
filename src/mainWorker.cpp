@@ -786,9 +786,9 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 								   regW.RW.gearRatio,
 								   mab::Md80Reg_E::motorIMax,
 								   regW.RW.iMax,
-								   mab::Md80Reg_E::motorTorgueBandwidth,
+								   mab::Md80Reg_E::motorTorqueBandwidth,
 								   regW.RW.torqueBandwidth))
-		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorTorgueBandwidth);
+		ui::printFailedToSetupMotor(mab::Md80Reg_E::motorTorqueBandwidth);
 
 	/* motor advanced config */
 	if (!candle->writeMd80Register(id,
@@ -911,7 +911,7 @@ void MainWorker::setupReadConfig(std::vector<std::string>& args)
 								  regR.RW.iMax,
 								  mab::Md80Reg_E::motorGearRatio,
 								  regR.RW.gearRatio,
-								  mab::Md80Reg_E::motorTorgueBandwidth,
+								  mab::Md80Reg_E::motorTorqueBandwidth,
 								  regR.RW.torqueBandwidth,
 								  mab::Md80Reg_E::motorKV,
 								  regR.RW.motorKV))
