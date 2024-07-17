@@ -794,7 +794,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!candle->writeMd80Register(id,
 								   mab::Md80Reg_E::motorFriction,
 								   regW.RW.friction,
-								   mab::Md80Reg_E::motorStiction,
+								   mab::Md80Reg_E::motorStriction,
 								   regW.RW.stiction,
 								   mab::Md80Reg_E::motorKt_a,
 								   regW.RW.motorKt_a,
