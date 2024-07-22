@@ -299,6 +299,10 @@ namespace ui
 					return "HW20";
 				case 3:
 					return "HW21";
+				case 4:
+					return "HW30";
+				case 5:
+					return "HD10";
 				default:
 					return "UNKNOWN";
 			}
