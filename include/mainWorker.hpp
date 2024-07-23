@@ -52,7 +52,6 @@ class MainWorker
 
 	void setupCalibration(std::vector<std::string>& args);
 	void setupCalibrationOutput(std::vector<std::string>& args);
-	void setupHoming(std::vector<std::string>& args);
 	void setupInfo(std::vector<std::string>& args);
 	void setupMotor(std::vector<std::string>& args);
 	void setupReadConfig(std::vector<std::string>& args);

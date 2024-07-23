@@ -115,7 +115,6 @@ namespace ui
 			 << std::endl;
 		vout << "\t motor [id] [*.cfg] \t\t\tloads selected motor config." << std::endl;
 		vout << "\t info  [id] \t\t\t\tprints detailed info about controller." << std::endl;
-		vout << "\t homing   [id]        \t\t\tstarts the homing routine" << std::endl;
 		vout << std::endl;
 		vout << "For more information please refer to the manual:"
 			 << GREEN(" https://mabrobotics.pl/servos/manual") << std::endl;
@@ -300,8 +299,10 @@ namespace ui
 					return "HW20";
 				case 3:
 					return "HW21";
-        case 4:
-				  return "HW30";
+				case 4:
+					return "HW30";
+				case 5:
+					return "HD10";
 				default:
 					return "UNKNOWN";
 			}
@@ -353,7 +354,7 @@ namespace ui
 		vout << "- torque bandwidth: " << drive.getReadReg().RW.torqueBandwidth << " Hz"
 			 << std::endl;
 		vout << "- CAN watchdog: " << drive.getReadReg().RW.canWatchdog << " ms" << std::endl;
-		vout << "- brake mode: " << getListElement(brakeModes, drive.getReadReg().RW.brakeMode)
+		vout << "- GPIO mode: " << getListElement(GPIOmodes, drive.getReadReg().RW.userGpioConfiguration)
 			 << std::endl;
 
 		if (printAll)
@@ -415,21 +416,7 @@ namespace ui
 			}
 		}
 
-		vout << "- homing: "
-			 << (drive.getReadReg().RW.homingMode
-					 ? getListElement(homingModes, drive.getReadReg().RW.homingMode)
-					 : "off")
-			 << std::endl;
-
-		if (drive.getReadReg().RW.homingMode != 0)
-		{
-			vout << "   - homing max travel: " << std::setprecision(2)
-				 << drive.getReadReg().RW.homingMaxTravel << " rad" << std::endl;
-			vout << "   - homing max torque: " << std::setprecision(2)
-				 << drive.getReadReg().RW.homingTorque << " Nm" << std::endl;
-			vout << "   - homing max velocity: " << std::setprecision(2)
-				 << drive.getReadReg().RW.homingVelocity << " rad/s" << std::endl;
-		}
+		
 		vout << "- motion limits: " << std::endl;
 		vout << "   - max torque: " << std::setprecision(2) << drive.getReadReg().RW.maxTorque
 			 << " Nm" << std::endl;
@@ -487,13 +474,6 @@ namespace ui
 		vout << "- motion status: 	0x" << std::hex
 			 << (unsigned short)drive.getReadReg().RO.motionErrors << std::dec;
 		printErrorDetails(drive.getReadReg().RO.motionErrors, motionErrorList);
-
-		if (drive.getReadReg().RW.homingMode != 0)
-		{
-			vout << "- homing status: 	0x" << std::hex
-				 << (unsigned short)drive.getReadReg().RO.homingErrors << std::dec;
-			printErrorDetails(drive.getReadReg().RO.homingErrors, homingErrorList);
-		}
 	}
 
 	void printErrorDetails(uint32_t error, const std::vector<std::string>& errorList)
