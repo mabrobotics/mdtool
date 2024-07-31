@@ -32,7 +32,7 @@ _mdtool_complete()
 			COMPREPLY=( $(compgen -W "read write" -- $cur) )
 			;; 
 			"setup")
-			COMPREPLY=( $(compgen -W "calibration calibration_out homing info motor read_config" -- $cur) )
+			COMPREPLY=( $(compgen -W "calibration calibration_out info motor read_config" -- $cur) )
 			;;
 			"test")
 			COMPREPLY=( $(compgen -W "encoder latency move" -- $cur) )

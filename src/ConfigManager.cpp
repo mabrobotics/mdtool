@@ -9,7 +9,7 @@
 
 #include "dirent.h"
 
-ConfigManager::ConfigManager(std::string userPath) : userConfigPath(userConfigPath)
+ConfigManager::ConfigManager(std::string userPath)
 {
 	update();
 	if (isConfigDefault(defaultConfigFileName) && isConifgDifferent(defaultConfigFileName))
