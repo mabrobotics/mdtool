@@ -289,6 +289,8 @@ MainWorker::MainWorker(std::vector<std::string>& args)
 		{
 			if (option == toolsOptions_E::CALIBRATION)
 				setupCalibration(args);
+			else if (option == toolsOptions_E::CALIBRATION_OUTPUT)
+				setupCalibrationOutput(args);
 			else if (option == toolsOptions_E::INFO)
 				setupInfo(args);
 			else if (option == toolsOptions_E::MOTOR)
@@ -794,7 +796,7 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 	if (!candle->writeMd80Register(id,
 								   mab::Md80Reg_E::motorFriction,
 								   regW.RW.friction,
-								   mab::Md80Reg_E::motorStriction,
+								   mab::Md80Reg_E::motorStiction,
 								   regW.RW.stiction,
 								   mab::Md80Reg_E::motorKt_a,
 								   regW.RW.motorKt_a,
