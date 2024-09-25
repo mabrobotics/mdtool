@@ -82,7 +82,7 @@ namespace ui
 												   "M24B_CENTER",
 												   "M24B_OFFAXIS"};
 	const std::vector<std::string> encoderModes = {
-		"NONE", "STARTUP", "MOTION", "REPORT", "MAIN", "CALIBRATED_REPORT"};
+		"NONE", "STARTUP", "MOTION", "REPORT", "MAIN", "CALIBRATED_REPORT", "DUAL_RLS"};
 	const std::vector<std::string> encoderCalibrationModes = {"FULL", "DIRONLY"};
 	const std::vector<std::string> motorCalibrationModes   = {"FULL", "NOPPDET"};
 	const std::vector<std::string> GPIOmodes			   = {"OFF", "BRAKE", "GPIO INPUT"};
