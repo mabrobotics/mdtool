@@ -763,13 +763,18 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 
 	regW.RW.outputEncoderDefaultBaud =
 		atoi(cfg["output encoder"]["output encoder default baud"].c_str());
+
 	regW.RW.outputEncoder =
 		getNumericParamFromList(cfg["output encoder"]["output encoder"], ui::encoderTypes);
+	if (regW.RW.outputEncoder == 0)	 // aka NONE
+		regW.RW.outputEncoder =
+			getNumericParamFromList(cfg["output encoder"]["output encoder"], ui::encoderTypesLegacy);
+
 	regW.RW.outputEncoderMode =
 		getNumericParamFromList(cfg["output encoder"]["output encoder mode"], ui::encoderModes);
 	regW.RW.outputEncoderCalibrationMode = getNumericParamFromList(
 		cfg["output encoder"]["output encoder calibration mode"], ui::encoderCalibrationModes);
-	regW.RW.userGpioConfiguration  = getNumericParamFromList(cfg["GPIO"]["mode"], ui::GPIOmodes);
+	regW.RW.userGpioConfiguration = getNumericParamFromList(cfg["GPIO"]["mode"], ui::GPIOmodes);
 
 	auto floatFromField = [&](const char* category, const char* field) -> float
 	{ return atof(cfg[category][field].c_str()); };
@@ -876,7 +881,8 @@ void MainWorker::setupMotor(std::vector<std::string>& args)
 								   floatFromField("profile", "velocity")))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::positionLimitMin);
 
-	if (!candle->writeMd80Register(id, mab::Md80Reg_E::userGpioConfiguration, regW.RW.userGpioConfiguration))
+	if (!candle->writeMd80Register(
+			id, mab::Md80Reg_E::userGpioConfiguration, regW.RW.userGpioConfiguration))
 		ui::printFailedToSetupMotor(mab::Md80Reg_E::userGpioConfiguration);
 
 	candle->configMd80Save(id);

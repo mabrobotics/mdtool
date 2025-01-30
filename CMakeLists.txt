@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CXX_STANDARD 14)
 
-set(MDTOOL_VERSION 1.5.1)
+set(MDTOOL_VERSION 1.5.2)
+
 set(MDTOOL_VERSION_TAG 'r')
 
 if(NOT DEFINED ARCH)

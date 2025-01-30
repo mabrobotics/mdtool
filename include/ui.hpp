@@ -74,15 +74,22 @@ namespace ui
 	constexpr float mainEncoderStdDevMax = 0.012f;
 	constexpr float mainEncoderMaxError	 = 0.05f;
 
-	const std::vector<std::string> encoderTypes = {"NONE",
+	const std::vector<std::string> encoderTypesLegacy = {"NONE",
 												   "AS5047_CENTER",
 												   "AS5047_OFFAXIS",
 												   "MB053SFA17BENT00",
 												   "CM_OFFAXIS",
 												   "M24B_CENTER",
 												   "M24B_OFFAXIS"};
+	const std::vector<std::string> encoderTypes = {"NONE",
+												   "ME_AS_CENTER",
+												   "ME_AS_OFFAXIS",
+												   "MB053SFA17BENT00",
+												   "CM_OFFAXIS",
+												   "M24B_CENTER",
+												   "M24B_OFFAXIS"};
 	const std::vector<std::string> encoderModes = {
-		"NONE", "STARTUP", "MOTION", "REPORT", "MAIN", "CALIBRATED_REPORT"};
+		"NONE", "STARTUP", "MOTION", "REPORT", "MAIN", "CALIBRATED_REPORT", "DUAL_RLS"};
 	const std::vector<std::string> encoderCalibrationModes = {"FULL", "DIRONLY"};
 	const std::vector<std::string> motorCalibrationModes   = {"FULL", "NOPPDET"};
 	const std::vector<std::string> GPIOmodes			   = {"OFF", "BRAKE", "GPIO INPUT"};
