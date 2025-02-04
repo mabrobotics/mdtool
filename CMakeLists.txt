@@ -39,7 +39,7 @@ add_subdirectory(candle)
 set(CMAKE_BUILD_TYPE Release)
 
 add_executable(${PROJECT_NAME} ${SRC})
-target_link_libraries(${PROJECT_NAME} candle)
+target_link_libraries(${PROJECT_NAME} candle -static-libgcc -static-libstdc++)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/candle/include ${CMAKE_SOURCE_DIR}/3rd_party/mINI/src)
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "mdtool")
 
