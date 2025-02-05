@@ -14,14 +14,14 @@ jobs:
         container:
             image: klonyyy/armnoneeabi:2
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
               with:
                 submodules: recursive
                 # token: ${{ secrets.PAT }}
             - name: build_step
               shell: bash
               run: ./release.sh
-            - uses: actions/upload-artifact@v3
+            - uses: actions/upload-artifact@v4
               with:
                 name: MDtool
                 path: build/packages/*
