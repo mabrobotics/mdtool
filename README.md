@@ -1,3 +1,8 @@
+# Legacy warning
+This is most likely the final release of mdtool, it is now considered Legacy. We will still provide
+technical support for candle library and mdtool, guaranteed at least until 2026. 
+Further development of the CANdle Ecosystem is going to happen through [CANdle-SDK](https://github.com/mabrobotics/CANdle-SDK)
+
 # MDtool
 ![example workflow](https://github.com/mabrobotics/mdtool/actions/workflows/build.yaml/badge.svg)
 
