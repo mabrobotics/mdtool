@@ -10,7 +10,7 @@ on:
 jobs:
     # The job that will use the container image you just pushed to ghcr.io
     build:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-latest
         container:
             image: klonyyy/armnoneeabi:2
         steps:
